@@ -85,10 +85,10 @@ export async function getAllCourseForEbook(title?: any) {
 
 function getCoursesGql(fortaxLaw: boolean, isActive: boolean) {
 
-    // var currentDate = JSON.parse(stringified);
     return gql`query {
       courses( 
         pagination: { limit: -1 }, 
+         sort: ["startDate:desc"],
         filters : {
           isActive: { eq: ${isActive}}, 
           forTaxLaw: { eq: ${fortaxLaw} },
@@ -210,6 +210,8 @@ function getCoursesWithTitleGql(
       courses( 
         
         pagination: { limit: -1 }, 
+         sort: ["startDate:desc"],
+
         filters : {
           isActive: { eq: ${isActive}}, 
           forTaxLaw: { eq: ${fortaxLaw} },
@@ -312,7 +314,7 @@ function getCoursesWithTitleGql(
 
 function getCoursesDetail(slug: string) {
     return gql`query {
-    courses(filters:{slug:{eq:"${slug}"}}) {
+    courses( sort: ["startDate:desc"],filters:{slug:{eq:"${slug}"}}) {
       data {
         id
          
@@ -461,7 +463,8 @@ function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
 
     return gql`query {
         courses(
-            pagination: { limit: -1 }
+            pagination: { limit: -1 },
+             sort: ["startDate:desc"],
             filters: {
             isActive: { eq: ${isActive} }
             forTaxLaw: { eq: ${fortaxLaw} }
@@ -548,6 +551,7 @@ function getCoursesRecordedTitleGql(fortaxLaw: boolean, isActive: boolean) {
       courses( 
         
         pagination: { limit: -1 }, 
+         sort: ["startDate:desc"],
         filters : {
           isActive: { eq: ${isActive}}, 
           forTaxLaw: { eq: ${fortaxLaw} },
@@ -632,6 +636,7 @@ function getCourseBookTitleGql(fortaxLaw: boolean, isActive: boolean) {
       courses( 
         
         pagination: { limit: -1 }, 
+         sort: ["startDate:desc"],
         filters : {
           isActive: { eq: ${isActive}}, 
           forTaxLaw: { eq: ${fortaxLaw} },

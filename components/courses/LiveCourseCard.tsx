@@ -4,6 +4,7 @@ import { imageUrl } from '@/lib/constants'
 import moment from "moment-timezone";
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import PaginationComponent from './PaginationComponent';
 
 const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
     const timezone = moment.tz.guess();
@@ -13,6 +14,11 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
     const twoLettertimezone = firstLetter + lastLetter;
 
     const [filterCourse, setFilterCourse] = useState<any>([]);
+
+    const itemsPerPage = 9;
+
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
 
     async function getDataByFilterValueChanges() {
 
@@ -54,6 +60,7 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
         })
 
         setFilterCourse(filterCourse)
+        setTotalPages(Math.ceil(filterCourse.length / itemsPerPage));
     }
 
     useEffect(() => {
@@ -64,11 +71,11 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
 
         <div className="flex gap-5 ml-1 mt-6">
 
-            <div className="w-full flex  content-start flex-wrap gap-2">
+            <div className="w-full flex flex-col  content-start flex-wrap gap-2">
 
                 <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 mb-5 gap-6">
                     {
-                        filterCourse.length > 0 ? filterCourse.map((course: any, index: number) => (
+                        filterCourse.length > 0 ? filterCourse.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage).map((course: any, index: number) => (
                             <div
                                 key={index}
                                 className="course-container flex flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-sky-500">
@@ -164,10 +171,14 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                             </div>
                         )) : <div>No Record</div>
                     }
-
                 </section >
+                <PaginationComponent
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                />
             </div>
-        </div >
+        </div>
 
     )
 }

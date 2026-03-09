@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import moment from "moment-timezone";
 import Link from 'next/link';
 import { imageUrl } from '@/lib/constants';
+import PaginationComponent from './PaginationComponent';
 
 
 const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
@@ -12,6 +13,10 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
     const firstLetter = timezoneAbbrv.charAt(0);
     const lastLetter = timezoneAbbrv.charAt(timezoneAbbrv.length - 1);
     const twoLettertimezone = firstLetter + lastLetter;
+
+    const itemsPerPage = 9;
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
 
     const [filterCourse, setFilterCourse] = useState<any>([]);
 
@@ -55,6 +60,8 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
         })
 
         setFilterCourse(filterCourse)
+
+        setTotalPages(Math.ceil(filterCourse.length / itemsPerPage));
     }
 
     useEffect(() => {
@@ -69,7 +76,7 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
 
                 <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 mb-5 gap-6">
                     {
-                        filterCourse.length > 0 ? filterCourse.map((course: any, index: number) => (
+                        filterCourse.length > 0 ? filterCourse.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage).map((course: any, index: number) => (
                             <div
                                 key={index}
                                 className="course-container flex flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-gray-500">
@@ -166,6 +173,11 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                     }
 
                 </section >
+                <PaginationComponent
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                />
             </div>
         </div >
 

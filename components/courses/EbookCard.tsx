@@ -3,9 +3,14 @@
 import React, { useEffect, useState } from 'react'
 import { imageUrl } from '@/lib/constants';
 import Link from 'next/link';
+import PaginationComponent from './PaginationComponent';
 
 const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
     const [filterCourse, setFilterCourse] = useState<any>([]);
+
+    const itemsPerPage = 9;
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
 
     async function getDataByFilterValueChanges() {
 
@@ -47,6 +52,8 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
         })
 
         setFilterCourse(filterCourse)
+
+        setTotalPages(Math.ceil(filterCourse.length / itemsPerPage));
     }
 
     useEffect(() => {
@@ -60,7 +67,7 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
 
                 <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 mb-5 gap-6">
                     {
-                        filterCourse.length > 0 ? filterCourse.map((course: any, index: number) => (
+                        filterCourse.length > 0 ? filterCourse.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage).map((course: any, index: number) => (
                             <div
                                 key={index}
                                 className="course-container flex flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-gray-500">
@@ -135,6 +142,11 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
                         )) : <div>No Record</div>
                     }
                 </section>
+                <PaginationComponent
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                />
             </div>
         </div>
     )

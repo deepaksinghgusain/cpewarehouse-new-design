@@ -5,6 +5,8 @@ import FilterCourse from './FilterCourse';
 import { getAllCourseForEbook, getAllCoursesForLive, getAllCoursesForRecorded } from '@/services/course';
 import LiveCourseCard from './LiveCourseCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import SelfStudyCard from './SelfStudyCard';
+import EbookCard from './EbookCard';
 
 const CourseCatalog = () => {
 
@@ -88,10 +90,10 @@ const CourseCatalog = () => {
                         <LiveCourseCard courses={course.liveCourseListing} filterValue={filterValue} />
                     </TabsContent>
                     <TabsContent value="Self-Study">
-                        <LiveCourseCard courses={course.selfStudyCourseListing} filterValue={filterValue} />
+                        <SelfStudyCard courses={course.selfStudyCourseListing} filterValue={filterValue} />
                     </TabsContent>
                     <TabsContent value="eBook">
-                        <LiveCourseCard courses={course.ebookCourseListing} filterValue={filterValue} />
+                        <EbookCard courses={course.ebookCourseListing} filterValue={filterValue} />
                     </TabsContent>
                     <TabsContent value="Free CPE">
                         <LiveCourseCard courses={course.freeCourseListing} filterValue={filterValue} />

@@ -63,7 +63,7 @@ const AboutPage = async () => {
                   </div>
                   <div className="w-5 h-5 relative  overflow-hidden">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M17.5 7.50001L17.5 2.50001M17.5 2.50001H12.5M17.5 2.50001L10 10M8.33333 2.5H6.5C5.09987 2.5 4.3998 2.5 3.86502 2.77248C3.39462 3.01217 3.01217 3.39462 2.77248 3.86502C2.5 4.3998 2.5 5.09987 2.5 6.5V13.5C2.5 14.9001 2.5 15.6002 2.77248 16.135C3.01217 16.6054 3.39462 16.9878 3.86502 17.2275C4.3998 17.5 5.09987 17.5 6.5 17.5H13.5C14.9001 17.5 15.6002 17.5 16.135 17.2275C16.6054 16.9878 16.9878 16.6054 17.2275 16.135C17.5 15.6002 17.5 14.9001 17.5 13.5V11.6667" stroke="#344054" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M17.5 7.50001L17.5 2.50001M17.5 2.50001H12.5M17.5 2.50001L10 10M8.33333 2.5H6.5C5.09987 2.5 4.3998 2.5 3.86502 2.77248C3.39462 3.01217 3.01217 3.39462 2.77248 3.86502C2.5 4.3998 2.5 5.09987 2.5 6.5V13.5C2.5 14.9001 2.5 15.6002 2.77248 16.135C3.01217 16.6054 3.39462 16.9878 3.86502 17.2275C4.3998 17.5 5.09987 17.5 6.5 17.5H13.5C14.9001 17.5 15.6002 17.5 16.135 17.2275C16.6054 16.9878 16.9878 16.6054 17.2275 16.135C17.5 15.6002 17.5 14.9001 17.5 13.5V11.6667" stroke="#344054" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </div>
@@ -89,7 +89,7 @@ const AboutPage = async () => {
             portfolio.section.length > 0 && portfolio.section.map((item: any, index: number) => {
 
               if (index == 0) {
-                return <div className="about-container-1 self-stretch px-8 justify-start items-center gap-24 inline-flex">
+                return <div key={index} className="about-container-1 self-stretch px-8 justify-start items-center gap-24 inline-flex">
                   <div className="grow shrink basis-0 flex-col justify-start items-start gap-8 inline-flex">
                     <div className="self-stretch h-[110px] flex-col justify-start items-start gap-5 flex">
                       <div className="self-stretch h-[110px] flex-col justify-start items-start gap-4 flex">
@@ -100,11 +100,11 @@ const AboutPage = async () => {
                     <div className="self-stretch h-64 pl-4 flex-col justify-start items-start gap-5 flex">
                       {
                         item.list.length > 0 && item.list.map((list: any, index: number) => (
-                          <div className="self-stretch justify-start items-start gap-3 inline-flex">
+                          <div key={index} className="self-stretch justify-start items-start gap-3 inline-flex">
                             <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
                               <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
                                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M8.7487 13.9999L12.2487 17.4999L19.2487 10.4999M25.6654 13.9999C25.6654 20.4432 20.442 25.6666 13.9987 25.6666C7.55538 25.6666 2.33203 20.4432 2.33203 13.9999C2.33203 7.5566 7.55538 2.33325 13.9987 2.33325C20.442 2.33325 25.6654 7.5566 25.6654 13.9999Z" stroke="#2970FF" stroke-width="2.33333" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M8.7487 13.9999L12.2487 17.4999L19.2487 10.4999M25.6654 13.9999C25.6654 20.4432 20.442 25.6666 13.9987 25.6666C7.55538 25.6666 2.33203 20.4432 2.33203 13.9999C2.33203 7.5566 7.55538 2.33325 13.9987 2.33325C20.442 2.33325 25.6654 7.5566 25.6654 13.9999Z" stroke="#2970FF" strokeWidth="2.33333" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </div>
                             </div>
@@ -121,7 +121,7 @@ const AboutPage = async () => {
                         <div className="text-[#db6803] text-lg font-semibold font-['Inter'] leading-7">Learn more</div>
                         <div className="w-6 h-6 relative  overflow-hidden">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15.0002 15.0001V9.00005M15.0002 9.00005H9.00019M15.0002 9.00005L9.00019 14.9999M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z" stroke="#DC6803" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M15.0002 15.0001V9.00005M15.0002 9.00005H9.00019M15.0002 9.00005L9.00019 14.9999M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z" stroke="#DC6803" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                       </div>
@@ -132,7 +132,7 @@ const AboutPage = async () => {
               }
 
               if (index == 1) {
-                return <div className="about-container-2 self-stretch px-8 justify-start items-center gap-24 inline-flex">
+                return <div key={index} className="about-container-2 self-stretch px-8 justify-start items-center gap-24 inline-flex">
                   <img className="h-[512px] relative" src={imageUrl + item.image.data.attributes.url} />
                   <div className="grow shrink basis-0 flex-col justify-start items-start gap-8 inline-flex">
                     <div className="self-stretch h-[110px] flex-col justify-start items-start gap-5 flex">
@@ -148,7 +148,7 @@ const AboutPage = async () => {
                             <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
                               <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
                                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M8.7487 13.9999L12.2487 17.4999L19.2487 10.4999M25.6654 13.9999C25.6654 20.4432 20.442 25.6666 13.9987 25.6666C7.55538 25.6666 2.33203 20.4432 2.33203 13.9999C2.33203 7.5566 7.55538 2.33325 13.9987 2.33325C20.442 2.33325 25.6654 7.5566 25.6654 13.9999Z" stroke="#2970FF" stroke-width="2.33333" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M8.7487 13.9999L12.2487 17.4999L19.2487 10.4999M25.6654 13.9999C25.6654 20.4432 20.442 25.6666 13.9987 25.6666C7.55538 25.6666 2.33203 20.4432 2.33203 13.9999C2.33203 7.5566 7.55538 2.33325 13.9987 2.33325C20.442 2.33325 25.6654 7.5566 25.6654 13.9999Z" stroke="#2970FF" strokeWidth="2.33333" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </div>
                             </div>
@@ -165,7 +165,7 @@ const AboutPage = async () => {
                         <div className="text-[#db6803] text-lg font-semibold font-['Inter'] leading-7">Learn more</div>
                         <div className="w-6 h-6 relative  overflow-hidden">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15.0002 15.0001V9.00005M15.0002 9.00005H9.00019M15.0002 9.00005L9.00019 14.9999M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z" stroke="#DC6803" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M15.0002 15.0001V9.00005M15.0002 9.00005H9.00019M15.0002 9.00005L9.00019 14.9999M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z" stroke="#DC6803" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                       </div>
@@ -176,7 +176,7 @@ const AboutPage = async () => {
               }
 
               if (index == 2) {
-                return <div className="about-container-3 self-stretch px-8 justify-start items-center gap-24 inline-flex">
+                return <div key={index} className="about-container-3 self-stretch px-8 justify-start items-center gap-24 inline-flex">
                   <div className="grow shrink basis-0 flex-col justify-start items-start gap-8 inline-flex">
                     <div className="self-stretch h-[110px] flex-col justify-start items-start gap-5 flex">
                       <div className="self-stretch h-[110px] flex-col justify-start items-start gap-4 flex">
@@ -191,7 +191,7 @@ const AboutPage = async () => {
                             <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
                               <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
                                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M8.7487 13.9999L12.2487 17.4999L19.2487 10.4999M25.6654 13.9999C25.6654 20.4432 20.442 25.6666 13.9987 25.6666C7.55538 25.6666 2.33203 20.4432 2.33203 13.9999C2.33203 7.5566 7.55538 2.33325 13.9987 2.33325C20.442 2.33325 25.6654 7.5566 25.6654 13.9999Z" stroke="#2970FF" stroke-width="2.33333" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M8.7487 13.9999L12.2487 17.4999L19.2487 10.4999M25.6654 13.9999C25.6654 20.4432 20.442 25.6666 13.9987 25.6666C7.55538 25.6666 2.33203 20.4432 2.33203 13.9999C2.33203 7.5566 7.55538 2.33325 13.9987 2.33325C20.442 2.33325 25.6654 7.5566 25.6654 13.9999Z" stroke="#2970FF" strokeWidth="2.33333" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </div>
                             </div>

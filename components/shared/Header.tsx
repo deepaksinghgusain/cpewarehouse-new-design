@@ -13,14 +13,11 @@ export const Header = () => {
 
         let logo = `${process.env.NEXT_PUBLIC_IMAGE_END_POINT}` + response?.data?.attributes?.headerLogo?.data?.attributes?.url;
 
-        console.log(logo);
-
-
         setLogo(logo)
     }
 
     useEffect(() => {
-        // getHeaderData();
+        getHeaderData();
     }, [])
 
     return (
@@ -29,9 +26,9 @@ export const Header = () => {
                 <header className="flex sticky px-2 py-2 mt-4 top-0 bg-white z-50 w-[100%]">
                     <nav className="flex justify-between gap-8">
                         <div className="flex items-center w-[300px]">
-                            <a href="/">
+                            <Link href="/">
                                 <Image src={logo} alt="LOGO" height={200} width={200} />
-                            </a>
+                            </Link>
                         </div>
                         <div className="relative pr-3 md:pr-0 py-1 lg:w-[600px]">
                             <div className="justify-start items-center gap-4 flex w-full">
@@ -54,18 +51,18 @@ export const Header = () => {
                         </div >
 
                         <div className='flex justify-end w-[400px] gap-8 items-center'>
-                            <a href="/checkout"
+                            <Link href="/checkout"
                                 className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7 flex items-center">
                                 <Image src="/assets/images/cart.gif" height={30} width={30} className="h-[30px] w-[30px]" alt="" />
-                            </a>
+                            </Link>
 
-                            <a href="/login" className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7">Log in</a>
+                            <Link href="/login" className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7">Log in</Link>
 
                             <div
                                 className="px-4 py-2.5 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                                 <div className="px-0.5 justify-center items-center flex">
-                                    <a href="/register" className="text-white text-lg font-semibold font-['Inter'] leading-7">Create
-                                        profile</a>
+                                    <Link href="/register" className="text-white text-lg font-semibold font-['Inter'] leading-7">Create
+                                        profile</Link>
                                 </div>
                             </div>
                         </div>
@@ -80,17 +77,17 @@ export const Header = () => {
                                     <div
                                         className="px-3 py-2 bg-white rounded-md justify-center items-center gap-2 flex overflow-hidden">
                                         <div className="justify-start items-center gap-3 flex">
-                                            <a href="/course-catalog"
+                                            <Link href="/course-catalog"
                                                 className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Course
-                                                Catalogue</a>
+                                                Catalogue</Link>
                                         </div>
                                     </div>
                                     <div
                                         className="px-3 py-2 bg-white rounded-md justify-start items-center gap-2 flex overflow-hidden">
                                         <div className="justify-start items-center gap-3 flex">
-                                            <a href="/bundle-and-subscription"
+                                            <Link href="/bundle-and-subscription"
                                                 className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Bundles
-                                                & Subcriptions</a>
+                                                & Subcriptions</Link>
                                         </div>
                                     </div>
                                     <div className="h-10 px-3 py-2 rounded-md justify-start items-center gap-2 flex overflow-hidden">
@@ -101,8 +98,8 @@ export const Header = () => {
                                     <div
                                         className="h-11 px-3 py-2  rounded-md justify-start items-center gap-2 flex overflow-hidden">
                                         <div className="grow shrink basis-0 h-7 justify-center items-center gap-3 flex">
-                                            <a href="/about-us"
-                                                className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">About</a>
+                                            <Link href="/about-us"
+                                                className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">About</Link>
                                         </div>
                                     </div>
                                 </div>

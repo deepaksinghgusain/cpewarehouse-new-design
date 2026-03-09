@@ -5,36 +5,21 @@ import { getAllCoursesForLive } from '@/services/course';
 import moment from "moment-timezone";
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import PaginationComponent from './PaginationComponent';
 
-const FreeCourseCard = ({ filterValue }: { filterValue: any }) => {
+const FreeCourseCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
     const timezone = moment.tz.guess();
     const timezoneAbbrv = moment().tz(timezone).format('z');
     const firstLetter = timezoneAbbrv.charAt(0);
     const lastLetter = timezoneAbbrv.charAt(timezoneAbbrv.length - 1);
     const twoLettertimezone = firstLetter + lastLetter;
 
-    const [courses, setCourses] = useState<any>([]);
     const [filterCourse, setFilterCourse] = useState<any>([]);
 
-    async function getCourse() {
-        let resCourse: any = await getAllCoursesForLive();
+    const itemsPerPage = 9;
 
-        let freeCourse: any = [];
-
-        const courseListing = resCourse.data;
-
-        courseListing.forEach((element: any) => {
-            let priceCheck = element?.attributes?.price;
-            let forTaxLawCheck = element?.attributes?.forTaxLaw;
-            let isActiveCheck = element?.attributes?.isActive;
-            if (priceCheck < 1 && forTaxLawCheck === true && isActiveCheck === true) {
-                freeCourse.push(element)
-            }
-        });
-
-        setCourses([...freeCourse])
-        setFilterCourse([...freeCourse])
-    }
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
 
     function getDataByFilterValueChanges() {
         const filterCourse = courses.filter((course: any) => {
@@ -75,17 +60,14 @@ const FreeCourseCard = ({ filterValue }: { filterValue: any }) => {
         })
 
         setFilterCourse(filterCourse)
+
+        setTotalPages(Math.ceil(filterCourse.length / itemsPerPage));
     }
 
     useEffect(() => {
         if (filterValue.cpe_credit !== null || filterValue.field_of_study !== null) {
             getDataByFilterValueChanges();
         }
-
-        if (courses.length === 0) {
-            getCourse();
-        }
-
     }, [filterCourse.length, filterValue.field_of_study, filterValue.cpe_credit])
 
     return (
@@ -96,7 +78,7 @@ const FreeCourseCard = ({ filterValue }: { filterValue: any }) => {
 
                 <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 mb-5 gap-6">
                     {
-                        filterCourse.length > 0 ? filterCourse.map((course: any, index: number) => (
+                        filterCourse.length > 0 ? filterCourse.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage).map((course: any, index: number) => (
                             <div
                                 key={index}
                                 className="course-container flex flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-sky-500">
@@ -194,6 +176,11 @@ const FreeCourseCard = ({ filterValue }: { filterValue: any }) => {
                     }
 
                 </section >
+                <PaginationComponent
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                />
             </div>
         </div >
 
