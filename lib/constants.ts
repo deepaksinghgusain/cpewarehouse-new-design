@@ -1,0 +1,1 @@
+export let imageUrl: string = `${process.env.NEXT_PUBLIC_IMAGE_END_POINT}`;

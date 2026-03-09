@@ -124,3 +124,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+.about-container-1 {
+    background: url('/assets/images/about-container-1.jpg') lightgray 50% / cover no-repeat;
+}
+
+.about-container-2 {
+    background: url('/assets/images/about-container-2.jpg') lightgray 50% / cover no-repeat;
+}
+
+.about-container-3 {
+    background: url('/assets/images/about-container-3.jpg') lightgray 50% / cover no-repeat;
+}

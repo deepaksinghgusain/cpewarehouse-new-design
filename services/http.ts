@@ -1,3 +1,5 @@
+import { ApiResponse } from "./common";
+
 type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: HeadersInit;
@@ -6,10 +8,10 @@ type FetchOptions = {
   revalidate?: number;
 };
 
-export async function apiFetch<T>(
+export async function apiFetch(
   url: string,
   options: FetchOptions = {}
-): Promise<T> {
+): Promise<any> {
   const {
     method = "GET",
     headers = {},
@@ -33,5 +35,7 @@ export async function apiFetch<T>(
     throw new Error(`Error: ${res.status}`);
   }
 
-  return res.json();
+  let result: ApiResponse = await res.json();
+
+  return result
 }

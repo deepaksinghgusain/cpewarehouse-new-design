@@ -2,6 +2,7 @@
 
 import { getCommonData } from '@/services/common';
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 
 const imageUrl = `${process.env.NEXT_PUBLIC_IMAGE_END_POINT}`
@@ -11,12 +12,8 @@ export const Footer = () => {
   const [footerMiddle, setFooterMiddle] = useState<any>({})
   const [footerBottom, setFooterBottom] = useState<any>({})
 
-
   const getFooterData = async () => {
     const response: any = await getCommonData()
-
-    console.log(response);
-    
 
     if (response) {
       setFooterTop(response.data.attributes.footer_top)
@@ -45,18 +42,15 @@ export const Footer = () => {
               {footerTop.sub_title}
             </p>
           </div>
-          <a href={footerTop?.button?.href}
+          <Link href={footerTop?.button?.href ?? ""}
             className="bg-[#2970fe] text-white text-sm font-medium px-5 py-2 rounded-full shadow hover:bg-indigo-700">
             {footerTop?.button?.label}
-          </a>
+          </Link>
         </div>
-
-
-
 
         {
           footerMiddle?.length > 0 &&
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 px-8 py-10 text-sm text-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 px-8 py-10 text-sm text-gray-700">
             {
               footerMiddle.map((list: any, index: number) => (
                 <div key={index}>
@@ -66,9 +60,9 @@ export const Footer = () => {
                     {
                       list.item.length > 0 && list.item.map((item: any, index: number) => (
                         <li key={index}>
-                          <a href="{{ item.href }}" className="hover:underline">
-                            {item.icon.data ? <Image src={ imageUrl + item.icon?.data?.attributes?.url } alt="icon" height={15} width={15}  /> : item.label}
-                          </a>
+                          <Link href={item.href ?? "" } className="hover:underline">
+                            {item.icon.data ? <Image src={imageUrl + item.icon?.data?.attributes?.url} alt="icon" height={15} width={15} /> : item.label}
+                          </Link>
                         </li>
                       ))
                     }
@@ -79,7 +73,6 @@ export const Footer = () => {
           </div>
         }
 
-
         <div className="flex justify-between items-center px-8 py-6 border-t border-gray-200 text-sm text-gray-500">
           <div className="flex items-center space-x-2">
             {footerBottom?.image?.data?.attributes?.url && <Image src={imageUrl + footerBottom?.image?.data?.attributes?.url} alt="Logo" height={50} width={200} />}
@@ -87,7 +80,6 @@ export const Footer = () => {
           <p>{footerBottom.copyright}</p>
         </div>
       </div>
-
 
     </footer>
   )
