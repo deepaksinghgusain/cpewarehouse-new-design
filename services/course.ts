@@ -6,86 +6,95 @@ import moment from "moment";
 let currentDate = moment().format('YYYY-MM-DD') + 'T00:00:00.000Z'
 
 export async function getCourseDetailPage() {
-    const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/api/pages?populate=deep&filters[slug][$eq]=course-detail";
-    return await apiFetch(url)
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/api/pages?populate=deep&filters[slug][$eq]=course-detail";
+  return await apiFetch(url)
 }
 
 export async function getAllCourses(title?: any) {
-    let search = title || '';
+  let search = title || '';
 
-    if (search !== '') {
-        const { data }: { data: any } = await client.query({
-            query: getCoursesWithTitleGql(true, true, search),
-            fetchPolicy: "network-only",
-        });
+  if (search !== '') {
+    const { data }: { data: any } = await client.query({
+      query: getCoursesWithTitleGql(true, true, search),
+      fetchPolicy: "network-only",
+    });
 
-        return data;
-    } else {
+    return data;
+  } else {
 
-        const { data }: { data: any } = await client.query({
-            query: getCoursesGql(true, true),
-            fetchPolicy: "network-only",
-        });
+    const { data }: { data: any } = await client.query({
+      query: getCoursesGql(true, true),
+      fetchPolicy: "network-only",
+    });
 
-        return data;
-    }
+    return data;
+  }
 
 }
 
 export async function getcoursesBySlug(slug: any) {
-    const { data }: { data: any } = await client.query({
-        query: getCoursesDetail(slug),
-        fetchPolicy: "network-only",
-    });
+  const { data }: { data: any } = await client.query({
+    query: getCoursesDetail(slug),
+    fetchPolicy: "network-only",
+  });
 
-    console.log(data);
+  console.log(data);
 
-    if (!data) return {};
+  if (!data) return {};
 
-    return data?.courses;
-
+  return data?.courses;
 }
 
 
 export async function getAllCoursesForLive() {
-    const { data }: { data: any } = await client.query({
-        query: getCoursesLiveTitleGql(true, true),
-        fetchPolicy: "network-only",
-    });
+  const { data }: { data: any } = await client.query({
+    query: getCoursesLiveTitleGql(true, true),
+    fetchPolicy: "network-only",
+  });
 
-    if (!data) return {};
+  if (!data) return {};
 
-    return data?.courses;
-
+  return data?.courses;
 }
 
 export async function getAllCoursesForRecorded() {
-    const { data }: { data: any } = await client.query({
-        query: getCoursesRecordedTitleGql(true, true),
-        fetchPolicy: "network-only",
-    });
+  const { data }: { data: any } = await client.query({
+    query: getCoursesRecordedTitleGql(true, true),
+    fetchPolicy: "network-only",
+  });
 
-    if (!data) return {};
+  if (!data) return {};
 
-    return data?.courses;
-
+  return data?.courses;
 }
 
 
 export async function getAllCourseForEbook(title?: any) {
-    const { data }: { data: any } = await client.query({
-        query: getCourseBookTitleGql(true, true),
-        fetchPolicy: "network-only",
-    });
+  const { data }: { data: any } = await client.query({
+    query: getCourseBookTitleGql(true, true),
+    fetchPolicy: "network-only",
+  });
 
-    if (!data) return {};
+  if (!data) return {};
 
-    return data?.courses;
+  return data?.courses;
 }
+
+export async function getAllPackages() {
+  const { data }: { data: any } = await client.query({
+    query: packagesonly,
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data?.packages;
+
+} 
 
 function getCoursesGql(fortaxLaw: boolean, isActive: boolean) {
 
-    return gql`query {
+  return gql`query {
       courses( 
         pagination: { limit: -1 }, 
          sort: ["startDate:desc"],
@@ -199,14 +208,14 @@ function getCoursesGql(fortaxLaw: boolean, isActive: boolean) {
 }
 
 function getCoursesWithTitleGql(
-    fortaxLaw: boolean,
-    isActive: boolean,
-    title: string
+  fortaxLaw: boolean,
+  isActive: boolean,
+  title: string
 
 ) {
 
 
-    return gql`query{
+  return gql`query{
       courses( 
         
         pagination: { limit: -1 }, 
@@ -313,7 +322,7 @@ function getCoursesWithTitleGql(
 
 
 function getCoursesDetail(slug: string) {
-    return gql`query {
+  return gql`query {
     courses( sort: ["startDate:desc"],filters:{slug:{eq:"${slug}"}}) {
       data {
         id
@@ -461,7 +470,7 @@ function getCoursesDetail(slug: string) {
 
 function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
 
-    return gql`query {
+  return gql`query {
         courses(
             pagination: { limit: -1 },
              sort: ["startDate:desc"],
@@ -547,7 +556,7 @@ function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
 
 function getCoursesRecordedTitleGql(fortaxLaw: boolean, isActive: boolean) {
 
-    return gql`query{
+  return gql`query{
       courses( 
         
         pagination: { limit: -1 }, 
@@ -632,7 +641,7 @@ function getCoursesRecordedTitleGql(fortaxLaw: boolean, isActive: boolean) {
 
 function getCourseBookTitleGql(fortaxLaw: boolean, isActive: boolean) {
 
-    return gql`query{
+  return gql`query{
       courses( 
         
         pagination: { limit: -1 }, 
@@ -714,3 +723,46 @@ function getCourseBookTitleGql(fortaxLaw: boolean, isActive: boolean) {
       }
     }`;
 }
+
+
+const packagesonly = gql`
+  query {
+    packages {
+      data {
+        attributes {
+          title
+          desc
+          price
+          slug
+          discountedPrice
+
+          valid_till
+
+          category{
+            data{
+              attributes{
+                title
+              }
+            }
+          }
+
+          image {
+            data {
+              attributes {
+                name
+                caption
+                width
+                height
+                url
+                previewUrl
+                alternativeText
+                formats
+                ext
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

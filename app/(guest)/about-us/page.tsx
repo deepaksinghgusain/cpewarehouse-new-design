@@ -144,7 +144,7 @@ const AboutPage = async () => {
                     <div className="self-stretch h-64 pl-4 flex-col justify-start items-start gap-5 flex">
                       {
                         item.list.length > 0 && item.list.map((list: any, index: number) => (
-                          <div className="self-stretch justify-start items-start gap-3 inline-flex">
+                          <div key={index} className="self-stretch justify-start items-start gap-3 inline-flex">
                             <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
                               <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
                                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -17,9 +17,6 @@ export default async function page() {
 
   const homepagefacultymembers = await getInstructorsForHome()
 
-  console.log(homepagefacultymembers);
-
-
   let partners: any;
   let latestnews: any;
   let feature: any;
