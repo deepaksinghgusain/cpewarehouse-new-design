@@ -89,8 +89,20 @@ export async function getAllPackages() {
   if (!data) return {};
 
   return data?.packages;
+}
 
-} 
+export async function GetUserSubscribedCourses(email: string) {
+  const { data }: { data: any } = await client.query({
+    query: getUserCourseGQL(email),
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data?.userCourses;
+
+}
+
 
 function getCoursesGql(fortaxLaw: boolean, isActive: boolean) {
 
@@ -205,6 +217,93 @@ function getCoursesGql(fortaxLaw: boolean, isActive: boolean) {
     }
   }
   `;
+}
+
+function getUserCourseGQL(email: string) {
+  return gql`query{
+     userCourses( sort: ["purchasedOn:desc"],pagination:{limit:-1},filters:{user:{email :{ eq: "${email}"}}}){
+      data{
+        id
+          attributes{
+            status
+            completedOn
+            purchasedOn
+            joinUrl
+            isReviewExamPassed
+            lastVideoView
+            course{
+              data{
+                id
+                  attributes{
+                    title
+                    startDate
+                    endDate
+                    slug
+                    webinarId
+                    videoUrl
+                    credit
+                    medium
+                    fieldOfStudy
+                    programNumber
+                    instructors{
+                      data{
+                        attributes{
+                          firstName
+                          lastName
+                          image {
+                            data {
+                              attributes {
+                                url
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    certificateTemplate {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                    handout {
+                      data {
+                        attributes {
+                          url
+                          name
+                        }
+                      }
+                    }
+                    category {
+                      data {
+                        attributes {
+                          title
+                        }
+                      }
+                    }
+                    image {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                  }
+              }
+            }
+            user{
+              data{
+                id
+                attributes{
+                  username
+                }
+              }
+            }
+          }
+        }  
+      }
+    }`;
 }
 
 function getCoursesWithTitleGql(

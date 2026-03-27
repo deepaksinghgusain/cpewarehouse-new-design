@@ -73,45 +73,41 @@ export const Header = () => {
                         </nav >
                     </header >
 
-                    <section className="">
-                        <div className="container mx-auto">
-                            <div className="h-[72px] px-8 mt-4 justify-center items-center">
-                                <div className="justify-center items-center gap-4 flex">
-                                    <div className="justify-center items-center gap-6 flex">
-                                        <div
-                                            className="px-3 py-2 bg-white rounded-md justify-center items-center gap-2 flex overflow-hidden">
-                                            <div className="justify-start items-center gap-3 flex">
-                                                <Link href="/course-catalog"
-                                                    className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Course
-                                                    Catalogue</Link>
+                    {
+                        !pathname.includes("learner") && <section className="">
+                            <div className="container mx-auto">
+                                <div className="h-[72px] px-8 mt-4 justify-center items-center">
+                                    <div className="justify-center items-center gap-4 flex">
+                                        <div className="justify-center items-center gap-6 flex">
+                                            <div
+                                                className="px-3 py-2 bg-white rounded-md justify-center items-center gap-2 flex overflow-hidden">
+                                                <div className="justify-start items-center gap-3 flex">
+                                                    <Link href="/course-catalog"
+                                                        className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Course
+                                                        Catalogue</Link>
+                                                </div>
+                                            </div>
+                                            <div
+                                                className="px-3 py-2 bg-white rounded-md justify-start items-center gap-2 flex overflow-hidden">
+                                                <div className="justify-start items-center gap-3 flex">
+                                                    <Link href="/bundle-and-subscription"
+                                                        className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Bundles
+                                                        & Subcriptions</Link>
+                                                </div>
+                                            </div>
+                                            <div
+                                                className="h-11 px-3 py-2  rounded-md justify-start items-center gap-2 flex overflow-hidden">
+                                                <div className="grow shrink basis-0 h-7 justify-center items-center gap-3 flex">
+                                                    <Link href="/about-us"
+                                                        className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">About</Link>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div
-                                            className="px-3 py-2 bg-white rounded-md justify-start items-center gap-2 flex overflow-hidden">
-                                            <div className="justify-start items-center gap-3 flex">
-                                                <Link href="/bundle-and-subscription"
-                                                    className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Bundles
-                                                    & Subcriptions</Link>
-                                            </div>
-                                        </div>
-                                        {/* <div className="h-10 px-3 py-2 rounded-md justify-start items-center gap-2 flex overflow-hidden">
-                                            <div className="grow shrink basis-0 h-6 justify-start items-center gap-3 flex">
-                                                <div className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">CPE Forums</div>
-                                            </div>
-                                        </div> */}
-                                        <div
-                                            className="h-11 px-3 py-2  rounded-md justify-start items-center gap-2 flex overflow-hidden">
-                                            <div className="grow shrink basis-0 h-7 justify-center items-center gap-3 flex">
-                                                <Link href="/about-us"
-                                                    className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">About</Link>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    </div >
                                 </div >
                             </div >
-                        </div >
-                    </section >
-
+                        </section >
+                    }
                 </div>
             </div>
         )
