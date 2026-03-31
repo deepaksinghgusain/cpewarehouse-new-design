@@ -33,3 +33,10 @@ export async function registerUser(data: any) {
         return false
     }
 }
+
+
+export async function userInfo() {
+    const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me";
+    
+    return await apiFetch(url)
+}

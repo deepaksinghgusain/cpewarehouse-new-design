@@ -1,236 +1,390 @@
 "use client"
-
-import * as React from "react"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-import { Button } from "@/components/ui/button"
-
-type Invoice = {
-  invoice: string
-  date: string
-  receipt: string
-}
-
-const data: Invoice[] = [
-  { invoice: "INV-001", date: "2024-01-12", receipt: "Download" },
-  { invoice: "INV-002", date: "2023-05-21", receipt: "Download" },
-  { invoice: "INV-003", date: "2022-09-01", receipt: "Download" },
-  { invoice: "INV-004", date: "2024-02-10", receipt: "Download" },
-  { invoice: "INV-005", date: "2023-08-18", receipt: "Download" },
-  { invoice: "INV-006", date: "2024-04-11", receipt: "Download" },
-  { invoice: "INV-007", date: "2022-07-15", receipt: "Download" },
-  { invoice: "INV-008", date: "2023-12-22", receipt: "Download" },
-]
-
-const columns: ColumnDef<Invoice>[] = [
-  {
-    accessorKey: "invoice",
-    header: "Invoice(s)",
-  },
-  {
-    accessorKey: "date",
-    header: "Date",
-    filterFn: (row, columnId, filterValue) => {
-      if (!filterValue || filterValue === "all") return true
-      const date = new Date(row.getValue(columnId))
-      return date.getFullYear().toString() === filterValue
-    },
-  },
-  {
-    accessorKey: "receipt",
-    header: "Receipt",
-    cell: ({ row }) => (
-      <Button variant="outline" size="sm">
-        {row.original.receipt}
-      </Button>
-    ),
-  },
-]
+import { getInvoicetemplate, getOrderDetailByUserEmail, GetUserSubscribedCourses } from "@/services/course"
+import { useEffect, useState } from "react"
+import jsPDF from "jspdf";
+import moment from "moment";
+import html2canvas from "html2canvas";
 
 export default function InvoiceDataTable() {
-  const [columnFilters, setColumnFilters] =
-    React.useState<ColumnFiltersState>([])
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: { columnFilters },
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 5,
-      },
-    },
+  let [selectedYear, setSelectedYear] = useState(2024)
+  let [profileData, setProfileData] = useState({
+    firstName: "",
+    lastName: "",
+    company: "",
+    ptin: "",
+    state: "",
+    country: "",
+    phone: "",
+    imgUrl: "",
   })
 
-  const uniqueYears = Array.from(
-    new Set(data.map((item) => new Date(item.date).getFullYear()))
-  )
+  let [availableYears, setAvailableYears] = useState<any>([])
+  let [filteredInvoices, setFilteredInvoices] = useState<any>([])
+  let [allInvoices, setAllInvoices] = useState<any>([])
+  let [invoicesTem, setInvoicesTem] = useState<any>([])
 
-  const totalRows = table.getFilteredRowModel().rows.length
-  const pageIndex = table.getState().pagination.pageIndex
-  const pageSize = table.getState().pagination.pageSize
+  let [itemsPerPage, setItemsPerPage] = useState(5)
+  let [currentPage, setCurrentPage] = useState(1)
+  let [totalPages, setTotalPages] = useState(0)
 
-  const startRow = pageIndex * pageSize + 1
-  const endRow = Math.min((pageIndex + 1) * pageSize, totalRows)
+  const getUserData = async () => {
+    const token = localStorage.getItem("token")
 
-  const totalPages = table.getPageCount()
+    if (!token) return;
+
+    let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    let res = await response.json();
+
+    setProfileData(res)
+  }
+
+  const getEventlist = async () => {
+    const email = localStorage.getItem('email')?.toString() || '';
+    let res = await GetUserSubscribedCourses(email)
+    let IDarray = [];
+    res.data.forEach((element: any) => {
+
+      if (element?.attributes?.course?.data != null) {
+        IDarray.push(parseInt(element?.attributes?.course?.data?.id))
+      }
+    })
+
+    let invoicesTem = [];
+    let resp = await getInvoicetemplate()
+    invoicesTem = resp.data.global.data;
+
+    setInvoicesTem(invoicesTem)
+
+    if (res?.data?.userCourses.length == 0) {
+      let message = 'You have not purchased any course. Please purchase a course to access this information';
+    }
+
+    const coursesPurchased: any = []
+    const localTime = moment().format('YYYY-MM-DD') + 'T00:00:00.000Z'; // store localTime
+    res.data.forEach((element: any) => {
+      const course = element?.attributes?.course?.data?.attributes;
+      const usercourse = element.attributes;
+      if (course != undefined) {
+        coursesPurchased.push({
+          'course': course,
+          'startDate': course?.startDate,
+          'category': course?.category?.data?.attributes?.title,
+          'webinarId': course?.webinarId || '',
+          'joinUrl': usercourse?.joinUrl,
+          'status': usercourse?.status,
+          'completedOn': usercourse?.completedOn,
+          'watchRecording': course?.category?.data?.attributes?.title.toLowerCase() == 'recorded',
+          'purchasedOn': usercourse?.purchasedOn,
+
+        })
+      }
+    })
+  }
+
+  const calculateTotalPages = (allInvoices: any) => {
+    let totalPages = Math.ceil(allInvoices.length / itemsPerPage);
+    setTotalPages(totalPages)
+  }
+
+  const downloadInvoice = async (
+    invoice: any
+  ) => {
+    const InvoiceNo = invoice?.id;
+
+    const lastname =
+      typeof window !== "undefined" ? localStorage.getItem("lastname") : "";
+
+    let invoiceDate = invoice?.attributes?.createdAt || "";
+
+    if (invoiceDate !== "") {
+      invoiceDate = moment(invoice?.attributes?.createdAt).format(
+        "MMMM DD, YYYY"
+      );
+    }
+
+    const url =
+      invoicesTem?.attributes?.invoiceTemplate?.data?.attributes?.url;
+
+
+    const orderItems = invoice?.attributes?.OrderItems || [];
+
+    const totalDiscount = (
+      parseInt(invoice?.attributes?.totalPrice) -
+      parseInt(invoice?.attributes?.finalPrice)
+    ).toString();
+
+    let htmlContentforInvoiceItems = "";
+    let totalQty: any = 0;
+    let totalItems = 0;
+
+    orderItems.forEach((orderItemH: any) => {
+      const coursePrice = orderItemH?.price ?? 0;
+      const courseNetPrice = orderItemH?.finalPrice ?? 0;
+
+      const discount = (
+        parseInt(coursePrice) - parseInt(courseNetPrice)
+      ).toString();
+
+      totalQty += Number(orderItemH?.qty ?? 0);
+      totalItems++;
+
+      htmlContentforInvoiceItems += `
+      <tr style="font-weight: bold; font-size: 10px;">
+        <td style="text-align:left;padding:6px 4px;">${orderItemH?.title}</td>
+        <td style="padding:6px;">${orderItemH?.qty}</td>
+        <td style="padding:6px;">$ ${coursePrice}</td>
+        <td style="padding:6px;">$ ${discount}</td>
+        <td style="padding:6px;">$ ${courseNetPrice}</td>
+      </tr>
+    `;
+    });
+
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + url);
+      const template = await response.text();
+
+      let html = template
+        .replace(
+          "{{userName}}",
+          profileData.firstName + " " + profileData.lastName
+        )
+        .replace("{{invoiceNo}}", InvoiceNo)
+        .replace(
+          "{{address}}",
+          profileData.state + ", " + profileData.country
+        )
+        .replace("{{invoiceDate}}", invoiceDate)
+        .replace("{{htmlContentforInvoiceItems}}", htmlContentforInvoiceItems)
+        .replace("{{totalQty}}", totalQty)
+        .replace("{{totalPrice}}", invoice?.attributes?.totalPrice ?? 0)
+        .replace("{{totalDiscount}}", totalDiscount)
+        .replace("{{finalPrice}}", invoice?.attributes?.finalPrice ?? 0);
+
+      const doc = new jsPDF("p", "pt", [595, 841.89]);
+
+      doc.html(html, {
+        callback: function (doc) {
+          let rectX = 210;
+          let rectYFix = 229 + totalItems * 30;
+          let rectY = 267 + totalItems * 30;
+          let rectW = 100;
+          let rectH = 12;
+
+          doc.link(rectX, rectY, rectW, rectH, {
+            url: "https://cpewarehouse.com/learner/dashboard",
+          });
+
+          doc.link(rectX - 168, rectY + 153, rectW, rectH, {
+            url: "https://cpewarehouse.com/learner/dashboard",
+          });
+
+          doc.link(rectX + 43, rectY + 247, rectW, rectH, {
+            url: "https://cpewarehouse.com/learner/dashboard",
+          });
+
+          doc.link(rectX - 14, rectYFix + 422, rectW + 120, rectH + 18, {
+            url: "https://cpewarehouse.com/learner/dashboard",
+          });
+
+          doc.link(rectX - 210, rectYFix + 484, rectW + 50, rectH + 10, {
+            url: "https://www.linkedin.com/company/cpewarehouse",
+          });
+
+          doc.link(rectX - 40, rectYFix + 484, rectW - 5, rectH + 10, {
+            url: "https://twitter.com/cpe4cpa",
+          });
+
+          doc.link(rectX + 68, rectYFix + 484, rectW + 45, rectH + 10, {
+            url: "https://www.facebook.com/cpewarehouse",
+          });
+
+          doc.link(rectX + 235, rectYFix + 484, rectW + 50, rectH + 10, {
+            url: "https://instagram.com/cpe_warehouse",
+          });
+
+          doc.save(`invoice_${InvoiceNo}.pdf`);
+
+          console.log("invoice downloaded successfully");
+        },
+      });
+    } catch (error) {
+      console.error("Error generating invoice:", error);
+    }
+  };
+
+  const getinvoiceList = async () => {
+
+    const email = localStorage.getItem('email')?.toString() || '';
+
+    let allInvoices = [];
+
+    let res = await getOrderDetailByUserEmail(email);
+    allInvoices = res.data;
+    setAllInvoices(allInvoices);
+
+    // Extract all unique years from invoice list
+    const yearsSet = new Set<number>();
+    allInvoices.forEach((invoice: any) => {
+      const year = new Date(invoice.attributes.createdAt).getFullYear();
+      yearsSet.add(year);
+    });
+
+    let years = Array.from(yearsSet).sort((a, b) => b - a); // Sort descending
+    if (years.includes(selectedYear)) {
+      selectedYear = selectedYear;
+    } else if (years.length > 0) {
+      selectedYear = years[0];
+    }
+
+    setAvailableYears(years)
+
+    setSelectedYear(selectedYear)
+
+    filterInvoicesByYear(allInvoices); // Initially show invoices for current year
+  }
+
+  function filterInvoicesByYear(allInvoices: any) {
+
+    let invoices = allInvoices.filter((invoice: any) => {
+
+      const createdAt = invoice?.attributes?.createdAt;
+      if (createdAt) {
+        const invoiceYear = new Date(createdAt).getFullYear();
+
+        return invoiceYear === +selectedYear;
+      }
+      return false;
+    });
+
+    setFilteredInvoices(invoices)
+    calculateTotalPages(allInvoices);
+  }
+
+  useEffect(() => {
+    getUserData()
+    getEventlist();
+    getinvoiceList();
+  }, [])
 
   return (
-    <div className="container mx-auto py-10 space-y-4">
+    <>
+      <div className="bg-white py-8 px-8 flex flex-col gap-8">
+        <h1 className="text-3xl font-semibold text-gray-900">Certificate(s)</h1>
 
-      {/* FILTER + PAGE SIZE */}
-      <div className="flex justify-between">
+        {/* PAGE TITLE */}
+        <div className="flex gap-4 justify-end bg-[#eee] py-4 items-center max-w-6xl w-full">
 
-        <Select
-          onValueChange={(value) =>
-            table.getColumn("date")?.setFilterValue(value)
-          }
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filter by Year" />
-          </SelectTrigger>
-
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {uniqueYears.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={pageSize.toString()}
-          onValueChange={(value) => table.setPageSize(Number(value))}
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue />
-          </SelectTrigger>
-
-          <SelectContent>
-            {[5, 10, 20].map((size) => (
-              <SelectItem key={size} value={size.toString()}>
-                {size} rows
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* TABLE */}
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-
-          <TableBody>
-            {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="border rounded-lg px-4 py-2"
+          > {
+              availableYears.map((year: number, index: number) => (
+                <option key={index}>{year}</option>
               ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3} className="text-center py-6">
-                  No results
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            }
+          </select>
+        </div>
       </div>
 
-      {/* PAGINATION */}
-      <div className="flex items-center justify-between">
+      <div className="px-8 py-6">
 
-        <div className="text-sm text-muted-foreground">
-          Showing {startRow} to {endRow} of {totalRows} entries
-        </div>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
 
-        <div className="flex gap-2">
+          {/* TABLE */}
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
+          <table className="w-full">
 
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <Button
-              key={index}
-              size="sm"
-              variant={pageIndex === index ? "default" : "outline"}
-              onClick={() => table.setPageIndex(index)}
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Invoice
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Date
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Proof of Purchase
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filteredInvoices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((invoice: any, index: number) => (
+                <tr key={index} className="border-t hover:bg-gray-50">
+
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {invoice.id}
+                  </td>
+
+
+
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {moment(invoice.attributes.createdAt).format("MMMM DD,YYYY")}
+                  </td>
+
+                  <td className="px-6 py-4 flex">
+
+                    <span
+                      onClick={() => downloadInvoice(invoice)}
+                      className="px-3 py-1.5 flex cursor-pointer items-center gap-2 text-xs font-medium text-indigo-600"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M17.5 17.5H2.5M15 9.16667L10 14.1667M10 14.1667L5 9.16667M10 14.1667V2.5" stroke="#444CE7" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+
+                      Download
+                    </span>
+                  </td>
+
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+
+          <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100"
             >
-              {index + 1}
-            </Button>
-          ))}
+              Previous
+            </button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 text-sm rounded-md border ${currentPage === i + 1
+                    ? "bg-indigo-600 text-white"
+                    : "hover:bg-gray-100"
+                    }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
 
+            </div>
+
+            <button
+              onClick={() =>
+                setCurrentPage((p: any) => Math.min(p + 1, totalPages))
+              }
+              className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 
-    </div>
+    </>
   )
 }

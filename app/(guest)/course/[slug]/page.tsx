@@ -195,7 +195,7 @@ const CourseLandingPage = async () => {
                                                                         className="w-5 h-5 p-[3px] bg-[#155dee] rounded-md  shadow-[0px_0px_0px_2px_rgba(255,255,255,1.00)] justify-center items-center flex overflow-hidden">
                                                                         <div className="w-3.5 h-3.5 relative flex-col justify-start items-start flex overflow-hidden">
                                                                         </div>
-                                                                        <input type="checkbox" name="" id=""/>
+                                                                        <input type="checkbox" name="" id="" />
                                                                     </div>
                                                                 </div>
                                                                 <div className="justify-start items-center gap-3 flex">
@@ -394,6 +394,131 @@ const CourseLandingPage = async () => {
                                         }
                                     </div>
                                 </div >
+                                <section>
+                                    <div
+                                        className="h-auto w-full py-12  bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
+
+                                        {
+                                            accreditedPartners && <div className="w-full py-12  bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
+                                                <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex mb-8">
+                                                    <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
+                                                        <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
+                                                            <div className="container mx-auto">
+                                                                <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
+                                                                    <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">
+                                                                        {accreditedPartners?.title}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full"
+                                                    style={{
+                                                        backgroundImage: `url('${imageUrl + accreditedPartners?.bg_image?.data?.attributes?.url}')`,
+                                                        backgroundSize: "cover"
+                                                    }}>
+                                                    <div className="h-80 w-full px-1 flex-col justify-start items-center gap-16 flex">
+                                                        <div className="self-stretch h-80 p-16 justify-center items-start gap-8 inline-flex">
+                                                            {accreditedPartners?.list && accreditedPartners?.list.map((l: any, index: number) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="w-[180px] h-[142px] px-6 py-8 bg-white/30 rounded-2xl border border-white/30 backdrop-blur-xl flex-col justify-start items-center gap-5 inline-flex">
+                                                                    <img className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down"
+                                                                        src={imageUrl + l?.image?.data?.attributes?.url} />
+                                                                </div>
+                                                            ))
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div className="w-[90%] mx-auto">
+                                            <div className="self-stretch px-8 justify-between items-start gap-8 inline-flex">
+                                                <div className="w-[771px] py-5 flex-col justify-between items-start gap-8 inline-flex">
+                                                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
+                                                        {sponsorship.title}</div>
+                                                    <div className="self-stretch h-20 px-1 flex-col justify-start items-start gap-8 flex">
+                                                        <div className="w-[794px] justify-start items-start inline-flex">
+
+                                                            {
+                                                                sponsorship.list.length > 0 && sponsorship.list.map((list: any, index: number) => (
+                                                                    <div className="grow shrink basis-0 px-4 pt-6 flex-col justify-start items-center gap-5 inline-flex" key={index}>
+                                                                        <div className="self-stretch justify-start items-start gap-3 inline-flex">
+                                                                            <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
+                                                                                <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
+                                                                                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                        <g id="check-circle">
+                                                                                            <path id="Icon"
+                                                                                                d="M8.75065 14.0002L12.2507 17.5002L19.2507 10.5002M25.6673 14.0002C25.6673 20.4435 20.444 25.6668 14.0007 25.6668C7.55733 25.6668 2.33398 20.4435 2.33398 14.0002C2.33398 7.55684 7.55733 2.3335 14.0007 2.3335C20.444 2.3335 25.6673 7.55684 25.6673 14.0002Z"
+                                                                                                stroke="#7F56D9" strokeWidth="2.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                                                                        </g>
+                                                                                    </svg>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
+                                                                                <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
+                                                                                    {list.value}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                    <div className="self-stretch h-[200px] py-4 flex-col justify-start items-start gap-5 flex">
+                                                        <div className="self-stretch h-[168px] flex-col justify-start items-center gap-2 flex">
+                                                            <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
+                                                                {sponsorship.description}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {sponsorship.features.length > 0 &&
+                                                    <div className="w-[446px] self-stretch px-8 flex-col justify-start items-start gap-8 inline-flex">
+                                                        <div className="self-stretch justify-center items-start gap-8 inline-flex">
+                                                            <div
+                                                                className="grow shrink basis-0 bg-white rounded-2xl  shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex">
+                                                                <div className="self-stretch h-[284px] px-8 pt-8 pb-10 flex-col justify-start items-start gap-6 flex">
+                                                                    <div className="self-stretch h-[212px] flex-col justify-start items-start gap-4 flex">
+
+                                                                        {
+                                                                            sponsorship.features.map((list: any, index: number) => (
+                                                                                <div className="self-stretch justify-start items-start gap-3 inline-flex" key={index}>
+                                                                                    <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
+                                                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                            <g id="Check icon">
+                                                                                                <path
+                                                                                                    d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
+                                                                                                    fill="#DCFAE6" />
+                                                                                                <path id="Icon" fillRule="evenodd" clipRule="evenodd"
+                                                                                                    d="M17.096 7.39016L9.93602 14.3002L8.03602 12.2702C7.68602 11.9402 7.13602 11.9202 6.73602 12.2002C6.34602 12.4902 6.23602 13.0002 6.47602 13.4102L8.72602 17.0702C8.94602 17.4102 9.32601 17.6202 9.75601 17.6202C10.166 17.6202 10.556 17.4102 10.776 17.0702C11.136 16.6002 18.006 8.41016 18.006 8.41016C18.906 7.49016 17.816 6.68016 17.096 7.38016V7.39016Z"
+                                                                                                    fill="#079455" />
+                                                                                            </g>
+                                                                                        </svg>
+
+                                                                                    </div>
+                                                                                    <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
+                                                                                        <div className="self-stretch text-[#344054] text-lg font-semibold font-['Inter'] leading-7">2 hours
+                                                                                            {list.value}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))
+                                                                        }
+
+                                                                    </div>
+                                                                </div>
+                                                                <div className="self-stretch h-20 px-8 pb-8"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
                             </TabsContent>
                             <TabsContent value="CPE Info">
                                 <div className="">
@@ -560,131 +685,7 @@ const CourseLandingPage = async () => {
                     </div>
 
 
-                    <section>
-                        <div
-                            className="h-auto w-full py-12  bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
 
-                            {
-                                accreditedPartners && <div className="w-full py-12  bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
-                                    <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex mb-8">
-                                        <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
-                                            <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
-                                                <div className="container mx-auto">
-                                                    <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">
-                                                            {accreditedPartners?.title}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="w-full"
-                                        style={{
-                                            backgroundImage: `url('${imageUrl + accreditedPartners?.bg_image?.data?.attributes?.url}')`,
-                                            backgroundSize: "cover"
-                                        }}>
-                                        <div className="h-80 w-full px-1 flex-col justify-start items-center gap-16 flex">
-                                            <div className="self-stretch h-80 p-16 justify-center items-start gap-8 inline-flex">
-                                                {accreditedPartners?.list && accreditedPartners?.list.map((l: any, index: number) => (
-                                                    <div
-                                                        key={index}
-                                                        className="w-[180px] h-[142px] px-6 py-8 bg-white/30 rounded-2xl border border-white/30 backdrop-blur-xl flex-col justify-start items-center gap-5 inline-flex">
-                                                        <img className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down"
-                                                            src={imageUrl + l?.image?.data?.attributes?.url} />
-                                                    </div>
-                                                ))
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            <div className="w-[90%] mx-auto">
-                                <div className="self-stretch px-8 justify-between items-start gap-8 inline-flex">
-                                    <div className="w-[771px] py-5 flex-col justify-between items-start gap-8 inline-flex">
-                                        <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
-                                            {sponsorship.title}</div>
-                                        <div className="self-stretch h-20 px-1 flex-col justify-start items-start gap-8 flex">
-                                            <div className="w-[794px] justify-start items-start inline-flex">
-
-                                                {
-                                                    sponsorship.list.length > 0 && sponsorship.list.map((list: any, index: number) => (
-                                                        <div className="grow shrink basis-0 px-4 pt-6 flex-col justify-start items-center gap-5 inline-flex" key={index}>
-                                                            <div className="self-stretch justify-start items-start gap-3 inline-flex">
-                                                                <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
-                                                                    <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
-                                                                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <g id="check-circle">
-                                                                                <path id="Icon"
-                                                                                    d="M8.75065 14.0002L12.2507 17.5002L19.2507 10.5002M25.6673 14.0002C25.6673 20.4435 20.444 25.6668 14.0007 25.6668C7.55733 25.6668 2.33398 20.4435 2.33398 14.0002C2.33398 7.55684 7.55733 2.3335 14.0007 2.3335C20.444 2.3335 25.6673 7.55684 25.6673 14.0002Z"
-                                                                                    stroke="#7F56D9" strokeWidth="2.33333" strokeLinecap="round" strokeLinejoin="round" />
-                                                                            </g>
-                                                                        </svg>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
-                                                                    <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
-                                                                        {list.value}</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
-
-                                            </div>
-                                        </div>
-                                        <div className="self-stretch h-[200px] py-4 flex-col justify-start items-start gap-5 flex">
-                                            <div className="self-stretch h-[168px] flex-col justify-start items-center gap-2 flex">
-                                                <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
-                                                    {sponsorship.description}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {sponsorship.features.length > 0 &&
-                                        <div className="w-[446px] self-stretch px-8 flex-col justify-start items-start gap-8 inline-flex">
-                                            <div className="self-stretch justify-center items-start gap-8 inline-flex">
-                                                <div
-                                                    className="grow shrink basis-0 bg-white rounded-2xl  shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex">
-                                                    <div className="self-stretch h-[284px] px-8 pt-8 pb-10 flex-col justify-start items-start gap-6 flex">
-                                                        <div className="self-stretch h-[212px] flex-col justify-start items-start gap-4 flex">
-
-                                                            {
-                                                                sponsorship.features.map((list: any, index: number) => (
-                                                                    <div className="self-stretch justify-start items-start gap-3 inline-flex" key={index}>
-                                                                        <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
-                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                <g id="Check icon">
-                                                                                    <path
-                                                                                        d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
-                                                                                        fill="#DCFAE6" />
-                                                                                    <path id="Icon" fillRule="evenodd" clipRule="evenodd"
-                                                                                        d="M17.096 7.39016L9.93602 14.3002L8.03602 12.2702C7.68602 11.9402 7.13602 11.9202 6.73602 12.2002C6.34602 12.4902 6.23602 13.0002 6.47602 13.4102L8.72602 17.0702C8.94602 17.4102 9.32601 17.6202 9.75601 17.6202C10.166 17.6202 10.556 17.4102 10.776 17.0702C11.136 16.6002 18.006 8.41016 18.006 8.41016C18.906 7.49016 17.816 6.68016 17.096 7.38016V7.39016Z"
-                                                                                        fill="#079455" />
-                                                                                </g>
-                                                                            </svg>
-
-                                                                        </div>
-                                                                        <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
-                                                                            <div className="self-stretch text-[#344054] text-lg font-semibold font-['Inter'] leading-7">2 hours
-                                                                                {list.value}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))
-                                                            }
-
-                                                        </div>
-                                                    </div>
-                                                    <div className="self-stretch h-20 px-8 pb-8"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </section>
 
                 </section>
 
@@ -692,8 +693,8 @@ const CourseLandingPage = async () => {
                     <div className="w-[90%] mx-auto">
                         <div className=" h-auto  flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
+                            <div className="grid grid-cols-5 gap-4 justify-between">
+                                <div className='col-span-3'>
                                     {
                                         coursesDetail?.data[0]?.attributes?.includes && <div className=" mt-8">
                                             <div className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 my-8">
@@ -746,42 +747,41 @@ const CourseLandingPage = async () => {
                                     </div>
                                 </div>
                                 <div className="py-8">
-                                    <div className="mx-auto self-stretch px-8 justify-start items-start gap-8 inline-flex">
-                                        <div
-                                            className="w-full h-[442px] bg-white rounded-xl shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] flex-col justify-start items-end inline-flex overflow-hidden">
-                                            <div className="self-stretch px-6 pt-6 flex-col justify-start items-center gap-5 flex">
-                                                <div className="pr-[9px] pb-1 justify-center items-center inline-flex overflow-hidden">
-                                                    <div className="w-full bg-red-950">
-                                                        <img className="object-contain" src="/assets/images/package-icon.png" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="self-stretch  flex-col justify-start items-center flex">
-                                                <div className="self-stretch  px-6 pt-2 flex-col justify-start items-center gap-4 flex">
-                                                    <div className="self-stretch h-[114px] flex-col justify-start items-center gap-1 flex">
-                                                        <div className="self-stretch text-center text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
-                                                            Explore Our Unlimited CPE Package</div>
-                                                        <div className="self-stretch text-center"><span
-                                                            className="text-[#344054] text-lg font-normal font-['Inter'] leading-7">This course is part of the
-                                                            CPE
-                                                            Warehouse Pass. Subscribe today for</span><span
-                                                                className="text-black text-lg font-normal font-['Inter'] leading-7"> </span><span
-                                                                    className="text-[#667084] text-lg font-medium font-['Inter'] line-through leading-7">$1200</span><span
-                                                                        className="text-[#7e56d8] text-2xl font-bold font-['Inter'] leading-7"> $999</span></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="self-stretch h-[100px] pt-2 flex-col justify-start items-start flex">
-                                                <div className="self-stretch px-6 pb-6 justify-start items-start gap-3 inline-flex">
-                                                    <div
-                                                        className="grow shrink basis-0 h-11 px-4 py-2.5 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
-                                                        <div className="px-0.5 justify-center items-center flex">
-                                                            <div className="text-white text-base font-semibold font-['Inter'] leading-normal">Explore now</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                    <div className="w-96 bg-white rounded-xl shadow-lg flex flex-col overflow-hidden">
+
+                                        {/* Image */}
+                                        <div className="px-6 pt-6">
+                                            <div className="h-32 overflow-hidden rounded-md">
+                                                <video
+                                                    src="/assets/images/package-image.mp4"
+                                                   
+                                                    className="w-full h-full object-fill border border-blue-600"
+                                                ></video>
                                             </div>
                                         </div>
+
+                                        {/* Content */}
+                                        <div className="px-6 pt-6 text-center flex flex-col gap-4">
+
+                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                Explore Our Unlimited CPE Package
+                                            </h3>
+
+                                            <p className="text-gray-600 text-lg leading-7">
+                                                This course is part of the CPE Warehouse Pass. Subscribe today for{" "}
+                                                <span className="line-through text-gray-400">$1200</span>{" "}
+                                                <span className="text-purple-600 text-2xl font-bold">$999</span>
+                                            </p>
+
+                                        </div>
+
+                                        {/* Button */}
+                                        <div className="px-6 py-8">
+                                            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-full transition">
+                                                Explore now
+                                            </button>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>

@@ -18,7 +18,7 @@ export default function GuestLayout({
             <Header />
             <main className='flex flex-1 wrapper'>
                 <LearnerSidebar />
-                <div>
+                <div className='w-full'>
                     {children}
                 </div>
             </main >

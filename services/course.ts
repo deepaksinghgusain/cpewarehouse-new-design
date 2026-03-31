@@ -100,9 +100,111 @@ export async function GetUserSubscribedCourses(email: string) {
   if (!data) return {};
 
   return data?.userCourses;
-
 }
 
+export async function getOrderDetailByUserEmail(email: string) {
+  const { data }: { data: any } = await client.query({
+    query: getOrderDetailByUserEmailGql(email),
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data?.orders;
+}
+
+export async function getInvoicetemplate() {
+  const { data }: { data: any } = await client.query({
+    query: getInvoiceTemplateUrl,
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data;
+}
+
+
+export async function getUpcomingCourse(IDarray: any) {
+  const { data }: { data: any } = await client.query({
+    query: getCourses(IDarray),
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data?.userCourses;
+}
+
+export function getCourses(IDarray: any) {
+  return gql`
+    query {
+      courses(
+        pagination: { limit: -1 }
+        filters: {
+          id: { notIn: [${IDarray}] }
+          isActive: { eq: true }
+          forTaxLaw: { eq: true }
+          or: [
+            {
+              and: [
+                {
+                  startDate: { gte: "${currentDate}" }
+                  category: { title: { eq: "Live" } }
+                }
+              ]
+            }
+          ]
+        }
+      ) {
+        data {
+          id
+          attributes {
+            title
+            forTaxLaw
+            slug
+            startDate
+            endDate
+            timezone
+            price
+            shortDesc
+            isActive
+            image {
+              data {
+                attributes {
+                  url
+                }
+              }
+            }
+            instructors{
+              data{
+                attributes{
+                  firstName
+                  lastName
+                  image {
+                    data {
+                      attributes {
+                        url
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            category {
+              data {
+                attributes {
+                  title
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    `;
+}
 
 function getCoursesGql(fortaxLaw: boolean, isActive: boolean) {
 
@@ -289,6 +391,7 @@ function getUserCourseGQL(email: string) {
                         }
                       }
                     }
+                      
                   }
               }
             }
@@ -394,7 +497,7 @@ function getCoursesWithTitleGql(
                       }
                     }
                   }
-                     instructor{
+                  instructor{
                     data{
                       attributes{
                         firstName
@@ -865,3 +968,58 @@ const packagesonly = gql`
     }
   }
 `;
+
+function getOrderDetailByUserEmailGql(email: string) {
+  return gql`query{
+      orders(filters:{email :{ eq: "${email}" },
+      orderStatus :{ eq: "succeeded" }}
+    sort: "id:DESC"
+    )
+    {
+       data{
+         id,
+         attributes{
+           OrderItems{
+            title
+            courseId
+            packageId
+            qty
+            price
+            finalPrice
+            
+            Enrolls{
+              email
+            }
+          }
+          totalPrice 
+          finalPrice
+          createdAt
+           orderStatus
+           stripeSessionId,
+           userId
+           email
+           
+          
+         }
+       }
+     }
+       }`
+}
+
+
+
+const getInvoiceTemplateUrl = gql`query {
+  global {
+    data {
+      attributes {
+        invoiceTemplate {
+          data {
+            attributes {
+              url              
+            }
+          }
+        }
+      }
+    }
+  }
+}`

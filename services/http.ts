@@ -20,18 +20,20 @@ export async function apiFetch(
     revalidate,
   } = options;
 
+
   const res = await fetch(url, {
     method,
     headers: {
-      ...headers,
+      ...headers
     },
     body: body ? JSON.stringify(body) : undefined,
     cache,
     next: revalidate ? { revalidate } : undefined,
   });
 
+
   if (!res.ok) {
-    throw new Error(`Error: ${res.status}`);
+    console.log(`Error: ${res.status}`);
   }
 
   let result: ApiResponse = await res.json();
