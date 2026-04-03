@@ -27,7 +27,7 @@ export const Header = () => {
         return (
             <div className='border-b border-gray-300'>
                 <div className='w-[90%] mx-auto'>
-                    <header className="flex sticky px-2 py-2 mt-4 top-0 bg-white z-50 w-[100%]">
+                    <header className="flex justify-center fixed px-2 py-6 top-0 left-0 bg-white z-100 w-[100%]">
                         <nav className="flex justify-between gap-8">
                             <div className="flex items-center w-[300px]">
                                 <Link href="/">
@@ -77,7 +77,7 @@ export const Header = () => {
                     {
                         !pathname.includes("learner") && <section className="">
                             <div className="container mx-auto">
-                                <div className="h-[72px] px-8 mt-4 justify-center items-center">
+                                <div className="h-[72px] px-8 mt-25 justify-center items-center">
                                     <div className="justify-center items-center gap-4 flex">
                                         <div className="justify-center items-center gap-6 flex">
                                             <div

@@ -1,30 +1,75 @@
 "use client"
-import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Form } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff } from 'lucide-react';
+import React, { useState, useTransition } from 'react'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import z from 'zod';
+
+
+export const passwordSchema = z.object({
+    currentPassword: z.string().min(1, "Current Password is required"),
+    password: z.string().min(1, "New Password is required"),
+    confirmPassword: z.string().min(1, "Confirm Password is required"),
+}).refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"], // show error under confirmPassword field
+    message: "New Password and Confirm Password must match",
+});;
+
+export type Password = z.infer<typeof passwordSchema>;
 
 const Password = () => {
-    const [form, setForm] = useState({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-    })
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+    const [showNewPassword, setShowNewPassword] = useState(false)
+    const [showConfirmPassword, setShowComfirmPassword] = useState(false)
 
-    const handleChange = (e: any) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
+    const [errorMessage, setErrorMessage] = useState('')
+    const [error, setError] = useState(false)
+
+    const [successMessage, setSuccessMessage] = useState('')
+    const [success, setSuccess] = useState(false)
+
+    const form = useForm<Password>({
+        resolver: zodResolver(passwordSchema),
+        defaultValues: {
+            currentPassword: "",
+            password: "",
+            confirmPassword: "",
+        },
+    });
+
+    const [isPending, startTransition] = useTransition()
+
+    const onSubmit: SubmitHandler<z.infer<typeof passwordSchema>> = async (values: any) => {
+
+        startTransition(async () => {
+            const token = localStorage.getItem("token")
+
+            let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/change-password", {
+                method: "PUT",
+                body: JSON.stringify(values),
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "content-type": "application/json"
+                },
+            });
+
+            let res = await response.json();
+            console.log(res);
+
+            if (res?.data) {
+                setSuccess(true);
+                setSuccessMessage(res.msg)
+            } else {
+                setError(true);
+                setErrorMessage(res.error.message)
+            }
         })
     }
 
-    const handleSubmit = (e: any) => {
-        e.preventDefault()
-
-        if (form.newPassword !== form.confirmPassword) {
-            alert("Passwords do not match")
-            return
-        }
-
-        console.log(form)
-    }
     return (
         <div className="w-full bg-white py-8">
 
@@ -48,93 +93,203 @@ const Password = () => {
                     </div>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="mt-6 space-y-8 w-full">
+                <Form {...form}>
+                    <form className='mt-6 space-y-8 w-full' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
 
-                    {/* Current Password */}
-                    <div className="grid grid-cols-3 gap-8 items-center">
 
-                        <label className="text-sm font-semibold text-gray-700">
-                            Current password *
-                        </label>
+                        {/* Current Password */}
+                        <div className="grid grid-cols-3 gap-8 items-center">
 
-                        <div className="col-span-2">
-                            <input
-                                type="password"
-                                name="currentPassword"
-                                value={form.currentPassword}
-                                onChange={handleChange}
-                                required
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                                placeholder="••••••••"
-                            />
+                            <label className="text-sm font-semibold text-gray-700">
+                                Current password *
+                            </label>
+
+                            <div className="col-span-2">
+                                <FieldGroup>
+                                    <Controller
+                                        name="currentPassword"
+                                        control={form.control}
+                                        render={({ field, fieldState }) => (
+                                            <Field data-invalid={fieldState.invalid}>
+
+                                                <div className="relative w-full">
+                                                    <Input
+                                                        {...field}
+                                                        id="password"
+                                                        type={showCurrentPassword ? "text" : "password"}
+                                                        placeholder="Enter password"
+                                                        className="pr-10"
+                                                        aria-invalid={fieldState.invalid}
+                                                    />
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                                    >
+                                                        {showCurrentPassword ? (
+                                                            <EyeOff className="h-4 w-4" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4" />
+                                                        )}
+                                                    </button>
+                                                </div>
+
+                                                {fieldState.invalid && (
+                                                    <FieldError errors={[fieldState.error]} />
+                                                )}
+                                            </Field>
+                                        )}
+                                    />
+                                </FieldGroup>
+                            </div>
+
+
+
                         </div>
 
-                    </div>
+                        <div className="border-b"></div>
 
-                    <div className="border-b"></div>
+                        {/* New Password */}
+                        <div className="grid grid-cols-3 gap-8 items-center">
 
-                    {/* New Password */}
-                    <div className="grid grid-cols-3 gap-8 items-center">
+                            <label className="text-sm font-semibold text-gray-700">
+                                New password *
+                            </label>
 
-                        <label className="text-sm font-semibold text-gray-700">
-                            New password *
-                        </label>
+                            <div className="col-span-2">
+                                <FieldGroup>
+                                    <Controller
+                                        name="password"
+                                        control={form.control}
+                                        render={({ field, fieldState }) => (
+                                            <Field data-invalid={fieldState.invalid}>
+                                                <div className="relative w-full">
+                                                    <Input
+                                                        {...field}
+                                                        id="password"
+                                                        type={showNewPassword ? "text" : "password"}
+                                                        placeholder="Enter password"
+                                                        className="pr-10"
+                                                        aria-invalid={fieldState.invalid}
+                                                    />
 
-                        <div className="col-span-2">
-                            <input
-                                type="password"
-                                name="newPassword"
-                                value={form.newPassword}
-                                onChange={handleChange}
-                                required
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                                placeholder="••••••••"
-                            />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                                    >
+                                                        {showNewPassword ? (
+                                                            <EyeOff className="h-4 w-4" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4" />
+                                                        )}
+                                                    </button>
+                                                </div>
+
+                                                {fieldState.invalid && (
+                                                    <FieldError errors={[fieldState.error]} />
+                                                )}
+                                            </Field>
+                                        )}
+                                    />
+                                </FieldGroup>
+                            </div>
+
+
+
                         </div>
 
-                    </div>
+                        <div className="border-b"></div>
 
-                    <div className="border-b"></div>
+                        {/* Confirm Password */}
+                        <div className="grid grid-cols-3 gap-8 items-center">
 
-                    {/* Confirm Password */}
-                    <div className="grid grid-cols-3 gap-8 items-center">
+                            <label className="text-sm font-semibold text-gray-700">
+                                Confirm new password *
+                            </label>
 
-                        <label className="text-sm font-semibold text-gray-700">
-                            Confirm new password *
-                        </label>
+                            <div className="col-span-2">
+                                <FieldGroup>
+                                    <Controller
+                                        name="confirmPassword"
+                                        control={form.control}
+                                        render={({ field, fieldState }) => (
+                                            <Field data-invalid={fieldState.invalid}>
+                                                <div className="relative w-full">
+                                                    <Input
+                                                        {...field}
+                                                        id="password"
+                                                        type={showConfirmPassword ? "text" : "password"}
+                                                        placeholder="Enter password"
+                                                        className="pr-10"
+                                                        aria-invalid={fieldState.invalid}
+                                                    />
 
-                        <div className="col-span-2">
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                value={form.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                                placeholder="••••••••"
-                            />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowComfirmPassword(!showConfirmPassword)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                                    >
+                                                        {showConfirmPassword ? (
+                                                            <EyeOff className="h-4 w-4" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4" />
+                                                        )}
+                                                    </button>
+                                                </div>
+
+                                                {fieldState.invalid && (
+                                                    <FieldError errors={[fieldState.error]} />
+                                                )}
+                                            </Field>
+                                        )}
+                                    />
+                                </FieldGroup>
+                            </div>
+
+
+
                         </div>
 
-                    </div>
+                        {/* Footer */}
+                        <div className="border-t pt-6 flex justify-end">
 
-                    {/* Footer */}
-                    <div className="border-t pt-6 flex justify-end">
+                            <button
+                                type="submit"
+                                className="bg-indigo-600 cursor-pointer text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+                            >
+                                Change password
+                            </button>
 
-                        <button
-                            type="submit"
-                            className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
-                        >
-                            Change password
-                        </button>
+                        </div>
 
-                    </div>
-
-                </form>
-
+                    </form>
+                </Form>
             </div>
+            <Dialog open={success} onOpenChange={setSuccess}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Success</DialogTitle>
+                        <DialogDescription>
+                            {successMessage}
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
 
+            <Dialog open={error} onOpenChange={setError}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Error</DialogTitle>
+                        <DialogDescription>
+                            {errorMessage}
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
         </div>
+
     )
 }
 

@@ -15,6 +15,7 @@ import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { imageUrl } from "@/lib/constants";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import Link from "next/link";
 
 export const profileSchema = z.object({
     firstName: z.string().min(1, "First Name is required"),
@@ -428,13 +429,13 @@ const ProfileForm = () => {
                                             <div className="self-stretch pb-4 flex flex-col justify-start items-center gap-4">
                                                 <div className="self-stretch h-px bg-gray-200" />
                                                 <div className="self-stretch px-6 inline-flex justify-end items-center gap-4">
-                                                    <div className="flex-1 flex justify-end items-center gap-3">
+                                                    <Link href="/learner/password" className="flex-1 flex justify-end items-center gap-3">
                                                         <div className="px-4 py-3 bg-indigo-600 rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_-2px_0px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] outline outline-2 outline-offset-[-2px] outline-white/10 flex justify-center items-center gap-1.5 overflow-hidden">
                                                             <div className="px-0.5 flex justify-center items-center">
                                                                 <div className="justify-start text-white text-base font-semibold font-['Inter'] leading-6">Change password</div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </Link>
                                                 </div>
                                             </div>
                                         </div >
