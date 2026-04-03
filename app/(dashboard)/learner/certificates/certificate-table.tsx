@@ -230,7 +230,7 @@ export default function CertificateDataTable() {
         <h1 className="text-3xl font-semibold text-gray-900">Certificate(s)</h1>
 
         {/* PAGE TITLE */}
-        <div className="flex gap-4 justify-end bg-[#eee] py-4 items-center max-w-6xl w-full">
+        <div className="flex gap-4 justify-end bg-[#eee] py-4 px-4 items-center max-w-6xl w-full">
 
           <select
             value={selectedYear}

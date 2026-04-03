@@ -1,8 +1,9 @@
 import { Footer } from '@/components/shared/Footer';
-import { Header } from '@/components/shared/Header';
-import Link from 'next/link';
 import React from 'react'
 import LearnerSidebar from './learner-sidebar';
+import { ChevronDown, LucideShoppingCart, Search } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import LearnerNavBar from './learner-navbar';
 
 
 export default function GuestLayout({
@@ -15,10 +16,10 @@ export default function GuestLayout({
 
     return (
         <div className='flex flex-col h-screen'>
-            <Header />
             <main className='flex flex-1 wrapper'>
                 <LearnerSidebar />
                 <div className='w-full'>
+                    <LearnerNavBar />
                     {children}
                 </div>
             </main >

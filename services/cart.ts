@@ -1,0 +1,68 @@
+import { gql } from "@apollo/client";
+import { apiFetch } from "./http";
+import { client } from "@/lib/apollo-client";
+
+export async function getCart(cartId: any) {
+    const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/carts/${cartId}?populate=deep`;
+    return await apiFetch(url)
+}
+
+export async function checkAlreadyCoursePurchased(id: number, email: string) {
+    const { data }: { data: any } = await client.query({
+        query: getAlreadyCoursePurchasedGQL(id, email),
+        fetchPolicy: "network-only",
+    });
+
+    if (!data) return {};
+
+    return data;
+}
+
+function getAlreadyCoursePurchasedGQL(id: number, email: string) {
+    return gql`query{
+      userCourses( sort: ["purchasedOn:desc"],
+       pagination:{limit:-1},
+       filters:
+       {
+         user:{email :{ eq: "${email}" }}
+         course:{id :{ eq: ${id}}}
+       }){
+        data{
+         id
+           attributes{
+             status
+             completedOn
+             joinUrl
+             course{
+               data{
+                 id
+                   attributes{
+                     title
+                     startDate
+                     slug
+                     webinarId
+                     videoUrl
+                     
+                       category{
+                         data{
+                           attributes{
+                             title
+                           }
+                         }
+                       }
+                   }
+               }
+             }
+             user{
+               data{
+                 id
+                 attributes{
+                   username
+                 }
+               }
+             }
+            }
+           }  
+         }
+       }`;
+}

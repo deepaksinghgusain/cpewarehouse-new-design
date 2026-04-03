@@ -56,11 +56,13 @@ export default function InvoiceDataTable() {
 
     let invoicesTem = [];
     let resp = await getInvoicetemplate()
-    invoicesTem = resp.data.global.data;
+    if (res.data) {
+      invoicesTem = resp.data?.global?.data;
+      setInvoicesTem(invoicesTem)
+    }
 
-    setInvoicesTem(invoicesTem)
 
-    if (res?.data?.userCourses.length == 0) {
+    if (res?.data?.length == 0) {
       let message = 'You have not purchased any course. Please purchase a course to access this information';
     }
 
@@ -274,10 +276,12 @@ export default function InvoiceDataTable() {
   return (
     <>
       <div className="bg-white py-8 px-8 flex flex-col gap-8">
-        <h1 className="text-3xl font-semibold text-gray-900">Certificate(s)</h1>
+        <h1 className="text-3xl font-semibold text-gray-900">Invoice(s)</h1>
+
+        <h2 className="font-semibold text-gray-900">Asterid Group Inc., (dba CPE Warehouse) is a registered corporation inToronto, ON, Canada with an EIN #:98-1551198</h2>
 
         {/* PAGE TITLE */}
-        <div className="flex gap-4 justify-end bg-[#eee] py-4 items-center max-w-6xl w-full">
+        <div className="flex gap-10 justify-end bg-[#eee] py-4 px-4 items-center max-w-6xl w-full">
 
           <select
             value={selectedYear}

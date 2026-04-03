@@ -218,8 +218,6 @@ const BasicDetails = () => {
             }
         });
 
-        console.log(subscribedCourseIds);
-        
 
         const response = await getUpcomingCourse(subscribedCourseIds);
 
