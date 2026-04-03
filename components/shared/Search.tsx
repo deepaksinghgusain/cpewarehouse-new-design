@@ -3,9 +3,9 @@
 import * as React from "react"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
+import { Search } from "lucide-react"
 
-
-export default function Search() {
+export default function SearchComponent() {
     const [query, setQuery] = React.useState("")
     const [filtered, setFiltered] = React.useState<string[]>([])
     const [open, setOpen] = React.useState(false)
@@ -25,18 +25,19 @@ export default function Search() {
             return
         }
 
-        console.log(options);
-
-
         const results = options.filter((item) =>
             item.toLowerCase().includes(query.toLowerCase())
         )
 
         setFiltered(results)
-    }, [query, options])
+    }, [query, options.length])
 
     return (
         <div className="relative w-full max-w-sm">
+
+            {/* Search Icon */}
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+
             <Input
                 placeholder="Search Course"
                 value={query}
@@ -45,6 +46,7 @@ export default function Search() {
                     setOpen(true)
                 }}
                 onFocus={() => setOpen(true)}
+                className="pl-9"   // space for icon
             />
 
             {open && filtered.length > 0 && (
@@ -52,7 +54,7 @@ export default function Search() {
                     {filtered.map((item, index) => (
                         <div
                             key={index}
-                            className="cursor-pointer rounded-md px-2 py-1 hover:bg-muted"
+                            className="cursor-pointer rounded-md px-2 py-2 hover:bg-muted"
                             onClick={() => {
                                 setQuery(item)
                                 setOpen(false)

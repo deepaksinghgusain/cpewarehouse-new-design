@@ -35,6 +35,7 @@ export const Header = () => {
                                 </Link>
                             </div>
                             <div className="relative pr-3 md:pr-0 py-1 lg:w-[600px]">
+                                {/* <Search /> */}
                                 <div className="justify-start items-center gap-4 flex w-full">
                                     <div className="h-12 justify-start items-center flex border border-[#D0D5DD] rounded-md w-full">
                                         <div className="pr-3 inset-y-0 pl-3 flex items-center cursor-pointer">

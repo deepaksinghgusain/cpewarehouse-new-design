@@ -1,5 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ChevronDown, LucideShoppingCart, Search } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 
 const LearnerNavBar = () => {
@@ -10,15 +11,15 @@ const LearnerNavBar = () => {
             <div className="flex items-center gap-1">
 
                 <div className="px-3 py-2 rounded-md flex items-center gap-2">
-                    <span className="text-base font-semibold text-gray-600">
+                    <Link href="/about-us" className="text-base font-semibold text-gray-600">
                         About
-                    </span>
+                    </Link>
                 </div>
 
                 <div className="px-3 py-2 rounded-md  flex items-center gap-2">
-                    <span className="text-base font-semibold ">
+                    <Link href="/course-catalog" className="text-base font-semibold ">
                         Course Catalogue
-                    </span>
+                    </Link>
                 </div>
 
                 <div className="px-3 py-2 rounded-md flex items-center gap-2">
@@ -32,7 +33,6 @@ const LearnerNavBar = () => {
                         Cpe Forums
                     </span>
                 </div>
-
             </div>
 
 
@@ -50,8 +50,7 @@ const LearnerNavBar = () => {
 
                 {/* black square */}
                 <div className="w-12 h-12 flex items-center">
-                    <LucideShoppingCart />
-                    {/* <img src="/assets/images/cart.gif" className="w-8 h-8"></img> */}
+                    <img src="/assets/icons/cart-image.png" className="w-8 h-8"></img>
                 </div>
 
                 {/* avatar */}

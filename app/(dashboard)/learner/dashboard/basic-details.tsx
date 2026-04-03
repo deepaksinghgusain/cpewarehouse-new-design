@@ -1,48 +1,67 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { BookOpen, Calendar, Clock, User } from 'lucide-react';
+import { BookOpen, Calendar, Clock, Download, CheckCircle } from 'lucide-react';
 import { getUpcomingCourse, GetUserSubscribedCourses } from '@/services/course';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { imageUrl } from '@/lib/constants';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import moment from 'moment';
+import Link from 'next/link';
+
+function PastEventCard({ event }: any) {
+
+    return (
+        <div className="w-full p-4 bg-white rounded-xl shadow-sm border flex items-center gap-5">
+
+            {/* Course Image */}
+            <img
+                src={imageUrl + event.image}
+                alt="course"
+                className="w-48 h-36 object-cover rounded-lg"
+            />
+
+            {/* Course Content */}
+            <div className="flex-1 flex flex-col gap-4">
+
+                {/* Title Section */}
+                <div className="flex flex-col gap-1">
+                    <span className="text-pink-600 text-sm font-medium">
+                        {event.category}
+                    </span>
+
+                    <h3 className="text-gray-900 text-lg font-semibold leading-7">
+                        {event.course.title}
+                    </h3>
+                </div>
+
+                {/* Meta Info */}
+                <div className="flex items-center gap-6 flex-wrap">
+
+                    <div className="flex items-center gap-2 text-gray-500 text-sm font-medium">
+                        <Clock className="w-4 h-4" />
+                        Self Paced
+                    </div>
+
+                    <div className="flex items-center gap-2 text-gray-500 text-sm font-medium">
+                        <img src={imageUrl + event.instrutors.image.data.attributes.url} height="20" width="20" className='rounded-xl' />
+                        {event.instrutors?.firstName}
+                    </div>
+
+                </div>
+            </div>
+
+            {/* Download Button */}
+            <button className="flex items-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg shadow-sm hover:bg-indigo-700 transition">
+                <Download className="w-4 h-4" />
+                Download
+            </button>
+        </div>
+
+    )
+}
 
 
-const studies = [
-    { name: "Accounting", cpe: 1 },
-    { name: "Information Technology", cpe: 2 },
-    { name: "Tax Law", cpe: 1 },
-    { name: "Regulatory Ethics", cpe: 3 },
-];
-
-const events = [
-    {
-        type: "Live Webinar",
-        title:
-            "2024 FINCEN BENEFICIAL OWNERSHIP INTEREST (BOI) REPORTING - HOW TO GIVE GREAT CLIENT SERVICE / STAY OUT OF TROUBLE",
-        date: "Wed, Aug 07 2024",
-        time: "1:00 PM - 4:00 PM ET",
-        instructor: "Art Werner",
-        image: "https://placehold.co/200x160",
-    },
-    {
-        type: "Self Study",
-        title:
-            "2024 FINCEN BENEFICIAL OWNERSHIP INTEREST (BOI) REPORTING - HOW TO GIVE GREAT CLIENT SERVICE / STAY OUT OF TROUBLE",
-        date: "Self Paced",
-        instructor: "Art Werner",
-        image: "https://placehold.co/200x160",
-    },
-    {
-        type: "E-Book",
-        title: "Federal Tax Update Workbook",
-        instructor: "University Of Illinois Tax School",
-        image: "https://placehold.co/200x160",
-    },
-]
-
-
-function EventCard({ event }: any) {
+function RegisteredEventCard({ event }: any) {
     return (
         <div className="flex gap-6 p-4 border rounded-xl hover:shadow-md transition w-full">
 
@@ -66,30 +85,26 @@ function EventCard({ event }: any) {
 
                 <div className="flex flex-wrap gap-6 text-gray-600 text-sm mt-3">
 
-                    {event.startDate && (
-                        <div className="flex items-center gap-2">
-                            <Calendar size={16} />
-                            {event.startDate}
-                        </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {moment(event.startDate).format("ddd, MMM DD YYYY")}
+                    </div>
 
-                    {event.time && (
-                        <div className="flex items-center gap-2">
-                            <Clock size={16} />
-                            {event.time}
-                        </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {moment(event.startDate).format("h:mm A")} - {moment(event.endDate).format("h:mm A")}  ET
+                    </div>
 
                     <div className="flex items-center gap-2">
                         <img src={imageUrl + event.instrutors.image.data.attributes.url} height="20" width="20" className='rounded-xl' />
-                        {event.instrutors?.firstName}
+                        {event.instrutors.firstName} {event.instrutors.lastName}
                     </div>
 
                 </div>
 
                 <div className="mt-3 flex items-center gap-4">
 
-                    <button className="text-blue-700 font-semibold flex items-center gap-2">
+                    <button className="text-blue-700 font-semibold flex items-center gap-2 cursor-pointer">
                         <BookOpen size={18} />
                         Handouts
                     </button>
@@ -97,13 +112,89 @@ function EventCard({ event }: any) {
             </div>
 
             {/* Action */}
-            <button className="h-fit px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+            <Link href={event.joinUrl} className="h-fit px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
                 Launch
-            </button>
+            </Link>
         </div>
     )
 }
 
+
+function RecommendedEventCard({ event }: any) {
+
+    return (
+        <div className="w-full p-4 bg-white rounded-xl border shadow-sm flex gap-5 items-center">
+
+            {/* Image */}
+            <img
+                src={imageUrl + event.attributes.image.data.attributes.url}
+                alt="course"
+                className="w-48 h-40 object-cover rounded-lg"
+            />
+
+            {/* Content */}
+            <div className="flex-1 flex flex-col gap-4">
+
+                {/* Title */}
+                <div className="flex flex-col gap-1">
+                    <span className="text-pink-600 text-sm font-medium">
+                        {event.attributes.category.data.attributes.title}
+                    </span>
+
+                    <h3 className="text-gray-900 text-lg font-semibold leading-7">
+                        {event.attributes.title}
+                    </h3>
+                </div>
+
+                {/* Meta */}
+                <div className="flex items-center gap-6 flex-wrap text-gray-600 text-sm font-medium">
+
+                    <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {moment(event.attributes.startDate).format("ddd, MMM DD YYYY")}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {moment(event.attributes.startDate).format("h:mm A")} - {moment(event.attributes.endDate).format("h:mm A")}  ET
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <img src={imageUrl + event.attributes.instructors.data[0].attributes.image.data.attributes.url} height="20" width="20" className='rounded-xl' />
+                        {event.attributes.instructors.data[0].attributes.firstName} {event.attributes.instructors.data[0].attributes.lastName}
+                    </div>
+
+                </div>
+
+                {/* Features */}
+                <div className="flex items-center gap-8 flex-wrap text-gray-600">
+
+                    <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        Recording (via email)
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        Handouts
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        CPE Certificate
+                    </div>
+
+                </div>
+
+            </div>
+
+            {/* Button */}
+            <Link href={`/course/${event.attributes?.slug}`} className="px-4 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
+                Read more
+            </Link>
+        </div>
+    );
+}
 
 const BasicDetails = () => {
 
@@ -115,29 +206,8 @@ const BasicDetails = () => {
     let [certificatesByYear, setCertificatesByYear] = useState<{ [year: number]: { fieldOfStudy: string, credit: number }[] }>({});
     let [pastEvents, setPastEvents] = useState([]);
     let [regEvent, setRegEvent] = useState([]);
-
+    let [upcommingEvent, setUpcommingEvent] = useState([]);
     let [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me", {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            },
-        }).then((res) => {
-            return res.json()
-        }).then(res => {
-            if (res.jwt) {
-                localStorage.setItem("token", res.jwt)
-            } else {
-                setUser(res)
-            }
-        });
-
-        getEventlist()
-
-        setMounted(true);
-    }, [])
 
     async function getUserSubscription() {
 
@@ -150,7 +220,7 @@ const BasicDetails = () => {
         }).then((res) => {
             return res.json()
         }).then(res => {
-            console.log(res);
+
         });
     }
 
@@ -202,11 +272,7 @@ const BasicDetails = () => {
                 let completedYear = completedOn ? new Date(completedOn).getFullYear() : null;
                 const categoryLower = course?.category?.data?.attributes?.title.toLowerCase();
 
-                // Condition for including credits:
-                // 1. Live course AND completed AND has a completion year
-                // 2. Recorded course (we're assuming all recorded courses count once purchased)
-                const includeCredit = (categoryLower === 'live' && usercourse?.status?.toLowerCase() === 'completed' && completedYear) ||
-                    categoryLower === 'recorded';
+                const includeCredit = (categoryLower === 'live' && usercourse?.status?.toLowerCase() === 'completed' && completedYear) || categoryLower === 'recorded';
 
                 if (includeCredit && completedYear) {
                     if (!fieldCreditMapByYear[completedYear]) {
@@ -220,62 +286,46 @@ const BasicDetails = () => {
 
 
         const response = await getUpcomingCourse(subscribedCourseIds);
+        let upcomingEvents = response.data;
+        setUpcommingEvent(upcomingEvents)
 
-        console.log(response);
-        
-
-        console.log(coursesPurchased);
-        
         regEvent = coursesPurchased.filter((element: any) =>
         ((element.category.toLowerCase() === "live" && new Date(element?.course?.endDate) >= new Date(localTime))
             || (element.category.toLowerCase() === "recorded")
             && new Date(element?.course?.endDate) <= new Date(localTime)
         ));
 
-        console.log(regEvent);
-
-        // Sort the regEvent array
         regEvent.sort((a: any, b: any) => {
-            // First, compare by courseType: "Live Webinar" should come before "Self-Study"
             if (a.courseType === 'Live Webinar' && b.courseType !== 'Live Webinar') {
-                return -1; // a comes before b
+                return -1;
             }
             if (a.courseType !== 'Live Webinar' && b.courseType === 'Live Webinar') {
-                return 1; // b comes before a
+                return 1;
             }
-            // If both are the same courseType, then sort by startDate
             return (Date.parse(a.startDate) < Date.parse(b.startDate)) ? -1 : 1;
         });
-        
 
         setRegEvent(regEvent);
 
-        let pastEvents = coursesPurchased.filter((element: any) =>
-            (element.category.toLowerCase() === "live")
+        let pastEvents = coursesPurchased.filter((element: any) => (element.category.toLowerCase() === "live")
             && new Date(element?.course?.endDate) <= new Date(localTime)
         );
-        //sorting 
 
         pastEvents = pastEvents.sort((a: any, b: any) => (Date.parse(a.startDate) < Date.parse(b.startDate)) ? 1 : -1);
 
         setPastEvents(pastEvents)
 
-        // Populate available years for dropdown
-        availableYears = Object.keys(fieldCreditMapByYear)
-            .map(Number)
-            .sort((a, b) => b - a); // Sort descending
-        // Set selectedYear to the first available year if there are any
+        availableYears = Object.keys(fieldCreditMapByYear).map(Number).sort((a, b) => b - a);
         setAvailableYears(availableYears);
 
         if (availableYears.length > 0) {
             selectedYear = availableYears[0];
         } else {
-            selectedYear = new Date().getFullYear(); // Fallback if no data
+            selectedYear = new Date().getFullYear();
         }
 
         setSelectedYear(selectedYear);
 
-        // Convert fieldCreditMapByYear to display format
         for (let year of availableYears) {
             let data = Array.from(fieldCreditMapByYear[year], ([fieldOfStudy, credit]) => ({
                 fieldOfStudy,
@@ -297,11 +347,34 @@ const BasicDetails = () => {
         settTotalCreditEarned(certificates.reduce((sum: number, c: any) => sum + (c.credit || 0), 0))
     }
 
+    const getUserData = () => {
+        const token = localStorage.getItem("token");
+        fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me", {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        }).then((res) => {
+            return res.json()
+        }).then(res => {
+            if (res.jwt) {
+                localStorage.setItem("token", res.jwt)
+            } else {
+                setUser(res)
+            }
+        });
+    }
+
+    useEffect(() => {
+        getUserData();
+
+        getEventlist();
+
+        setMounted(true);
+    }, [])
 
     if (mounted) {
         return (
             <>
-
                 <div className="bg-gray-50 p-8 flex flex-col gap-6">
 
                     {/* Header */}
@@ -339,7 +412,21 @@ const BasicDetails = () => {
                                     </div>
 
                                     {/* Badge */}
-                                    <div className="px-3 py-1 bg-green-50 border border-green-200 rounded-full text-green-700 text-sm font-medium">
+                                    <div className="px-3 py-1 bg-green-50 border border-green-200 rounded-full text-green-700 text-sm font-medium flex gap-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="21" viewBox="0 0 15 21" fill="none">
+                                            <path d="M7.5 14.5C11.366 14.5 14.5 11.366 14.5 7.5C14.5 3.63401 11.366 0.5 7.5 0.5C3.63401 0.5 0.5 3.63401 0.5 7.5C0.5 11.366 3.63401 14.5 7.5 14.5Z" fill="url(#paint0_linear_3165_1965)" />
+                                            <path d="M3.46668 13.2219L2.5 20.5L7.0884 17.747C7.23805 17.6572 7.31288 17.6123 7.39276 17.5947C7.46341 17.5792 7.53659 17.5792 7.60724 17.5947C7.68712 17.6123 7.76195 17.6572 7.9116 17.747L12.5 20.5L11.5343 13.2212M14.5 7.5C14.5 11.366 11.366 14.5 7.5 14.5C3.63401 14.5 0.5 11.366 0.5 7.5C0.5 3.63401 3.63401 0.5 7.5 0.5C11.366 0.5 14.5 3.63401 14.5 7.5Z" stroke="url(#paint1_linear_3165_1965)" strokeLinecap="round" strokeLinejoin="round" />
+                                            <defs>
+                                                <linearGradient id="paint0_linear_3165_1965" x1="0.499782" y1="20.4999" x2="19.2918" y2="7.34543" gradientUnits="userSpaceOnUse">
+                                                    <stop stopColor="#FF7A00" />
+                                                    <stop offset="1" stopColor="#FFD439" />
+                                                </linearGradient>
+                                                <linearGradient id="paint1_linear_3165_1965" x1="0.499782" y1="20.4999" x2="19.2918" y2="7.34543" gradientUnits="userSpaceOnUse">
+                                                    <stop stopColor="#FF7A00" />
+                                                    <stop offset="1" stopColor="#FFD439" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
                                         Subscribed member
                                     </div>
                                 </div>
@@ -384,14 +471,14 @@ const BasicDetails = () => {
                                         </div>
                                     </div>
 
-                                    <div>
+                                    <div className='ml-12'>
                                         <div className="text-gray-500 font-semibold">
                                             PTIN
                                         </div>
                                         <div>{user.ptin}</div>
                                     </div>
 
-                                    <div>
+                                    <div className='ml-12'>
                                         <div className="text-gray-500 font-semibold">
                                             CFP ID
                                         </div>
@@ -510,13 +597,12 @@ const BasicDetails = () => {
                     </div>
                 </div>
 
-                <div className="w-full mx-auto p-8 space-y-4">
-
+                <div className="w-full p-8 space-y-4">
                     {/* Tabs */}
                     <div className="border-b flex gap-6 text-lg font-semibold w-full">
                         <Tabs defaultValue="registered-event" className=" bg-transparent w-full">
                             <TabsList variant="line" className='w-full bg-transparent border-b border-[#dee1e9]'>
-                                <TabsTrigger value="registered-event" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Registered Event(s)</TabsTrigger>
+                                <TabsTrigger value="registered-event" className="text-xl  font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Registered Event(s)</TabsTrigger>
                                 <TabsTrigger value="past-event" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Past Event(s)</TabsTrigger>
                                 <TabsTrigger value="recommended-events" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Recommended Events</TabsTrigger>
                             </TabsList>
@@ -534,7 +620,7 @@ const BasicDetails = () => {
                                     {/* Events */}
                                     <div className="p-4 space-y-4 w-full">
                                         {regEvent.length > 0 && regEvent.map((event, index) => (
-                                            <EventCard key={index} event={event} />
+                                            <RegisteredEventCard key={index} event={event} />
                                         ))}
                                     </div>
                                 </div>
@@ -551,7 +637,7 @@ const BasicDetails = () => {
                                     {/* Events */}
                                     <div className="p-4 space-y-4">
                                         {pastEvents.length > 0 && pastEvents.map((event, index) => (
-                                            <EventCard key={index} event={event} />
+                                            <PastEventCard key={index} event={event} />
                                         ))}
                                     </div>
                                 </div>
@@ -560,16 +646,16 @@ const BasicDetails = () => {
                                 <div className="bg-white border rounded-xl shadow-sm">
                                     {/* Header */}
                                     <div className="flex items-center justify-end px-6 py-4 border-b">
-                                        <h2 className="text-lg font-semibold">
+                                        <Link href="/course-catalog" className="text-lg font-semibold">
                                             View All Courses
-                                        </h2>
+                                        </Link>
                                     </div>
 
                                     {/* Events */}
                                     <div className="p-4 space-y-4">
-                                        {/* {events.map((event, index) => (
-                                            <EventCard key={index} event={event} />
-                                        ))} */}
+                                        {upcommingEvent.length > 0 && upcommingEvent.map((event, index) => (
+                                            <RecommendedEventCard key={index} event={event} />
+                                        ))}
                                     </div>
                                 </div>
                             </TabsContent>

@@ -130,10 +130,11 @@ export async function getUpcomingCourse(IDarray: any) {
     query: getCourses(IDarray),
     fetchPolicy: "network-only",
   });
+ 
 
   if (!data) return {};
 
-  return data?.userCourses;
+  return data?.courses;
 }
 
 export function getCourses(IDarray: any) {
