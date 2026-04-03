@@ -1,3 +1,5 @@
+"use client";
+
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ChevronDown, LucideShoppingCart, Search } from 'lucide-react'
 import Link from 'next/link'
@@ -63,7 +65,7 @@ const LearnerNavBar = () => {
                 {/* dashboard button */}
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
-                        <button className="px-4 py-2.5 bg-white rounded-lg border border-gray-300 shadow-sm flex items-center gap-2">
+                        <button className="px-4 py-2.5 cursor-pointer bg-white rounded-lg border border-gray-300 shadow-sm flex items-center gap-2">
                             <span className="text-base font-semibold text-slate-700">
                                 Dashboard
                             </span>
@@ -72,9 +74,21 @@ const LearnerNavBar = () => {
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">Settings</DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">Logout</DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" asChild>
+                            <Link href="/learner/dashboard" prefetch={false}>Dashboard</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" asChild>
+                            <Link href="/learner/certificates" prefetch={false}>Certificates</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" asChild>
+                            <Link href="/learner/invoice" prefetch={false}>Invoices</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" asChild>
+                            <Link href="/learner/profile" prefetch={false}>Profile</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer">
+                            Logout
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
