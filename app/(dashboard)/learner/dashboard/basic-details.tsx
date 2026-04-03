@@ -264,7 +264,7 @@ const BasicDetails = () => {
                             ? 'Self-Study'
                             : 'Live Webinar' // Determine course type
                     })
-                }
+                }                
 
                 let creditValue = parseFloat(course?.credit) || 0;
                 let fieldOfStudy = course?.fieldOfStudy || 'Unknown';
@@ -283,7 +283,6 @@ const BasicDetails = () => {
                 }
             }
         });
-
 
         const response = await getUpcomingCourse(subscribedCourseIds);
         let upcomingEvents = response.data;
@@ -525,7 +524,7 @@ const BasicDetails = () => {
 
                                 {/* Year Button */}
                                 <div className="absolute top-5 right-5">
-                                    <Select defaultValue="2024">
+                                    <Select defaultValue="2026">
                                         <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-300 rounded-lg shadow-sm">
 
                                             {/* Icon */}
@@ -547,7 +546,7 @@ const BasicDetails = () => {
                                         <SelectContent position="popper">
                                             {
                                                 availableYears.length > 0 && availableYears.map((year: any, index: number) => (
-                                                    <SelectItem value={year} key={index}>2024</SelectItem>
+                                                    <SelectItem value={year} key={index}>{year}</SelectItem>
                                                 ))
                                             }
                                         </SelectContent>

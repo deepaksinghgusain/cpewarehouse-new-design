@@ -9,7 +9,7 @@ import { getPageContent } from '@/services/common';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AddToCardComponent from './add-to-cart';
 
-const CourseLandingPage = async ({ params } : { params: Promise<{slug: string}>}) => {
+const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
 
     const { slug } = await params;
 
@@ -107,7 +107,7 @@ const CourseLandingPage = async ({ params } : { params: Promise<{slug: string}>}
         return (
             <>
                 <section className="w-[90%] mx-auto">
-                    <AddToCardComponent courseData={courseData} instructor={instructor}  />
+                    <AddToCardComponent courseData={courseData} instructor={instructor} />
                 </section >
 
                 <section className="mt-20 ">
@@ -189,6 +189,19 @@ const CourseLandingPage = async ({ params } : { params: Promise<{slug: string}>}
                                                 </div>
                                             ))
                                         }
+                                    </div>
+                                </div >
+                            </TabsContent>
+                            <TabsContent value="CPE Info">
+                                <div className="">
+                                    <div
+                                        className="w-full py-8 bg-Colors-Background-bg-primary inline-flex flex-col justify-start items-center gap-16 overflow-hidden text-[#475467]">
+                                        <div className="w-full  px-8 inline-flex justify-start items-start gap-16 flex-wrap content-start">
+                                            <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
+                                                <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content }} >
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div >
                                 <section>
@@ -316,19 +329,6 @@ const CourseLandingPage = async ({ params } : { params: Promise<{slug: string}>}
                                         </div>
                                     </div>
                                 </section>
-                            </TabsContent>
-                            <TabsContent value="CPE Info">
-                                <div className="">
-                                    <div
-                                        className="w-full py-8 bg-Colors-Background-bg-primary inline-flex flex-col justify-start items-center gap-16 overflow-hidden text-[#475467]">
-                                        <div className="w-full  px-8 inline-flex justify-start items-start gap-16 flex-wrap content-start">
-                                            <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
-                                                <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content }} >
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div >
                             </TabsContent>
                             <TabsContent value="FAQ">
                                 <div className="">
@@ -548,7 +548,7 @@ const CourseLandingPage = async ({ params } : { params: Promise<{slug: string}>}
                                             <div className="h-32 overflow-hidden rounded-md">
                                                 <video
                                                     src="/assets/images/package-image.mp4"
-                                                   
+
                                                     className="w-full h-full object-fill border border-blue-600"
                                                 ></video>
                                             </div>
