@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { imageUrl } from '@/lib/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
 import React, { useState, useTransition } from 'react'
@@ -270,9 +271,37 @@ const Password = () => {
             <Dialog open={success} onOpenChange={setSuccess}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Success</DialogTitle>
                         <DialogDescription>
-                            {successMessage}
+
+                            <div className="bg-gray-50 rounded-lg flex flex-col items-center justify-between">
+
+                                {/* Content */}
+                                <div className="flex flex-col items-center pt-6 pb-8 px-6 gap-6">
+
+                                    <img
+                                        src={"/assets/icons/update-password-icon.gif"}
+                                        alt="success"
+                                        className="w-60 h-48 object-contain"
+                                    />
+
+                                    <h2 className="text-4xl font-bold text-zinc-900 text-center leading-[56px]">
+                                        Password changed!
+                                    </h2>
+
+                                </div>
+
+                                {/* Footer */}
+                                <div className="w-full border-t border-gray-200 p-4">
+                                    <button
+                                        onClick={() => setSuccess(false)}
+                                        className="w-full py-3 bg-indigo-600 text-white text-lg font-semibold rounded-lg shadow-sm hover:bg-indigo-700 transition"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+
+                            </div>
+
                         </DialogDescription>
                     </DialogHeader>
                 </DialogContent>
