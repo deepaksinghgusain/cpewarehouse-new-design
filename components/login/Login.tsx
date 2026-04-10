@@ -64,6 +64,10 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
             let res = await login(values)
 
             if (res.user) {
+                // Set a cookie so the server-side layout can verify authentication
+                const maxAge = values.remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24; // 30 days or 1 day
+                document.cookie = `token=${res.jwt}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
                 localStorage.setItem('remember', values.remember);
                 localStorage.setItem('token', res.jwt);
                 localStorage.setItem('username', res.user.firstName);

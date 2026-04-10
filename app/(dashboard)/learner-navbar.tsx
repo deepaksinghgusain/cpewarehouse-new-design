@@ -3,9 +3,26 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ChevronDown, LucideShoppingCart, Search } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation';
 import React from 'react'
 
 const LearnerNavBar = () => {
+    const router = useRouter();
+
+    const handlogout = () => {
+        localStorage.removeItem('remember');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('lastname');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('email');
+        localStorage.removeItem('PTIN');
+        localStorage.removeItem('rem_email');
+        localStorage.removeItem('rem_pass');
+
+        router.push('/login');
+    }
+
     return (
         <div className="sticky top-0 z-50 bg-white py-5 w-full max-w-[1280px] px-8  flex justify-between items-center">
 
@@ -86,7 +103,7 @@ const LearnerNavBar = () => {
                         <DropdownMenuItem className="cursor-pointer" asChild>
                             <Link href="/learner/profile" prefetch={false}>Profile</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem className="cursor-pointer" onClick={handlogout}>
                             Logout
                         </DropdownMenuItem>
                     </DropdownMenuContent>

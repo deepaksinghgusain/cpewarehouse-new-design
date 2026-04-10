@@ -1,18 +1,21 @@
 import { Footer } from '@/components/shared/Footer';
 import React from 'react'
 import LearnerSidebar from './learner-sidebar';
-import { ChevronDown, LucideShoppingCart, Search } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import LearnerNavBar from './learner-navbar';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-
-export default function GuestLayout({
+export default async function GuestLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token");
 
-
+    if (!token) {
+        redirect("/login");
+    }
 
     return (
         <div className='flex flex-col h-screen'>
