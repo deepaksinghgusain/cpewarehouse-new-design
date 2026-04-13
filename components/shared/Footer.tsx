@@ -38,9 +38,9 @@ export const Footer = () => {
 
           <div className="flex justify-between items-center px-8 py-6 border-b border-gray-200">
             <div>
-              <h2 className="font-semibold text-gray-800">{footerTop.title}</h2>
+              <h2 className="font-semibold text-gray-800">{footerTop?.title}</h2>
               <p className="text-sm text-gray-600">
-                {footerTop.sub_title}
+                {footerTop?.sub_title}
               </p>
             </div>
             <Link href={footerTop?.button?.href ?? ""}
@@ -78,7 +78,7 @@ export const Footer = () => {
             <div className="flex items-center space-x-2">
               {footerBottom?.image?.data?.attributes?.url && <Image src={imageUrl + footerBottom?.image?.data?.attributes?.url} alt="Logo" height={50} width={200} />}
             </div>
-            <p>{footerBottom.copyright}</p>
+            <p>{footerBottom?.copyright}</p>
           </div>
         </div>
 

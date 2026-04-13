@@ -62,6 +62,7 @@ function PastEventCard({ event }: any) {
 
 
 function RegisteredEventCard({ event }: any) {
+    
     return (
         <div className="flex gap-6 p-4 border rounded-xl hover:shadow-md transition w-full">
 
@@ -112,9 +113,9 @@ function RegisteredEventCard({ event }: any) {
             </div>
 
             {/* Action */}
-            <Link href={event.joinUrl} className="h-fit flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+            <Link href={event.joinUrl ?? "" } className="h-fit flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M9.99967 12.5L7.49967 10M9.99967 12.5C11.1637 12.0573 12.2804 11.499 13.333 10.8334M9.99967 12.5V16.6667C9.99967 16.6667 12.5247 16.2084 13.333 15C14.233 13.65 13.333 10.8334 13.333 10.8334M7.49967 10C7.94313 8.84957 8.50151 7.74676 9.16634 6.70838C10.1373 5.15587 11.4894 3.87758 13.0938 2.99512C14.6983 2.11266 16.5019 1.65535 18.333 1.66671C18.333 3.93338 17.683 7.91671 13.333 10.8334M7.49967 10H3.33301C3.33301 10 3.79134 7.47504 4.99967 6.66671C6.34967 5.76671 9.16634 6.66671 9.16634 6.66671M3.74967 13.75C2.49967 14.8 2.08301 17.9167 2.08301 17.9167C2.08301 17.9167 5.19967 17.5 6.24967 16.25C6.84134 15.55 6.83301 14.475 6.17467 13.825C5.85076 13.5159 5.42409 13.3372 4.97653 13.3234C4.52897 13.3096 4.09207 13.4615 3.74967 13.75Z" stroke="white" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M9.99967 12.5L7.49967 10M9.99967 12.5C11.1637 12.0573 12.2804 11.499 13.333 10.8334M9.99967 12.5V16.6667C9.99967 16.6667 12.5247 16.2084 13.333 15C14.233 13.65 13.333 10.8334 13.333 10.8334M7.49967 10C7.94313 8.84957 8.50151 7.74676 9.16634 6.70838C10.1373 5.15587 11.4894 3.87758 13.0938 2.99512C14.6983 2.11266 16.5019 1.65535 18.333 1.66671C18.333 3.93338 17.683 7.91671 13.333 10.8334M7.49967 10H3.33301C3.33301 10 3.79134 7.47504 4.99967 6.66671C6.34967 5.76671 9.16634 6.66671 9.16634 6.66671M3.74967 13.75C2.49967 14.8 2.08301 17.9167 2.08301 17.9167C2.08301 17.9167 5.19967 17.5 6.24967 16.25C6.84134 15.55 6.83301 14.475 6.17467 13.825C5.85076 13.5159 5.42409 13.3372 4.97653 13.3234C4.52897 13.3096 4.09207 13.4615 3.74967 13.75Z" stroke="white" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Launch
             </Link>
@@ -205,7 +206,7 @@ const BasicDetails = () => {
     const [mounted, setMounted] = useState(false)
     let [certificates, setCertificates] = useState<any>([]);
     let [totalCreditEarned, settTotalCreditEarned] = useState(0);
-    let [availableYears, setAvailableYears] = useState<any>([]);
+    let [availableYears, setAvailableYears] = useState<number[]>([]);
     let [certificatesByYear, setCertificatesByYear] = useState<{ [year: number]: { fieldOfStudy: string, credit: number }[] }>({});
     let [pastEvents, setPastEvents] = useState([]);
     let [regEvent, setRegEvent] = useState([]);
@@ -320,34 +321,25 @@ const BasicDetails = () => {
         availableYears = Object.keys(fieldCreditMapByYear).map(Number).sort((a, b) => b - a);
         setAvailableYears(availableYears);
 
-        if (availableYears.length > 0) {
-            selectedYear = availableYears[0];
-        } else {
-            selectedYear = new Date().getFullYear();
-        }
+        const initialYear = availableYears.length > 0 ? availableYears[0] : new Date().getFullYear();
+        setSelectedYear(initialYear);
 
-        setSelectedYear(selectedYear);
-
-        for (let year of availableYears) {
-            let data = Array.from(fieldCreditMapByYear[year], ([fieldOfStudy, credit]) => ({
+        const nextCertificatesByYear: { [year: number]: { fieldOfStudy: string, credit: number }[] } = {};
+        for (const year of availableYears) {
+            nextCertificatesByYear[year] = Array.from(fieldCreditMapByYear[year], ([fieldOfStudy, credit]) => ({
                 fieldOfStudy,
                 credit
             }));
-
-            setCertificatesByYear((prevValue) => ({
-                ...prevValue,
-                [year]: data
-            }))
         }
 
-        updateDisplayedCredits();
+        setCertificatesByYear(nextCertificatesByYear);
     }
 
-    function updateDisplayedCredits() {
-        const year = selectedYear;
-        setCertificates(certificatesByYear[year])
-        settTotalCreditEarned(certificates.reduce((sum: number, c: any) => sum + (c.credit || 0), 0))
-    }
+    useEffect(() => {
+        const yearCertificates = certificatesByYear[selectedYear] || [];
+        setCertificates(yearCertificates);
+        settTotalCreditEarned(yearCertificates.reduce((sum: number, c: any) => sum + (c.credit || 0), 0));
+    }, [selectedYear, certificatesByYear]);
 
     const getUserData = () => {
         const token = localStorage.getItem("token");
@@ -527,7 +519,7 @@ const BasicDetails = () => {
 
                                 {/* Year Button */}
                                 <div className="absolute top-5 right-5">
-                                    <Select defaultValue="2026">
+                                    <Select value={String(selectedYear)} onValueChange={(value) => setSelectedYear(Number(value))}>
                                         <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-300 rounded-lg shadow-sm">
 
                                             {/* Icon */}
@@ -548,8 +540,8 @@ const BasicDetails = () => {
 
                                         <SelectContent position="popper">
                                             {
-                                                availableYears.length > 0 && availableYears.map((year: any, index: number) => (
-                                                    <SelectItem value={year} key={index}>{year}</SelectItem>
+                                                availableYears.length > 0 && availableYears.map((year: number, index: number) => (
+                                                    <SelectItem value={String(year)} key={index}>{year}</SelectItem>
                                                 ))
                                             }
                                         </SelectContent>
