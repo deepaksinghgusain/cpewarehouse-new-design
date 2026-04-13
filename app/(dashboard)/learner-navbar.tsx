@@ -5,20 +5,34 @@ import { ChevronDown, LucideShoppingCart, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { userLogoutRequest } from '@/store/actions/user-actions';
+import { RootState } from '@/store/store';
+import { imageUrl } from '@/lib/constants';
 
 const LearnerNavBar = () => {
     const router = useRouter();
+    const dispatch = useDispatch();
+    const user = useSelector((state: RootState) => state.user.user as any);
+
+    const profileImage = user?.profileImage?.url
+        ? `${imageUrl}${user.profileImage.url}`
+        : "https://placehold.co/29x29";
 
     const handlogout = () => {
+        dispatch(userLogoutRequest());
+
         localStorage.removeItem('remember');
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('lastname');
         localStorage.removeItem('userId');
+        localStorage.removeItem('userData');
         localStorage.removeItem('email');
         localStorage.removeItem('PTIN');
         localStorage.removeItem('rem_email');
         localStorage.removeItem('rem_pass');
+        document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
 
         router.push('/login');
     }
@@ -75,7 +89,7 @@ const LearnerNavBar = () => {
                 {/* avatar */}
                 <img
                     className="w-7 h-7"
-                    src="https://placehold.co/29x29"
+                    src={profileImage}
                     alt="profile"
                 />
 

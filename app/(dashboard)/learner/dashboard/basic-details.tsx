@@ -7,6 +7,8 @@ import { imageUrl } from '@/lib/constants';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import moment from 'moment';
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 function PastEventCard({ event }: any) {
 
@@ -61,7 +63,7 @@ function PastEventCard({ event }: any) {
 }
 
 
-function RegisteredEventCard({ event }: any) {
+function RegisteredEventCard({ event, onLaunch }: any) {
     
     return (
         <div className="flex gap-6 p-4 border rounded-xl hover:shadow-md transition w-full">
@@ -113,12 +115,16 @@ function RegisteredEventCard({ event }: any) {
             </div>
 
             {/* Action */}
-            <Link href={event.joinUrl ?? "" } className="h-fit flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+            <button
+                type="button"
+                onClick={() => onLaunch(event)}
+                className="h-fit flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 cursor-pointer"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M9.99967 12.5L7.49967 10M9.99967 12.5C11.1637 12.0573 12.2804 11.499 13.333 10.8334M9.99967 12.5V16.6667C9.99967 16.6667 12.5247 16.2084 13.333 15C14.233 13.65 13.333 10.8334 13.333 10.8334M7.49967 10C7.94313 8.84957 8.50151 7.74676 9.16634 6.70838C10.1373 5.15587 11.4894 3.87758 13.0938 2.99512C14.6983 2.11266 16.5019 1.65535 18.333 1.66671C18.333 3.93338 17.683 7.91671 13.333 10.8334M7.49967 10H3.33301C3.33301 10 3.79134 7.47504 4.99967 6.66671C6.34967 5.76671 9.16634 6.66671 9.16634 6.66671M3.74967 13.75C2.49967 14.8 2.08301 17.9167 2.08301 17.9167C2.08301 17.9167 5.19967 17.5 6.24967 16.25C6.84134 15.55 6.83301 14.475 6.17467 13.825C5.85076 13.5159 5.42409 13.3372 4.97653 13.3234C4.52897 13.3096 4.09207 13.4615 3.74967 13.75Z" stroke="white" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Launch
-            </Link>
+            </button>
         </div>
     )
 }
@@ -201,9 +207,9 @@ function RecommendedEventCard({ event }: any) {
 }
 
 const BasicDetails = () => {
-
-    const [user, setUser] = useState<any>({})
     const [mounted, setMounted] = useState(false)
+    const [isPageLoading, setIsPageLoading] = useState(true)
+    const user = useSelector((state: RootState) => state.user.user as any) || {};
     let [certificates, setCertificates] = useState<any>([]);
     let [totalCreditEarned, settTotalCreditEarned] = useState(0);
     let [availableYears, setAvailableYears] = useState<number[]>([]);
@@ -212,6 +218,47 @@ const BasicDetails = () => {
     let [regEvent, setRegEvent] = useState([]);
     let [upcommingEvent, setUpcommingEvent] = useState([]);
     let [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+
+    const gotowebinar = (webinarId?: string, joinUrl?: string) => {
+        const webinarLink = joinUrl || (webinarId ? `https://global.gotowebinar.com/join/${webinarId}` : "");
+        if (webinarLink) {
+            window.open(webinarLink, "_blank");
+        }
+    };
+
+    const navigateToVideo = (videoUrl?: string, slug?: string, eventImage?: string) => {
+        if (!videoUrl) return;
+
+        const baseOrigin = window.location.origin;
+        const cleanedVideoPath = videoUrl
+            .trim()
+            .replace(/^https?:\/\/[^/]+\/learner\/view-webinar\/?/i, "")
+            .replace(/^\/+|\/+$/g, "");
+
+        let targetUrl = `${baseOrigin}/learner/view-webinar/${cleanedVideoPath}`;
+
+        if (slug && !targetUrl.toLowerCase().includes(`/${slug.toLowerCase()}`)) {
+            targetUrl = `${targetUrl.replace(/\/$/, "")}/${slug}`;
+        }
+
+        if (eventImage && !targetUrl.includes("image=")) {
+            const separator = targetUrl.includes("?") ? "&" : "?";
+            const absoluteImageUrl = eventImage.startsWith("http") ? eventImage : `${imageUrl}${eventImage}`;
+            const encodedImageUrl = encodeURIComponent(absoluteImageUrl).replace(/%3A/g, ":");
+            targetUrl = `${targetUrl}${separator}image=${encodedImageUrl}`;
+        }
+
+        window.open(targetUrl, "_self");
+    };
+
+    const launchEvent = (event: any) => {
+        console.log(event);
+        if (event.courseType === 'Live Webinar') {
+            gotowebinar(event?.course?.webinarId, event?.joinUrl);
+        } else if (event.courseType === 'Self-Study') {
+            navigateToVideo(event?.course?.videoUrl, event?.course?.slug, event?.image);
+        }
+    };
 
     async function getUserSubscription() {
 
@@ -341,35 +388,79 @@ const BasicDetails = () => {
         settTotalCreditEarned(yearCertificates.reduce((sum: number, c: any) => sum + (c.credit || 0), 0));
     }, [selectedYear, certificatesByYear]);
 
-    const getUserData = () => {
-        const token = localStorage.getItem("token");
-        fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me", {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            },
-        }).then((res) => {
-            return res.json()
-        }).then(res => {
-            if (res.jwt) {
-                localStorage.setItem("token", res.jwt)
-            } else {
-                setUser(res)
-            }
-        });
-    }
-
     useEffect(() => {
-        getUserData();
+        const loadDashboardData = async () => {
+            try {
+                await getEventlist();
+            } finally {
+                setMounted(true);
+                setIsPageLoading(false);
+            }
+        };
 
-        getEventlist();
-
-        setMounted(true);
+        loadDashboardData();
     }, [])
 
-    if (mounted) {
+    if (isPageLoading) {
         return (
-            <>
-                <div className="bg-gray-50 p-8 flex flex-col gap-6">
+            <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50 p-8 flex flex-col gap-6">
+                <div className="pointer-events-none absolute -top-16 -right-16 h-52 w-52 rounded-full bg-indigo-100/50 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-pink-100/40 blur-3xl" />
+
+                <div className="relative h-10 w-72 overflow-hidden rounded-xl bg-slate-200/80">
+                    <div className="h-full w-1/2 animate-pulse bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+                </div>
+
+                <div className="grid lg:grid-cols-2 gap-6">
+                    <div className="space-y-6">
+                        <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="h-14 w-14 rounded-full bg-slate-200 animate-pulse" />
+                                <div className="space-y-2 w-full">
+                                    <div className="h-4 w-48 rounded bg-slate-200 animate-pulse" />
+                                    <div className="h-3 w-32 rounded bg-slate-200 animate-pulse" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="h-16 rounded-lg bg-slate-100 animate-pulse" />
+                                <div className="h-16 rounded-lg bg-slate-100 animate-pulse" />
+                                <div className="h-16 rounded-lg bg-slate-100 animate-pulse" />
+                                <div className="h-16 rounded-lg bg-slate-100 animate-pulse" />
+                            </div>
+                        </div>
+
+                        <div className="h-40 rounded-2xl border border-slate-200 bg-white/90 shadow-sm animate-pulse" />
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="h-32 rounded-2xl border border-slate-200 bg-white/90 shadow-sm animate-pulse" />
+                        <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm space-y-3">
+                            <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                            <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                            <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                            <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                            <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-4">
+                    <div className="h-8 w-72 rounded bg-slate-200 animate-pulse" />
+                    <div className="h-24 rounded-xl bg-slate-100 animate-pulse" />
+                    <div className="h-24 rounded-xl bg-slate-100 animate-pulse" />
+                    <div className="h-24 rounded-xl bg-slate-100 animate-pulse" />
+                </div>
+            </div>
+        );
+    }
+
+    if (!mounted) {
+        return null;
+    }
+
+    return (
+        <>
+            <div className="bg-gray-50 p-8 flex flex-col gap-6">
 
                     {/* Header */}
                     <div className="text-3xl font-semibold text-gray-800">
@@ -614,7 +705,7 @@ const BasicDetails = () => {
                                     {/* Events */}
                                     <div className="p-4 space-y-4 w-full">
                                         {regEvent.length > 0 && regEvent.map((event, index) => (
-                                            <RegisteredEventCard key={index} event={event} />
+                                            <RegisteredEventCard key={index} event={event} onLaunch={launchEvent} />
                                         ))}
                                     </div>
                                 </div>
@@ -657,10 +748,9 @@ const BasicDetails = () => {
                     </div>
 
                 </div>
-            </>
+        </>
 
-        )
-    }
+    )
 }
 
 export default BasicDetails

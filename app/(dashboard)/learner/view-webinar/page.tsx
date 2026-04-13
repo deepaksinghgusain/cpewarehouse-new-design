@@ -1,11 +1,507 @@
+"use client";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button';
 import { imageUrl } from '@/lib/constants';
+import { GetUserSubscribedCourses } from '@/services/course';
+import { getAllFinalExamQuestion } from '@/services/exam';
 import { ArrowLeft, Award, BadgeCheck, Bell, Check, Download, FileText, Mail, Monitor, Phone, Play, Settings, Star, ThumbsUp } from 'lucide-react'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from 'react-icons/fa6'
-import React from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link';
+import { useParams, useSearchParams } from 'next/navigation';
+import { jsPDF } from 'jspdf';
 
 const ViewWebinar = () => {
+    const params = useParams<{ videoPath?: string[] }>();
+    const searchParams = useSearchParams();
+    const [slug, setSlug] = useState("");
+    const [muxPlaybackId, setMuxPlaybackId] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [isReviewExamPassed, setIsReviewExamPassed] = useState(false);
+    const [lastVideoViewed, setLastVideoViewed] = useState(0);
+    const [userCourseId, setUserCourseId] = useState<number | null>(null);
+    const [courseCompletedOn, setCourseCompletedOn] = useState<string | null>(null);
+    const [selectedCourse, setSelectedCourse] = useState<any>(null);
+    const [prTime, setPrTime] = useState(0);
+    const [finalExamId, setFinalExamId] = useState<string>("");
+    const [finalquestionList, setFinalquestionList] = useState<any[]>([]);
+    const [finalQuestionCount, setFinalQuestionCount] = useState(0);
+    const [err, setErr] = useState("");
+    const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+    const [viewerUserId, setViewerUserId] = useState("");
+    const [pauseBtnCount, setPauseBtnCount] = useState(0);
+    const [playBtnCount, setPlayBtnCount] = useState(0);
+    const [isPlay, setIsPlay] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const [videoWatchTime, setVideoWatchTime] = useState("0");
+    const [vidViewPercent, setVidViewPercent] = useState("0.00");
+    const [isAnswerTrue, setIsAnswerTrue] = useState(false);
+    const [showQuestionOnTime, setShowQuestionOnTime] = useState(false);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [showFirstReviewQuestion, setShowFirstReviewQuestion] = useState(false);
+    const [isTimeoutCleared, setIsTimeoutCleared] = useState(false);
+    const [nextQuesRemainingTime, setNextQuesRemainingTime] = useState(0);
+
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+    const prTimeRef = useRef(0);
+    const showReviewQTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const sendViewIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const muxVideoEnv = process.env.NEXT_PUBLIC_MUX_ENV_KEY || "";
+
+    useEffect(() => {
+        const pathSegments = Array.isArray(params?.videoPath) ? params.videoPath : [];
+        let urlParam = "";
+        let slugParam = "";
+        let fullNameParam = "";
+
+        if (pathSegments.length >= 3) {
+            fullNameParam = pathSegments[pathSegments.length - 1] || "";
+            slugParam = pathSegments[pathSegments.length - 2] || "";
+            urlParam = pathSegments.slice(0, pathSegments.length - 2).join("/");
+        } else {
+            urlParam = pathSegments[0] || "";
+            slugParam = pathSegments[1] || "";
+            fullNameParam = pathSegments[2] || "";
+        }
+
+        setSlug(slugParam);
+        setMuxPlaybackId(urlParam);
+
+        const [first = "", last = ""] = fullNameParam.split("-");
+        setFirstName(first);
+        setLastName(last !== "null" ? last : "");
+        setViewerUserId(localStorage.getItem("userId") || "");
+    }, [params]);
+
+    const isReviewExamExist = finalquestionList.length > 0;
+
+    const openReviewQuestionPrompt = () => {
+        console.log("Open review question prompt");
+    };
+
+    const showReviewQuestions = () => {
+        setShowFirstReviewQuestion(true);
+    };
+
+    const CheckAnswer = () => {
+        console.log("Check answer hook");
+    };
+
+    const resumeCountdown = () => {
+        console.log("Resume countdown hook");
+    };
+
+    const sendVidViewToUsercourse = () => {
+        if (!videoRef.current) return;
+        const watched = videoRef.current.currentTime.toFixed(0);
+        localStorage.setItem("videoWatchTime", watched);
+    };
+
+    const webinarTitle = useMemo(() => {
+        if (!slug) return "Self-Study";
+
+        return slug
+            .split("-")
+            .filter(Boolean)
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(" ");
+    }, [slug]);
+
+    const playbackSource = useMemo(() => {
+        if (!muxPlaybackId) {
+            return { src: "", type: "application/x-mpegURL" };
+        }
+
+        let decoded = decodeURIComponent(muxPlaybackId).trim();
+        decoded = decoded.replace(/^https?:\/(?!\/)/i, (match) => `${match}/`);
+        if (/^stream\.mux\.com\//i.test(decoded)) {
+            decoded = `https://${decoded}`;
+        }
+
+        if (/^https?:\/\//i.test(decoded)) {
+            const isMp4 = decoded.toLowerCase().includes('.mp4');
+            return {
+                src: decoded,
+                type: isMp4 ? "video/mp4" : "application/x-mpegURL",
+            };
+        }
+
+        const cleanId = decoded.replace(/^\/+|\/+$/g, "");
+        const hasKnownExtension = cleanId.toLowerCase().endsWith('.m3u8') || cleanId.toLowerCase().endsWith('.mp4');
+        const src = hasKnownExtension
+            ? `https://stream.mux.com/${cleanId}`
+            : `https://stream.mux.com/${cleanId}.m3u8`;
+
+        return {
+            src,
+            type: cleanId.toLowerCase().endsWith('.mp4') ? "video/mp4" : "application/x-mpegURL",
+        };
+    }, [muxPlaybackId]);
+
+    const webinarImage = searchParams.get("image") || "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80";
+
+    const getFinalquestionListing = async (id: string) => {
+        try {
+            const res: any = await getAllFinalExamQuestion(id);
+
+            if (res?.exams?.data?.length > 0) {
+                const finalquestiondata = res.exams.data[0]?.attributes?.questions || [];
+                setFinalExamId(res.exams.data[0]?.id || "");
+
+                const finalquestions = finalquestiondata.map((element: any) => {
+                    const questionOptions = (element?.options || []).map((item: any) => ({
+                        id: item.id,
+                        option: item.option,
+                        isAnswer: item.isAnswer,
+                    }));
+
+                    return {
+                        id: element.id,
+                        isMCQ: true,
+                        selectedAnswer: "",
+                        title: element.title,
+                        options: questionOptions,
+                    };
+                });
+
+                setFinalquestionList(finalquestions);
+                setFinalQuestionCount(finalquestions.length);
+
+            } else {
+                setFinalExamId("");
+                setFinalquestionList([]);
+                setFinalQuestionCount(0);
+            }
+        } catch (error) {
+            console.log('error in fetching course listing', error);
+        }
+    };
+
+    const getUserCourse = async (courseSlug: string) => {
+        const userEmail = localStorage.getItem("email") || "";
+        if (!userEmail || !courseSlug) return null;
+
+        const res: any = await GetUserSubscribedCourses(userEmail);
+
+        if (res) {
+            const filterCourses = res?.data?.filter((element: any) => {
+                return element.attributes?.course?.data?.attributes?.slug === courseSlug;
+            });
+
+            if (filterCourses?.length > 0) {
+                const selectedCourse = filterCourses[0];
+                const viewedTime = Number(selectedCourse?.attributes?.lastVideoView || 0);
+                const courseDetails = selectedCourse?.attributes?.course?.data?.attributes || null;
+
+                setIsReviewExamPassed(!!selectedCourse?.attributes?.isReviewExamPassed);
+                setLastVideoViewed(viewedTime);
+                setUserCourseId(Number(selectedCourse?.id) || null);
+                setCourseCompletedOn(selectedCourse?.attributes?.completedOn || null);
+                setPrTime(viewedTime);
+                setSelectedCourse(courseDetails);
+
+                return {
+                    course: courseDetails,
+                    completedOn: selectedCourse?.attributes?.completedOn || null,
+                };
+            }
+
+            const video = document.getElementsByTagName('video')[0];
+            if (video) {
+                video.currentTime = Number(lastVideoViewed || 0);
+            }
+        }
+
+        return null;
+    };
+
+    const formatCompletedDate = (completedOn: string | null) => {
+        if (!completedOn) return "";
+        const date = new Date(completedOn);
+        if (Number.isNaN(date.getTime())) return "";
+
+        return date.toLocaleDateString("en-US", {
+            month: "long",
+            day: "2-digit",
+            year: "numeric",
+        });
+    };
+
+    const downloadCertificate = async () => {
+        console.log("fasfafs");
+
+        const courseResult = await getUserCourse(slug);
+        const course = courseResult?.course || selectedCourse;
+        const completedOn = courseResult?.completedOn || courseCompletedOn;
+
+        if (!course) {
+            setErr("Course details are not available for certificate download.");
+            return;
+        }
+
+        const templatePath = course?.certificateTemplate?.data?.attributes?.url;
+        if (!templatePath) {
+            setErr("Certificate template is not configured for this course.");
+            return;
+        }
+
+        const title = course?.title || "course";
+        const credit = String(course?.credit || "");
+        const medium = course?.medium || "";
+        const fieldStudy = course?.fieldOfStudy || "";
+        const program = course?.programNumber || "";
+        const usernameFromStorage = localStorage.getItem("username") || "";
+        const fullName = `${firstName} ${lastName}`.trim() || usernameFromStorage;
+        const datecompleted = formatCompletedDate(completedOn);
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+        const templateUrl = `${baseUrl}${templatePath}`;
+
+        try {
+            const response = await fetch(templateUrl);
+            const templateHtml = await response.text();
+
+            let html = templateHtml
+                .replace(/{{username}}/g, fullName)
+                .replace(/{{course}}/g, title)
+                .replace(/{{credit}}/g, credit)
+                .replace(/{{medium}}/g, medium)
+                .replace(/{{fieldStudy}}/g, fieldStudy)
+                .replace(/{{completedOn}}/g, datecompleted)
+                .replace(/{{program}}/g, program);
+
+            if (usernameFromStorage) {
+                html = html.replace(/{{username_alt}}/g, usernameFromStorage);
+            }
+
+            const doc = new jsPDF('p', 'pt', [745, 745]);
+            doc.html(html, {
+                callback: function (pdfDoc: any) {
+                    pdfDoc.save(`certificate_${title}.pdf`);
+                },
+            });
+        } catch (error) {
+            console.error("Certificate download failed", error);
+            setErr("Unable to download certificate right now. Please try again.");
+        }
+    };
+
+    useEffect(() => {
+        if (!slug) return;
+        getUserCourse(slug);
+        getFinalquestionListing(slug);
+    }, [slug]);
+
+    useEffect(() => {
+        const video = document.getElementsByTagName('video')[0];
+        if (video && lastVideoViewed > 0) {
+            video.currentTime = lastVideoViewed;
+            prTimeRef.current = lastVideoViewed;
+        }
+    }, [lastVideoViewed]);
+
+    useEffect(() => {
+        if (!videoRef.current || !playbackSource.src) return;
+        videoRef.current.load();
+    }, [playbackSource.src]);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video || !playbackSource.src) return;
+
+        const onPause = () => {
+            setPauseBtnCount((prev) => prev + 1);
+
+            if (showFirstReviewQuestion && showReviewQTimeoutIdRef.current) {
+                clearTimeout(showReviewQTimeoutIdRef.current);
+            } else {
+                if (timeoutIdRef.current) {
+                    clearTimeout(timeoutIdRef.current);
+                }
+                setIsTimeoutCleared(true);
+
+                if (isReviewExamExist && finalquestionList[currentQuestionIndex + 1]?.timeStampInSeconds) {
+                    setNextQuesRemainingTime(
+                        Math.floor(finalquestionList[currentQuestionIndex + 1].timeStampInSeconds - video.currentTime)
+                    );
+                }
+            }
+
+            setIsPlay(false);
+            setIsPaused(true);
+
+            const bigPlayButton = document.querySelector('.vjs-big-play-button') as HTMLElement | null;
+            if (bigPlayButton) {
+                bigPlayButton.style.display = 'block';
+            }
+
+            if (sendViewIntervalRef.current) {
+                clearInterval(sendViewIntervalRef.current);
+                sendViewIntervalRef.current = null;
+            }
+        };
+
+        const onPlay = () => {
+            setPlayBtnCount((prevPlayCount) => {
+                const nextCount = prevPlayCount + 1;
+
+                setIsPlay(true);
+                if ((nextCount === 1 || showFirstReviewQuestion) && isReviewExamExist && !isReviewExamPassed) {
+                    showReviewQuestions();
+                }
+                if (nextCount > 1 && !isAnswerTrue && showQuestionOnTime) {
+                    if (isReviewExamExist) {
+                        CheckAnswer();
+                        setIsPaused(true);
+                    }
+                }
+                if (nextCount > 1 && isAnswerTrue && currentQuestionIndex < finalquestionList.length - 1) {
+                    resumeCountdown();
+                }
+
+                return nextCount;
+            });
+
+            setIsPaused(false);
+            const bigPlayButton = document.querySelector('.vjs-big-play-button') as HTMLElement | null;
+            if (bigPlayButton) {
+                bigPlayButton.style.display = 'none';
+            }
+        };
+
+        const onPlaying = () => {
+            if (!isPaused) {
+                sendVidViewToUsercourse();
+            }
+
+            if (!sendViewIntervalRef.current) {
+                sendViewIntervalRef.current = setInterval(() => {
+                    if (!isPaused) {
+                        sendVidViewToUsercourse();
+                    }
+                }, 5000);
+            }
+        };
+
+        const onWaiting = () => {
+            console.log("waiting");
+        };
+
+        const onSeeking = () => {
+            const delta = video.currentTime - prTimeRef.current;
+            if (Math.abs(delta) > 1) {
+                video.currentTime = prTimeRef.current;
+            }
+        };
+
+        const onSeeked = () => {
+            console.log("seeked");
+        };
+
+        const onEnded = () => {
+            setVidViewPercent("100.00");
+            setPrTime(0);
+            prTimeRef.current = 0;
+        };
+
+        const onTimeUpdate = () => {
+            if (!video.seeking) {
+                setPrTime(video.currentTime);
+                prTimeRef.current = video.currentTime;
+
+                if (showQuestionOnTime && !isAnswerTrue) {
+                    video.pause();
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen()
+                            .then(() => {
+                                openReviewQuestionPrompt();
+                            })
+                            .catch((fullscreenError) => {
+                                console.error('Failed to exit fullscreen:', fullscreenError);
+                                openReviewQuestionPrompt();
+                            });
+                    } else {
+                        openReviewQuestionPrompt();
+                    }
+                }
+            }
+
+            const watched = video.currentTime.toFixed(0);
+            setVideoWatchTime(watched);
+            localStorage.setItem("videoWatchTime", watched);
+
+            if (video.duration > 0) {
+                const percent = ((Number(watched) * 100) / video.duration).toFixed(2);
+                setVidViewPercent(percent);
+            }
+        };
+
+        video.addEventListener('pause', onPause);
+        video.addEventListener('play', onPlay);
+        video.addEventListener('playing', onPlaying);
+        video.addEventListener('waiting', onWaiting);
+        video.addEventListener('seeking', onSeeking);
+        video.addEventListener('seeked', onSeeked);
+        video.addEventListener('ended', onEnded);
+        video.addEventListener('timeupdate', onTimeUpdate);
+
+        return () => {
+            video.removeEventListener('pause', onPause);
+            video.removeEventListener('play', onPlay);
+            video.removeEventListener('playing', onPlaying);
+            video.removeEventListener('waiting', onWaiting);
+            video.removeEventListener('seeking', onSeeking);
+            video.removeEventListener('seeked', onSeeked);
+            video.removeEventListener('ended', onEnded);
+            video.removeEventListener('timeupdate', onTimeUpdate);
+
+            if (sendViewIntervalRef.current) {
+                clearInterval(sendViewIntervalRef.current);
+                sendViewIntervalRef.current = null;
+            }
+        };
+    }, [
+        playbackSource.src,
+        showFirstReviewQuestion,
+        isReviewExamExist,
+        isReviewExamPassed,
+        isAnswerTrue,
+        showQuestionOnTime,
+        currentQuestionIndex,
+        finalquestionList,
+        isPaused,
+    ]);
+
+    const handleFinalAnswerChange = (questionIndex: number, optionValue: string) => {
+        setFinalquestionList((prevList) =>
+            prevList.map((question, index) =>
+                index === questionIndex
+                    ? { ...question, selectedAnswer: optionValue }
+                    : question
+            )
+        );
+    };
+
+    const checkFinalAnswers = () => {
+        const finalAnswerJson = finalquestionList.map((question: any) => question?.selectedAnswer);
+
+        if (
+            finalAnswerJson.length !== finalQuestionCount ||
+            finalAnswerJson.includes(undefined) ||
+            finalAnswerJson.includes("")
+        ) {
+            const message = 'Make sure you have answered each question';
+            setErr(message);
+            setShowSubmitConfirm(false);
+        } else {
+            setErr("");
+            setShowSubmitConfirm(true);
+        }
+    };
+
     const materials = [
         "Handout",
         "Forms (if applicable)",
@@ -19,18 +515,34 @@ const ViewWebinar = () => {
         "Table Of Contents",
     ];
     const faqItems = [
-        "What is this service about?",
-        "How can I sign up?",
-        "What payment methods are accepted?",
-        "Can I cancel my subscription anytime?",
+        {
+            question: "What is this service about?",
+            answer: "This service provides a platform to manage and streamline your workflow efficiently.",
+            isOpen: false
+        },
+        {
+            question: "How can I sign up?",
+            answer: "You can sign up by visiting our registration page and following the instructions.",
+            isOpen: false
+        },
+        {
+            question: "What payment methods are accepted?",
+            answer: "We accept credit cards, PayPal, and bank transfers.",
+            isOpen: false
+        },
+        {
+            question: "Can I cancel my subscription anytime?",
+            answer: "Yes, you can cancel your subscription at any time from your account settings.",
+            isOpen: false
+        }
     ];
 
     return (
         <div className='mx-8'>
-            <div className="inline-flex items-center border w-full bg-violet-100 px-4 py-2 gap-2 text-violet-700 font-semibold text-base cursor-pointer">
+            <Link href="/learner/dashboard" className="inline-flex items-center border w-full bg-violet-100 px-4 py-2 gap-2 text-violet-700 font-semibold text-base cursor-pointer">
                 <ArrowLeft className="w-5 h-5" />
                 <span>Back to Dashboard</span>
-            </div>
+            </Link>
             <div className="flex flex-col gap-5 w-full mt-4">
                 <div className="flex flex-col gap-4">
                     <div className="flex items-start gap-4">
@@ -55,18 +567,21 @@ const ViewWebinar = () => {
                             <div className="flex flex-col gap-5 md:flex-row md:items-center">
                                 <div className="w-full max-w-[210px] rounded-2xl border-[6px] border-violet-300 bg-white p-2 shadow-[0_10px_24px_rgba(148,107,255,0.28)]">
                                     <img
-                                        src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80"
-                                        alt="Taxation of Canadians in the U.S.A webinar"
+                                        src={webinarImage}
+                                        alt={webinarTitle}
                                         className="h-[120px] w-full rounded-xl object-cover"
                                     />
                                 </div>
 
                                 <div className="flex flex-col gap-2">
                                     <h3 className="text-2xl font-bold leading-tight text-slate-900">
-                                        Taxation Of Canadians In The U.S.A
+                                        {webinarTitle}
                                     </h3>
+                                    <p className="text-sm text-slate-600">
+                                        {firstName} {lastName}
+                                    </p>
                                     <p className="font-semibold leading-none text-amber-600">
-                                        1.03 % Complete...keep it going!
+                                        {vidViewPercent} % Complete...keep it going!
                                     </p>
                                 </div>
                             </div>
@@ -120,31 +635,23 @@ const ViewWebinar = () => {
                             <div className="grid gap-6 xl:grid-cols-[1.7fr_0.8fr]">
                                 <div className="overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-400 via-violet-300 to-pink-200 p-1.5 shadow-sm">
                                     <div className="h-full rounded-xl bg-black/80 p-0.5">
-                                        <div className="grid h-full grid-cols-[84px_1fr]">
-                                            <div className="border-r border-black bg-black">
-                                                <div className="h-[110px] border-b border-zinc-800 bg-zinc-900"></div>
-                                                <div className="h-[110px] border-b border-zinc-800 bg-zinc-900"></div>
-                                                <div className="h-[110px] bg-zinc-900"></div>
-                                            </div>
+                                        <div className="grid h-full grid-cols-1">
 
                                             <div className="bg-white/95">
-                                                <div className="h-9 bg-black"></div>
-                                                <div className="relative h-[330px] overflow-hidden bg-slate-100">
-                                                    <div className="absolute left-0 top-0 h-full w-[38%] bg-[#314886]"></div>
-                                                    <div className="absolute left-[20%] top-0 h-full w-[16%] -skew-x-[20deg] bg-[#5f7fd1]"></div>
-                                                    <div className="absolute right-[15%] top-0 h-full w-[45%] -skew-x-[22deg] bg-gray-200"></div>
-
-                                                    <button className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-2xl border-2 border-white/80 bg-slate-600/30 px-7 py-5 text-white backdrop-blur-sm">
-                                                        <Play className="h-7 w-7 fill-white text-white" />
-                                                    </button>
-
-                                                    <div className="absolute left-1/2 top-[53%] -translate-x-1/2 text-center">
-                                                        <p className="text-[22px] font-semibold leading-tight text-[#344d84]">
-                                                            Taxation of Canadians
-                                                        </p>
-                                                        <p className="text-[22px] font-semibold leading-tight text-[#344d84]">
-                                                            in America
-                                                        </p>
+                                                <div className="h-9"></div>
+                                                <div className="relative h-[330px] overflow-hidden bg-slate-900 p-4">
+                                                    <video
+                                                        ref={videoRef}
+                                                        id="my-player"
+                                                        className="video-js vjs-16-9 h-full w-full rounded-xl"
+                                                        controls
+                                                        preload="auto"
+                                                        data-setup={`{\n  \"timelineHoverPreviews\": true,\n  \"plugins\": {\n    \"mux\": {\n      \"debug\": true,\n      \"data\": {\n        \"env_key\": \"${muxVideoEnv}\",\n        \"video_title\": \"${slug}\",\n        \"viewer_user_id\": \"${viewerUserId}\"\n      }\n    }\n  }\n}`}
+                                                    >
+                                                        <source src={playbackSource.src} type={playbackSource.type} />
+                                                    </video>
+                                                    <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
+                                                        Watched: {videoWatchTime}s ({vidViewPercent}%)
                                                     </div>
                                                 </div>
                                                 <div className="h-9 bg-black"></div>
@@ -173,7 +680,11 @@ const ViewWebinar = () => {
                                         ))}
                                     </div>
 
-                                    <button className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-400 px-6 py-4 font-semibold text-white hover:bg-slate-500">
+                                    <button
+                                        type="button"
+                                        onClick={downloadCertificate}
+                                        className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-400 px-6 py-4 font-semibold text-white hover:bg-slate-500"
+                                    >
                                         <Download className="h-5 w-5 text-amber-300" />
                                         Download Certificate
                                     </button>
@@ -231,36 +742,54 @@ const ViewWebinar = () => {
                             <div className="mx-auto">
                                 <div className="text-center">
                                     <h2 className="text-2xl font-bold text-slate-900">Final Exam</h2>
-                                    <p className="mt-2 font-semibold text-slate-800">10 Questions</p>
+                                    <p className="mt-2 font-semibold text-slate-800">{finalQuestionCount} Questions</p>
                                 </div>
 
-                                <div className="mt-7 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                                    <p className="font-semibold leading-snug text-slate-900">
-                                        While preparing for US Tax, the speaker suggested eliminating assets that require onerous US reporting, which of the following was NOT discussed as an example?
+                                {
+                                    finalquestionList.length > 0 && finalquestionList.map((item: any, index: number) => (
+                                        <div className="mt-7 rounded-xl border border-gray-200 bg-white p-5 shadow-sm" key={item?.id || index}>
+                                            <p className="font-semibold leading-snug text-slate-900">
+                                                {index + 1}. {item.title}
+                                            </p>
+
+                                            <div className="mt-4 space-y-3">
+                                                {
+                                                    item.options.length > 0 && item.options.map((option: any, optionIndex: number) => (
+                                                        <label key={option?.id || optionIndex} className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-300 bg-gray-100 px-3 py-3">
+                                                            <input
+                                                                type="radio"
+                                                                name={`radiogroup_-${index}`}
+                                                                checked={item?.selectedAnswer === option?.option}
+                                                                onChange={() => handleFinalAnswerChange(index, option?.option)}
+                                                                className="h-5 w-5 accent-blue-500" />
+                                                            <span className="font-normal">{option?.option}</span>
+                                                        </label>
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+
+                                <div className='flex justify-center mt-4'>
+                                    <Button
+                                        className='bg-blue-500 text-white hover:bg-blue-600 cursor-pointer'
+                                        variant="default"
+                                        onClick={checkFinalAnswers}
+                                    >
+                                        Submit
+                                    </Button>
+                                </div>
+
+                                {err && (
+                                    <p className="mt-3 text-center text-sm font-medium text-red-600">{err}</p>
+                                )}
+
+                                {showSubmitConfirm && (
+                                    <p className="mt-3 text-center text-sm font-medium text-green-600">
+                                        All questions answered. Ready to submit.
                                     </p>
-
-                                    <div className="mt-4 space-y-3">
-                                        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-300 bg-gray-100 px-3 py-3">
-                                            <input type="radio" name="final-exam-question-1" defaultChecked className="h-5 w-5 accent-blue-500" />
-                                            <span className="font-normal">TFSA</span>
-                                        </label>
-
-                                        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-300 bg-gray-100 px-3 py-3">
-                                            <input type="radio" name="final-exam-question-1" className="h-5 w-5 accent-blue-500" />
-                                            <span className="font-normal">RESP</span>
-                                        </label>
-
-                                        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-300 bg-gray-100 px-3 py-3">
-                                            <input type="radio" name="final-exam-question-1" className="h-5 w-5 accent-blue-500" />
-                                            <span className="font-normal">Mutual Funds of $800k and above</span>
-                                        </label>
-
-                                        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-300 bg-gray-100 px-3 py-3">
-                                            <input type="radio" name="final-exam-question-1" className="h-5 w-5 accent-blue-500" />
-                                            <span className="font-normal">PFIC</span>
-                                        </label>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </section>
                     </TabsContent>
@@ -276,15 +805,15 @@ const ViewWebinar = () => {
                                     <Accordion type="single" collapsible className="space-y-4">
                                         {faqItems.map((item, index) => (
                                             <AccordionItem
-                                                key={item}
+                                                key={index}
                                                 value={`faq-item-${index}`}
                                                 className="rounded-xl border border-gray-300 bg-white px-4 shadow-sm"
                                             >
                                                 <AccordionTrigger className="py-4 text-xl font-bold text-slate-900 hover:no-underline">
-                                                    {item}
+                                                    {item.question}
                                                 </AccordionTrigger>
                                                 <AccordionContent className="text-slate-600">
-                                                    We are happy to help. Please contact support if you need more details about this question.
+                                                    {item.answer}
                                                 </AccordionContent>
                                             </AccordionItem>
                                         ))}

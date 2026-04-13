@@ -16,6 +16,8 @@ import { ArrowRight, Loader } from 'lucide-react';
 import { login } from '@/services/auth';
 import { redirect } from 'next/navigation';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { useDispatch } from 'react-redux';
+import { userLoginRequest } from '@/store/actions/user-actions';
 
 const loginSchema = z.object({
     identifier: z
@@ -28,6 +30,7 @@ const loginSchema = z.object({
 })
 
 const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => {
+    const dispatch = useDispatch();
     const [open, setOpen] = useState(false)
     const [error, setError] = useState("")
     const [mounted, setMounted] = useState(false)
@@ -75,6 +78,27 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                 localStorage.setItem('userId', res.user.id);
                 localStorage.setItem('email', res.user.email);
                 localStorage.setItem('PTIN', res.user.PTIN);
+
+                const token = localStorage.getItem('token');
+
+                await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                }).then((res) => {
+                    return res.json()
+                }).then(res => {
+                    if (res.jwt) {
+                        localStorage.setItem("token", res.jwt)
+                    } else {
+                        localStorage.setItem("userData", JSON.stringify(res));
+                        dispatch(userLoginRequest(res));
+                    }
+                });
+
+                if (!localStorage.getItem("userData")) {
+                    localStorage.setItem("userData", JSON.stringify(res.user));
+                }
 
                 if (values.remember === true) {
                     localStorage.setItem('rem_email', values.identifier);

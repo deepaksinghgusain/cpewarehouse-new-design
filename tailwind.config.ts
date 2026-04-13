@@ -1,4 +1,6 @@
-export default {
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
     theme: {
         container: {
             center: true,
@@ -10,5 +12,13 @@ export default {
                 // xl: "1200px",
             },
         },
+        extend: {
+            colors: {
+                // Ensure colors don't use unsupported lab() syntax
+                // Using standard CSS color formats
+            },
+        },
     },
 };
+
+export default config;
