@@ -46,7 +46,7 @@ export default function LearnerSidebar() {
 
 
     return (
-        <div className="w-1/4 h-screen flex flex-col bg-white border-r">
+        <div className="w-1/4 h-full flex flex-col bg-white border-r border-gray-200">
             {/* Logo */}
             <div className="px-6 sticky py-6 top-0 z-50 bg-white w-full">
                 <Link href="/">

@@ -9,11 +9,12 @@ import moment from 'moment';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { Card } from '@/components/ui/card';
 
 function PastEventCard({ event }: any) {
 
     return (
-        <div className="w-full p-4 bg-white rounded-xl shadow-sm border flex items-center gap-5">
+        <div className="w-full p-4 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center gap-5">
 
             {/* Course Image */}
             <img
@@ -66,7 +67,7 @@ function PastEventCard({ event }: any) {
 function RegisteredEventCard({ event, onLaunch }: any) {
     
     return (
-        <div className="flex gap-6 p-4 border rounded-xl hover:shadow-md transition w-full">
+        <div className="flex gap-6 p-4 border border-gray-200 rounded-xl hover:shadow-md transition w-full">
 
             {/* Image */}
             <img
@@ -133,7 +134,7 @@ function RegisteredEventCard({ event, onLaunch }: any) {
 function RecommendedEventCard({ event }: any) {
 
     return (
-        <div className="w-full p-4 bg-white rounded-xl border shadow-sm flex gap-5 items-center">
+        <div className="w-full p-4 bg-white rounded-xl border border-gray-200 shadow-sm flex gap-5 items-center">
 
             {/* Image */}
             <img
@@ -474,7 +475,7 @@ const BasicDetails = () => {
                         <div className="flex flex-col gap-6">
 
                             {/* Profile Card */}
-                            <div className="bg-white rounded-xl border shadow-sm p-6 flex flex-col gap-6">
+                            <Card className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-6">
 
                                 <div className="flex justify-between items-start">
 
@@ -571,10 +572,10 @@ const BasicDetails = () => {
                                     </div>
 
                                 </div>
-                            </div>
+                            </Card>
 
                             {/* Subscription Card */}
-                            <div className="bg-white rounded-xl shadow-sm border flex overflow-hidden">
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex overflow-hidden">
 
                                 <img
                                     src="/assets/images/anual-package.jpg"
@@ -611,7 +612,7 @@ const BasicDetails = () => {
                                 {/* Year Button */}
                                 <div className="absolute top-5 right-5">
                                     <Select value={String(selectedYear)} onValueChange={(value) => setSelectedYear(Number(value))}>
-                                        <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-300 rounded-lg shadow-sm">
+                                        <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-200border-gray-300 rounded-lg shadow-sm">
 
                                             {/* Icon */}
                                             <span className="flex items-center justify-center w-5 h-5">
@@ -651,10 +652,10 @@ const BasicDetails = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
                                 {/* Table Header */}
-                                <div className="grid grid-cols-2 border-b px-6 py-3 text-sm font-bold text-gray-600">
+                                <div className="grid grid-cols-2 border-b border-gray-200 px-6 py-3 text-sm font-bold text-gray-600">
                                     <div>Field of Study</div>
                                     <div>CPE Earned</div>
                                 </div>
@@ -663,7 +664,7 @@ const BasicDetails = () => {
                                 {certificates && certificates.length > 0 && certificates.map((certificate: any, index: number) => (
                                     <div
                                         key={index}
-                                        className="grid grid-cols-2 px-6 py-3 border-b text-sm items-center"
+                                        className="grid grid-cols-2 px-6 py-3 border border-gray-200 border-b text-sm items-center"
                                     >
                                         <div className="font-medium text-gray-900">
                                             {certificate?.fieldOfStudy}
@@ -684,20 +685,20 @@ const BasicDetails = () => {
 
                 <div className="w-full p-8 space-y-4">
                     {/* Tabs */}
-                    <div className="border-b flex gap-6 text-lg font-semibold w-full">
+                    <div className="borde-b border-gray-200 flex gap-6 text-lg font-semibold w-full">
                         <Tabs defaultValue="registered-event" className=" bg-transparent w-full">
-                            <TabsList variant="line" className='w-full bg-transparent border-b border-[#dee1e9]'>
+                            <TabsList variant="line" className='w-full bg-transparent border-b border-gray-200'>
                                 <TabsTrigger value="registered-event" className="text-xl  font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Registered Event(s)</TabsTrigger>
                                 <TabsTrigger value="past-event" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Past Event(s)</TabsTrigger>
                                 <TabsTrigger value="recommended-events" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Recommended Events</TabsTrigger>
                             </TabsList>
                             <TabsContent value="registered-event">
-                                <div className="bg-white border rounded-xl shadow-sm">
+                                <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
                                     {/* Header */}
-                                    <div className="flex items-center justify-between px-6 py-4 border-b">
+                                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                                         <h2 className="text-lg font-semibold">Registered Event(s)</h2>
 
-                                        <span className="text-xs px-2 py-1 border rounded-md bg-gray-50">
+                                        <span className="text-xs px-2 py-1 border border-gray-200 rounded-md bg-gray-50">
                                             {regEvent.length} events
                                         </span>
                                     </div>
@@ -711,9 +712,9 @@ const BasicDetails = () => {
                                 </div>
                             </TabsContent>
                             <TabsContent value="past-event">
-                                <div className="bg-white border rounded-xl shadow-sm">
+                                <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
                                     {/* Header */}
-                                    <div className="flex items-center justify-between px-6 py-4 border-b">
+                                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                                         <h2 className="text-lg font-semibold">
                                             Past Event
                                         </h2>
@@ -728,9 +729,9 @@ const BasicDetails = () => {
                                 </div>
                             </TabsContent>
                             <TabsContent value="recommended-events">
-                                <div className="bg-white border rounded-xl shadow-sm">
+                                <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
                                     {/* Header */}
-                                    <div className="flex items-center justify-end px-6 py-4 border-b">
+                                    <div className="flex items-center justify-end px-6 py-4 border-b border-gray-200">
                                         <Link href="/course-catalog" className="text-lg font-semibold">
                                             View All Courses
                                         </Link>

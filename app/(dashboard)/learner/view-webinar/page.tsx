@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { imageUrl } from '@/lib/constants';
 import { GetUserSubscribedCourses } from '@/services/course';
 import { getAllFinalExamQuestion } from '@/services/exam';
-import { ArrowLeft, Award, BadgeCheck, Bell, Check, Download, FileText, Mail, Monitor, Phone, Play, Settings, Star, ThumbsUp } from 'lucide-react'
+import { ArrowLeft, Award, BadgeCheck, Bell, Check, Download, FileText, Loader, Mail, Monitor, Phone, Play, Settings, Star, ThumbsUp } from 'lucide-react'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from 'react-icons/fa6'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link';
@@ -44,6 +44,8 @@ const ViewWebinar = () => {
     const [showFirstReviewQuestion, setShowFirstReviewQuestion] = useState(false);
     const [isTimeoutCleared, setIsTimeoutCleared] = useState(false);
     const [nextQuesRemainingTime, setNextQuesRemainingTime] = useState(0);
+    const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
+    const [isDownloadingHandout, setIsDownloadingHandout] = useState(false);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const prTimeRef = useRef(0);
@@ -232,35 +234,34 @@ const ViewWebinar = () => {
     };
 
     const downloadCertificate = async () => {
-        console.log("fasfafs");
-
-        const courseResult = await getUserCourse(slug);
-        const course = courseResult?.course || selectedCourse;
-        const completedOn = courseResult?.completedOn || courseCompletedOn;
-
-        if (!course) {
-            setErr("Course details are not available for certificate download.");
-            return;
-        }
-
-        const templatePath = course?.certificateTemplate?.data?.attributes?.url;
-        if (!templatePath) {
-            setErr("Certificate template is not configured for this course.");
-            return;
-        }
-
-        const title = course?.title || "course";
-        const credit = String(course?.credit || "");
-        const medium = course?.medium || "";
-        const fieldStudy = course?.fieldOfStudy || "";
-        const program = course?.programNumber || "";
-        const usernameFromStorage = localStorage.getItem("username") || "";
-        const fullName = `${firstName} ${lastName}`.trim() || usernameFromStorage;
-        const datecompleted = formatCompletedDate(completedOn);
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-        const templateUrl = `${baseUrl}${templatePath}`;
-
+        setIsDownloadingCertificate(true);
         try {
+            const courseResult = await getUserCourse(slug);
+            const course = courseResult?.course || selectedCourse;
+            const completedOn = courseResult?.completedOn || courseCompletedOn;
+
+            if (!course) {
+                setErr("Course details are not available for certificate download.");
+                return;
+            }
+
+            const templatePath = course?.certificateTemplate?.data?.attributes?.url;
+            if (!templatePath) {
+                setErr("Certificate template is not configured for this course.");
+                return;
+            }
+
+            const title = course?.title || "course";
+            const credit = String(course?.credit || "");
+            const medium = course?.medium || "";
+            const fieldStudy = course?.fieldOfStudy || "";
+            const program = course?.programNumber || "";
+            const usernameFromStorage = localStorage.getItem("username") || "";
+            const fullName = `${firstName} ${lastName}`.trim() || usernameFromStorage;
+            const datecompleted = formatCompletedDate(completedOn);
+            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+            const templateUrl = `${baseUrl}${templatePath}`;
+
             const response = await fetch(templateUrl);
             const templateHtml = await response.text();
 
@@ -286,6 +287,64 @@ const ViewWebinar = () => {
         } catch (error) {
             console.error("Certificate download failed", error);
             setErr("Unable to download certificate right now. Please try again.");
+        } finally {
+            setIsDownloadingCertificate(false);
+        }
+    };
+
+    const downloadHandout = async () => {
+        setIsDownloadingHandout(true);
+        try {
+        const courseResult = await getUserCourse(slug);
+        const course = courseResult?.course || selectedCourse;
+
+        if (!course) {
+            setErr("Course details not available for handout download.");
+            return;
+        }
+
+        const handoutsData = course?.handout?.data;
+        if (!handoutsData || !Array.isArray(handoutsData) || handoutsData.length === 0) {
+            setErr("No handouts available for this course.");
+            return;
+        }
+
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+        let downloadCount = 0;
+
+        console.log(baseUrl);
+        
+        for (const handout of handoutsData) {
+            const handoutUrl = handout?.attributes?.url;
+            if (!handoutUrl) continue;
+
+            const fileUrl = `${baseUrl}${handoutUrl}`;
+            const response = await fetch(fileUrl);
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = handout?.attributes?.name || `handout-${downloadCount + 1}`;
+            link.target = "_blank";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(objectUrl);
+
+            downloadCount++;
+        }
+
+        if (downloadCount === 0) {
+            setErr("No valid handouts could be downloaded.");
+        } else {
+            setErr("");
+        }
+        } catch (error) {
+            console.error("Handout download failed", error);
+            setErr("Unable to download handouts. Please try again.");
+        } finally {
+            setIsDownloadingHandout(false);
         }
     };
 
@@ -663,9 +722,22 @@ const ViewWebinar = () => {
                                 <aside className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                                     <div className="mb-5 flex items-center justify-between gap-1">
                                         <h3 className="font-semibold text-slate-900">Program Material</h3>
-                                        <button className="inline-flex items-center gap-2 rounded-full border border-indigo-300 px-4 py-2 font-medium text-indigo-600 hover:bg-indigo-50">
-                                            <Download className="h-5 w-5" />
-                                            Download
+                                        <button
+                                            type="button"
+                                            onClick={downloadHandout}
+                                            disabled={isDownloadingHandout}
+                                            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 font-medium transition-all ${
+                                                isDownloadingHandout
+                                                    ? "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed opacity-60"
+                                                    : "border-indigo-300 text-indigo-600 hover:bg-indigo-50 cursor-pointer"
+                                            }`}
+                                        >
+                                            {isDownloadingHandout ? (
+                                                <Loader className="h-5 w-5 animate-spin" />
+                                            ) : (
+                                                <Download className="h-5 w-5" />
+                                            )}
+                                            {isDownloadingHandout ? "Downloading..." : "Download"}
                                         </button>
                                     </div>
 
@@ -683,10 +755,19 @@ const ViewWebinar = () => {
                                     <button
                                         type="button"
                                         onClick={downloadCertificate}
-                                        className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-400 px-6 py-4 font-semibold text-white hover:bg-slate-500"
+                                        disabled={isDownloadingCertificate}
+                                        className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 font-semibold text-white transition-all ${
+                                            isDownloadingCertificate
+                                                ? "bg-gray-400 cursor-not-allowed opacity-60 hover:bg-gray-400"
+                                                : "bg-slate-400 hover:bg-slate-500 cursor-pointer"
+                                        }`}
                                     >
-                                        <Download className="h-5 w-5 text-amber-300" />
-                                        Download Certificate
+                                        {isDownloadingCertificate ? (
+                                            <Loader className="h-5 w-5 text-amber-300 animate-spin" />
+                                        ) : (
+                                            <Download className="h-5 w-5 text-amber-300" />
+                                        )}
+                                        {isDownloadingCertificate ? "Downloading..." : "Download Certificate"}
                                     </button>
                                 </aside>
                             </div>
