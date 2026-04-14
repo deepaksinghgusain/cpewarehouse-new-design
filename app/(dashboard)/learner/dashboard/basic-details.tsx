@@ -934,9 +934,9 @@ const BasicDetails = () => {
 
             <div className="w-full p-8 space-y-4">
                 {/* Tabs */}
-                <div className="borde-b border-gray-200 flex gap-6 text-lg font-semibold w-full">
+                <div className="borde-b border-gray-200  text-lg font-semibold w-full">
                     <Tabs defaultValue="registered-event" className=" bg-transparent w-full">
-                        <TabsList variant="line" className='w-full bg-transparent border-b border-gray-200'>
+                        <TabsList variant="line" className='w-[400px] ml-24 bg-transparent border-b border-gray-200'>
                             <TabsTrigger value="registered-event" className="text-xl  font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Registered Event(s)</TabsTrigger>
                             <TabsTrigger value="past-event" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Past Event(s)</TabsTrigger>
                             <TabsTrigger value="recommended-events" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Recommended Events</TabsTrigger>
