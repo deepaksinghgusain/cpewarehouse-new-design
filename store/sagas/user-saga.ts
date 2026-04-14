@@ -10,7 +10,7 @@ function* handleUserLogout() {
     yield put(clearUser());
 }
 
-export function* watchUserAuth() {
-    yield takeLatest(USER_LOGIN_REQUEST, handleUserLogin);
-    yield takeLatest(USER_LOGOUT_REQUEST, handleUserLogout);
+export function* watchUserAuth(): Generator {
+    yield takeLatest(USER_LOGIN_REQUEST as any, handleUserLogin);
+    yield takeLatest(USER_LOGOUT_REQUEST as any, handleUserLogout);
 }

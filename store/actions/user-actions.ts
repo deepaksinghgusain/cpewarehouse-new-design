@@ -1,5 +1,5 @@
-export const USER_LOGIN_REQUEST = "user/USER_LOGIN_REQUEST";
-export const USER_LOGOUT_REQUEST = "user/USER_LOGOUT_REQUEST";
+export const USER_LOGIN_REQUEST: string = "user/USER_LOGIN_REQUEST" as const;
+export const USER_LOGOUT_REQUEST : string = "user/USER_LOGOUT_REQUEST" as const;
 
 export interface UserInfo {
     id?: number;
