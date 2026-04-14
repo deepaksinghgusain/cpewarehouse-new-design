@@ -253,7 +253,6 @@ const BasicDetails = () => {
     };
 
     const launchEvent = (event: any) => {
-        console.log(event);
         if (event.courseType === 'Live Webinar') {
             gotowebinar(event?.course?.webinarId, event?.joinUrl);
         } else if (event.courseType === 'Self-Study') {

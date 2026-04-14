@@ -104,7 +104,7 @@ const LearnerNavBar = () => {
                         </button>
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="w-44">
+                    <DropdownMenuContent align="end" className="w-44 z-50 bg-white rounded-md border border-gray-200 shadow-lg">
                         <DropdownMenuItem className="cursor-pointer" asChild>
                             <Link href="/learner/dashboard" prefetch={false}>Dashboard</Link>
                         </DropdownMenuItem>

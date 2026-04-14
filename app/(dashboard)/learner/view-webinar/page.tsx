@@ -311,8 +311,6 @@ const ViewWebinar = () => {
 
         const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
         let downloadCount = 0;
-
-        console.log(baseUrl);
         
         for (const handout of handoutsData) {
             const handoutUrl = handout?.attributes?.url;

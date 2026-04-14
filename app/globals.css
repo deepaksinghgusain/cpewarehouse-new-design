@@ -92,3 +92,7 @@ html {
 .about-container-3 {
   background: url('/assets/images/about-container-3.jpg') lightgray 50% / cover no-repeat;
 }
+
+border {
+  border-color: var(--border) !important;
+}
