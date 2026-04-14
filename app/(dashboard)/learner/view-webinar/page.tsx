@@ -927,7 +927,7 @@ const ViewWebinar = () => {
                                 <div className="relative mx-auto w-full">
                                     <div className="absolute h-[400px] w-[400px] inset-8 rounded-full bg-indigo-200/70"></div>
                                     <img
-                                        src={imageUrl + "/uploads/banner_4_a2ad80fae0.png"}
+                                        src={"/assets/images/banner-4.png"}
                                         alt="Customer support illustration"
                                         className="relative z-10 w-full object-contain"
                                     />
