@@ -801,8 +801,8 @@ const ProfileForm = () => {
                                             </div >
                                             <div className="self-stretch pb-4 flex flex-col justify-start items-center gap-4">
                                                 <div className="self-stretch h-px bg-gray-200" />
-                                                <Button type='submit' className="rounded-full cursor-pointer bg-[#2970fe] hover:bg-[#134ab7] px-5 py-3 w-full h-[50px] font-semibold font-['Inter'] leading-7  text-lg" variant="default">
-                                                    Create Account
+                                                <Button type='submit' className="rounded-full text-white cursor-pointer bg-[#2970fe] hover:bg-[#134ab7] px-5 py-3 w-full h-[50px] font-semibold font-['Inter'] leading-7  text-lg" variant="default">
+                                                    Edit Profile
                                                 </Button>
                                             </div>
                                         </div >

@@ -149,7 +149,7 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                                                         <Input
                                                             {...field}
                                                             id="email"
-                                                            className="focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500"
+                                                            className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                             aria-invalid={fieldState.invalid}
                                                             placeholder="Please enter email id"
                                                             autoComplete="off"
@@ -177,7 +177,7 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                                                             aria-invalid={fieldState.invalid}
                                                             placeholder="Please enter password"
                                                             autoComplete="off"
-                                                            className="focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500"
+                                                            className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                         />
                                                         {fieldState.invalid && (
                                                             <FieldError errors={[fieldState.error]} />
@@ -211,7 +211,7 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                                         </div>
 
                                         <div className='flex gap-2 mb-4'>
-                                            <Button type='submit' variant="default" className='cursor-pointer w-full py-6 rounded-4xl text-xl bg-[#8181cc] hover:bg-[#6d6dd9]' disabled={isPending}>
+                                            <Button type='submit' variant="default" className='cursor-pointer w-full py-6 rounded-4xl text-xl text-white bg-[#8181cc] hover:bg-[#6d6dd9]' disabled={isPending}>
                                                 {
                                                     isPending ? (<Loader className='w-4 h-4 animate-spin cursor-pointer' />) : (
                                                         <ArrowRight className='w-4 h-4' />

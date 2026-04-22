@@ -82,7 +82,7 @@ const Password = () => {
                 </h1>
 
                 {/* Section Header */}
-                <div className="flex justify-between items-start pb-5 border-b">
+                <div className="flex justify-between items-start pb-5 border-b border-b-gray-200">
                     <div>
                         <h2 className="text-lg font-semibold text-gray-900">
                             Password
@@ -149,7 +149,7 @@ const Password = () => {
 
                         </div>
 
-                        <div className="border-b"></div>
+                        <div className="border-b border-b-gray-200"></div>
 
                         {/* New Password */}
                         <div className="grid grid-cols-3 gap-8 items-center">
@@ -197,11 +197,9 @@ const Password = () => {
                                 </FieldGroup>
                             </div>
 
-
-
                         </div>
 
-                        <div className="border-b"></div>
+                        <div className="border-b border-b-gray-200"></div>
 
                         {/* Confirm Password */}
                         <div className="grid grid-cols-3 gap-8 items-center">
@@ -254,7 +252,7 @@ const Password = () => {
                         </div>
 
                         {/* Footer */}
-                        <div className="border-t pt-6 flex justify-end">
+                        <div className="border-t border-t-gray-200 pt-6 flex justify-end">
 
                             <button
                                 type="submit"

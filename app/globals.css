@@ -77,9 +77,7 @@
   }
 }
 
-html {
-  overflow-y: scroll;
-}
+
 
 .about-container-1 {
   background: url('/assets/images/about-container-1.jpg') lightgray 50% / cover no-repeat;
@@ -93,6 +91,6 @@ html {
   background: url('/assets/images/about-container-3.jpg') lightgray 50% / cover no-repeat;
 }
 
-border {
+.border {
   border-color: var(--border) !important;
 }

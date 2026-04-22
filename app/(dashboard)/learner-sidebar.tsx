@@ -64,8 +64,6 @@ export default function LearnerSidebar() {
             {/* Top Section */}
             <div className="pt-8 flex flex-col gap-8 mb-20">
 
-
-
                 {/* Navigation */}
                 <div className="px-4 flex z-0 flex-col gap-2">
                     {menuItems.map((item, index) => {

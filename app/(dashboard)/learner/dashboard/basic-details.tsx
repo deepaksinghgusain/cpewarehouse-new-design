@@ -19,6 +19,17 @@ function PastEventCard({ event }: any) {
     const [courseCompletedOn, setCourseCompletedOn] = useState<string | null>(null);
     const user = useSelector((state: RootState) => state.user.user as any) || {};
 
+     let category = ""
+
+    if (event?.category.toLowerCase() === "live") {
+        category = "Live Webinar"
+    }
+
+    if (event?.category.toLowerCase() === "recorded") {
+        category = "Self Study"
+    }
+
+
 
     const getUserCourse = async (courseSlug: string) => {
         const userEmail = localStorage.getItem("email") || "";
@@ -139,7 +150,7 @@ function PastEventCard({ event }: any) {
                     {/* Title Section */}
                     <div className="flex flex-col gap-1">
                         <span className="text-pink-600 text-sm font-medium">
-                            {event.category}
+                            {category}
                         </span>
 
                         <h3 className="text-gray-900 text-lg font-semibold leading-7">
@@ -183,7 +194,7 @@ function PastEventCard({ event }: any) {
                 err && <Dialog open={Boolean(err)} onOpenChange={() => setErr("")}>
                     <DialogContent className='bg-white z-100'>
                         <DialogHeader>
-                            <DialogTitle>Error</DialogTitle>
+                            <DialogTitle></DialogTitle>
                             <DialogDescription>
                                 {err}
                             </DialogDescription>
@@ -198,6 +209,15 @@ function PastEventCard({ event }: any) {
 
 
 function RegisteredEventCard({ event, onLaunch }: any) {
+    let category = ""
+
+    if (event?.category.toLowerCase() === "live") {
+        category = "Live Webinar"
+    }
+
+    if (event?.category.toLowerCase() === "recorded") {
+        category = "Self Study"
+    }
 
     const [err, setErr] = useState("");
     const [isDownloadingHandout, setIsDownloadingHandout] = useState(false);
@@ -305,7 +325,7 @@ function RegisteredEventCard({ event, onLaunch }: any) {
                 <div className="flex flex-col flex-1 justify-between">
 
                     <div>
-                        <p className="text-pink-600 font-medium">{event.category}</p>
+                        <span className="text-pink-600 text-sm font-medium">{category}</span>
 
                         <h3 className="text-lg font-semibold text-gray-900 mt-1">
                             {event.course.title}
@@ -368,7 +388,7 @@ function RegisteredEventCard({ event, onLaunch }: any) {
                 err && <Dialog open={Boolean(err)} onOpenChange={() => setErr("")}>
                     <DialogContent className='bg-white z-100'>
                         <DialogHeader>
-                            <DialogTitle>Error</DialogTitle>
+                            <DialogTitle></DialogTitle>
                             <DialogDescription>
                                 {err}
                             </DialogDescription>
@@ -382,6 +402,16 @@ function RegisteredEventCard({ event, onLaunch }: any) {
 
 
 function RecommendedEventCard({ event }: any) {
+    let category = ""
+
+    if (event.attributes.category.data.attributes.title.toLowerCase() === "live") {
+        category = "Live Webinar"
+    }
+
+    if (event.attributes.category.data.attributes.title.toLowerCase() === "recorded") {
+        category = "Self Study"
+    }
+
 
     return (
         <div className="w-full p-4 bg-white rounded-xl border border-gray-200 shadow-sm flex gap-5 items-center">
@@ -399,7 +429,7 @@ function RecommendedEventCard({ event }: any) {
                 {/* Title */}
                 <div className="flex flex-col gap-1">
                     <span className="text-pink-600 text-sm font-medium">
-                        {event.attributes.category.data.attributes.title}
+                        {category}
                     </span>
 
                     <h3 className="text-gray-900 text-lg font-semibold leading-7">
@@ -514,15 +544,16 @@ const BasicDetails = () => {
 
         const token = localStorage.getItem("token");
 
-        fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/annual-pass-subscriptions?populate=user", {
+        let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/annual-pass-subscriptions?populate=user", {
             headers: {
                 "Authorization": `Bearer ${token}`,
+                "content-type": "application/json"
             },
-        }).then((res) => {
-            return res.json()
-        }).then(res => {
+        })
 
-        });
+        let data = await response.json();
+        console.log(data);
+
     }
 
     async function getEventlist() {
@@ -861,7 +892,7 @@ const BasicDetails = () => {
                             {/* Year Button */}
                             <div className="absolute top-5 right-5">
                                 <Select value={String(selectedYear)} onValueChange={(value) => setSelectedYear(Number(value))}>
-                                    <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-200border-gray-300 rounded-lg shadow-sm">
+                                    <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-300 rounded-lg shadow-sm">
 
                                         {/* Icon */}
                                         <span className="flex items-center justify-center w-5 h-5">
@@ -879,7 +910,10 @@ const BasicDetails = () => {
                                         <SelectValue placeholder="Year" />
                                     </SelectTrigger>
 
-                                    <SelectContent position="popper">
+                                    <SelectContent
+                                        side="bottom"
+                                        align="start"
+                                        sideOffset={4} position="popper" className='border-gray-200 z-50 bg-white'>
                                         {
                                             availableYears.length > 0 && availableYears.map((year: number, index: number) => (
                                                 <SelectItem value={String(year)} key={index}>{year}</SelectItem>

@@ -1,101 +1,25 @@
 "use client"
-import { getInvoicetemplate, getOrderDetailByUserEmail, GetUserSubscribedCourses } from "@/services/course"
+import { getInvoicetemplate, getOrderDetailByUserEmail } from "@/services/course"
 import { useEffect, useState } from "react"
 import jsPDF from "jspdf";
 import moment from "moment";
-import html2canvas from "html2canvas";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { Button } from "@/components/ui/button";
 
-export default function InvoiceDataTable() {
-  let [selectedYear, setSelectedYear] = useState(2024)
-  let [profileData, setProfileData] = useState({
-    firstName: "",
-    lastName: "",
-    company: "",
-    ptin: "",
-    state: "",
-    country: "",
-    phone: "",
-    imgUrl: "",
-  })
-
-  let [availableYears, setAvailableYears] = useState<any>([])
-  let [filteredInvoices, setFilteredInvoices] = useState<any>([])
-  let [allInvoices, setAllInvoices] = useState<any>([])
-  let [invoicesTem, setInvoicesTem] = useState<any>([])
-
-  let [itemsPerPage, setItemsPerPage] = useState(5)
-  let [currentPage, setCurrentPage] = useState(1)
-  let [totalPages, setTotalPages] = useState(0)
-
-  const getUserData = async () => {
-    const token = localStorage.getItem("token")
-
-    if (!token) return;
-
-    let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me", {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-    });
-
-    let res = await response.json();
-
-    setProfileData(res)
-  }
-
-  const getEventlist = async () => {
-    const email = localStorage.getItem('email')?.toString() || '';
-    let res = await GetUserSubscribedCourses(email)
-    let IDarray = [];
-    res.data.forEach((element: any) => {
-
-      if (element?.attributes?.course?.data != null) {
-        IDarray.push(parseInt(element?.attributes?.course?.data?.id))
-      }
-    })
-
-    let invoicesTem = [];
-    let resp = await getInvoicetemplate()
-    if (res.data) {
-      invoicesTem = resp.data?.global?.data;
-      setInvoicesTem(invoicesTem)
-    }
-
-
-    if (res?.data?.length == 0) {
-      let message = 'You have not purchased any course. Please purchase a course to access this information';
-    }
-
-    const coursesPurchased: any = []
-    const localTime = moment().format('YYYY-MM-DD') + 'T00:00:00.000Z'; // store localTime
-    res.data.forEach((element: any) => {
-      const course = element?.attributes?.course?.data?.attributes;
-      const usercourse = element.attributes;
-      if (course != undefined) {
-        coursesPurchased.push({
-          'course': course,
-          'startDate': course?.startDate,
-          'category': course?.category?.data?.attributes?.title,
-          'webinarId': course?.webinarId || '',
-          'joinUrl': usercourse?.joinUrl,
-          'status': usercourse?.status,
-          'completedOn': usercourse?.completedOn,
-          'watchRecording': course?.category?.data?.attributes?.title.toLowerCase() == 'recorded',
-          'purchasedOn': usercourse?.purchasedOn,
-
-        })
-      }
-    })
-  }
-
-  const calculateTotalPages = (allInvoices: any) => {
-    let totalPages = Math.ceil(allInvoices.length / itemsPerPage);
-    setTotalPages(totalPages)
-  }
+function InvoiceCard({ invoice, invoicesTem }: any) {
+  const [err, setErr] = useState("");
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
+  const user = useSelector((state: RootState) => state.user.user as any) || {};
 
   const downloadInvoice = async (
     invoice: any
   ) => {
+    setIsDownloadingInvoice(true);
+
     const InvoiceNo = invoice?.id;
 
     const lastname =
@@ -109,9 +33,7 @@ export default function InvoiceDataTable() {
       );
     }
 
-    const url =
-      invoicesTem?.attributes?.invoiceTemplate?.data?.attributes?.url;
-
+    const url = invoicesTem?.attributes?.invoiceTemplate?.data?.attributes?.url;
 
     const orderItems = invoice?.attributes?.OrderItems || [];
 
@@ -147,18 +69,18 @@ export default function InvoiceDataTable() {
     });
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + url);
+      const response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + url);
       const template = await response.text();
 
       let html = template
         .replace(
           "{{userName}}",
-          profileData.firstName + " " + profileData.lastName
+          user.firstName + " " + user.lastName
         )
         .replace("{{invoiceNo}}", InvoiceNo)
         .replace(
           "{{address}}",
-          profileData.state + ", " + profileData.country
+          user.state + ", " + user.country
         )
         .replace("{{invoiceDate}}", invoiceDate)
         .replace("{{htmlContentforInvoiceItems}}", htmlContentforInvoiceItems)
@@ -214,12 +136,82 @@ export default function InvoiceDataTable() {
           console.log("invoice downloaded successfully");
         },
       });
+
+      setIsDownloadingInvoice(false);
     } catch (error) {
       console.error("Error generating invoice:", error);
     }
   };
 
+  return (
+    <>
+      <tr className="border-t border-t-gray-200 hover:bg-gray-50">
+
+        <td className="px-6 py-4 text-sm text-gray-900">
+          {invoice.id}
+        </td>
+
+        <td className="px-6 py-4 text-sm text-gray-600">
+          {moment(invoice.attributes.createdAt).format("MMMM DD,YYYY")}
+        </td>
+
+        <td className="px-6 py-4 flex">
+
+          <Button
+            variant="default"
+            onClick={() => downloadInvoice(invoice)}
+            className="px-3 py-1.5 flex cursor-pointer items-center gap-2 text-xs font-medium text-indigo-600"
+          >
+
+            {isDownloadingInvoice ? (
+              <Loader className="h-5 w-5 text-amber-300 animate-spin" />
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M17.5 17.5H2.5M15 9.16667L10 14.1667M10 14.1667L5 9.16667M10 14.1667V2.5" stroke="#444CE7" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+            {isDownloadingInvoice ? "Downloading..." : "Download"}
+          </Button>
+        </td>
+
+      </tr>
+
+      {
+        err && <Dialog open={Boolean(err)} onOpenChange={() => setErr("")}>
+          <DialogContent className='bg-white z-100'>
+            <DialogHeader>
+              <DialogTitle></DialogTitle>
+              <DialogDescription>
+                {err}
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      }
+    </>
+  )
+}
+
+export default function InvoiceDataTable() {
+  const [loading, setLoading] = useState(true)
+
+  let [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  let [availableYears, setAvailableYears] = useState<any>([])
+  let [filteredInvoices, setFilteredInvoices] = useState<any>([])
+  let [allInvoices, setAllInvoices] = useState<any>([])
+  let [invoicesTem, setInvoicesTem] = useState<any>([])
+  let [itemsPerPage, setItemsPerPage] = useState(5)
+  let [currentPage, setCurrentPage] = useState(1)
+  let [totalPages, setTotalPages] = useState(0)
+  const user = useSelector((state: RootState) => state.user.user as any) || {};
+
+  const calculateTotalPages = (allInvoices: any) => {
+    let totalPages = Math.ceil(allInvoices.length / itemsPerPage);
+    setTotalPages(totalPages)
+  }
+
   const getinvoiceList = async () => {
+    setLoading(true);
 
     const email = localStorage.getItem('email')?.toString() || '';
 
@@ -227,7 +219,16 @@ export default function InvoiceDataTable() {
 
     let res = await getOrderDetailByUserEmail(email);
     allInvoices = res.data;
+
     setAllInvoices(allInvoices);
+
+    let invoicesTem = [];
+    let resp = await getInvoicetemplate()
+
+    if (resp) {
+      invoicesTem = resp.global?.data;
+      setInvoicesTem(invoicesTem)
+    }
 
     // Extract all unique years from invoice list
     const yearsSet = new Set<number>();
@@ -248,6 +249,7 @@ export default function InvoiceDataTable() {
     setSelectedYear(selectedYear)
 
     filterInvoicesByYear(allInvoices); // Initially show invoices for current year
+    setLoading(false)
   }
 
   function filterInvoicesByYear(allInvoices: any) {
@@ -264,14 +266,12 @@ export default function InvoiceDataTable() {
     });
 
     setFilteredInvoices(invoices)
-    calculateTotalPages(allInvoices);
+    calculateTotalPages(invoices);
   }
 
   useEffect(() => {
-    getUserData()
-    getEventlist();
     getinvoiceList();
-  }, [])
+  }, [allInvoices.length, selectedYear])
 
   return (
     <>
@@ -283,16 +283,36 @@ export default function InvoiceDataTable() {
         {/* PAGE TITLE */}
         <div className="flex gap-10 justify-end bg-[#eee] py-4 px-4 items-center max-w-6xl w-full">
 
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="border rounded-lg px-4 py-2"
-          > {
-              availableYears.map((year: number, index: number) => (
-                <option key={index}>{year}</option>
-              ))
-            }
-          </select>
+          <Select value={String(selectedYear)} onValueChange={(value) => setSelectedYear(Number(value))}>
+            <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-300 rounded-lg shadow-sm">
+
+              {/* Icon */}
+              <span className="flex items-center justify-center w-5 h-5">
+                <svg
+                  className="w-4 h-4 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 7V3M16 7V3M4 11H20M5 5H19C20.1 5 21 5.9 21 7V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V7C3 5.9 3.9 5 5 5Z" />
+                </svg>
+              </span>
+
+              <SelectValue placeholder="Year" />
+            </SelectTrigger>
+
+            <SelectContent
+              side="bottom"
+              align="start"
+              sideOffset={4} position="popper" className='border-gray-200 z-50 bg-white'>
+              {
+                availableYears.length > 0 ? availableYears.map((year: number, index: number) => (
+                  <SelectItem value={String(year)} key={index}>{year}</SelectItem>
+                )) : <SelectItem value={String(new Date().getFullYear())}>{new Date().getFullYear()}</SelectItem>
+              }
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -300,92 +320,81 @@ export default function InvoiceDataTable() {
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
 
-          {/* TABLE */}
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              {/* Spinner */}
 
-          <table className="w-full">
+              <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
 
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Invoice
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Date
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Proof of Purchase
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredInvoices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((invoice: any, index: number) => (
-                <tr key={index} className="border-t hover:bg-gray-50">
-
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {invoice.id}
-                  </td>
-
-
-
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {moment(invoice.attributes.createdAt).format("MMMM DD,YYYY")}
-                  </td>
-
-                  <td className="px-6 py-4 flex">
-
-                    <span
-                      onClick={() => downloadInvoice(invoice)}
-                      className="px-3 py-1.5 flex cursor-pointer items-center gap-2 text-xs font-medium text-indigo-600"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M17.5 17.5H2.5M15 9.16667L10 14.1667M10 14.1667L5 9.16667M10 14.1667V2.5" stroke="#444CE7" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-
-                      Download
-                    </span>
-                  </td>
-
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
-
-          <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
-
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100"
-            >
-              Previous
-            </button>
-
-            <div className="flex gap-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 text-sm rounded-md border ${currentPage === i + 1
-                    ? "bg-indigo-600 text-white"
-                    : "hover:bg-gray-100"
-                    }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-
+              <p className="text-gray-500 text-sm">
+                Loading invoices...
+              </p>
             </div>
 
-            <button
-              onClick={() =>
-                setCurrentPage((p: any) => Math.min(p + 1, totalPages))
-              }
-              className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100"
-            >
-              Next
-            </button>
-          </div>
+          ) : (
+            <>
+              <table className="w-full">
+
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                      Invoice
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                      Date
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                      Proof of Purchase
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredInvoices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((invoice: any, index: number) => (
+                    <InvoiceCard key={index} invoice={invoice} invoicesTem={invoicesTem} />
+                  ))}
+                </tbody>
+
+              </table>
+
+              <div className="flex items-center justify-between px-6 py-4 border-t border-t-gray-200 bg-gray-50">
+
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100"
+                >
+                  Previous
+                </button>
+
+                <div className="flex gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`px-3 py-1 text-sm rounded-md border ${currentPage === i + 1
+                        ? "bg-indigo-600 text-white"
+                        : "hover:bg-gray-100"
+                        }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                </div>
+
+                <button
+                  onClick={() =>
+                    setCurrentPage((p: any) => Math.min(p + 1, totalPages))
+                  }
+                  className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100"
+                >
+                  Next
+                </button>
+              </div>
+            </>
+          )}
+
+
         </div>
       </div>
 
