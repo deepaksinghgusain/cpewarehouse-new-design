@@ -273,7 +273,7 @@ export default function CertificateDataTable() {
 
   useEffect(() => {
     getEventlist();
-  }, [certificates.length, filteredCertificates.length])
+  }, [certificates.length, filteredCertificates.length, selectedYear])
 
   return (
     <>
