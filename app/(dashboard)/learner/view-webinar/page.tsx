@@ -295,49 +295,49 @@ const ViewWebinar = () => {
     const downloadHandout = async () => {
         setIsDownloadingHandout(true);
         try {
-        const courseResult = await getUserCourse(slug);
-        const course = courseResult?.course || selectedCourse;
+            const courseResult = await getUserCourse(slug);
+            const course = courseResult?.course || selectedCourse;
 
-        if (!course) {
-            setErr("Course details not available for handout download.");
-            return;
-        }
+            if (!course) {
+                setErr("Course details not available for handout download.");
+                return;
+            }
 
-        const handoutsData = course?.handout?.data;
-        if (!handoutsData || !Array.isArray(handoutsData) || handoutsData.length === 0) {
-            setErr("No handouts available for this course.");
-            return;
-        }
+            const handoutsData = course?.handout?.data;
+            if (!handoutsData || !Array.isArray(handoutsData) || handoutsData.length === 0) {
+                setErr("No handouts available for this course.");
+                return;
+            }
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-        let downloadCount = 0;
-        
-        for (const handout of handoutsData) {
-            const handoutUrl = handout?.attributes?.url;
-            if (!handoutUrl) continue;
+            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+            let downloadCount = 0;
 
-            const fileUrl = `${baseUrl}${handoutUrl}`;
-            const response = await fetch(fileUrl);
-            const blob = await response.blob();
-            const objectUrl = URL.createObjectURL(blob);
+            for (const handout of handoutsData) {
+                const handoutUrl = handout?.attributes?.url;
+                if (!handoutUrl) continue;
 
-            const link = document.createElement('a');
-            link.href = objectUrl;
-            link.download = handout?.attributes?.name || `handout-${downloadCount + 1}`;
-            link.target = "_blank";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(objectUrl);
+                const fileUrl = `${baseUrl}${handoutUrl}`;
+                const response = await fetch(fileUrl);
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
 
-            downloadCount++;
-        }
+                const link = document.createElement('a');
+                link.href = objectUrl;
+                link.download = handout?.attributes?.name || `handout-${downloadCount + 1}`;
+                link.target = "_blank";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(objectUrl);
 
-        if (downloadCount === 0) {
-            setErr("No valid handouts could be downloaded.");
-        } else {
-            setErr("");
-        }
+                downloadCount++;
+            }
+
+            if (downloadCount === 0) {
+                setErr("No valid handouts could be downloaded.");
+            } else {
+                setErr("");
+            }
         } catch (error) {
             console.error("Handout download failed", error);
             setErr("Unable to download handouts. Please try again.");
@@ -693,25 +693,20 @@ const ViewWebinar = () => {
                                 <div className="overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-400 via-violet-300 to-pink-200 p-1.5 shadow-sm">
                                     <div className="h-full rounded-xl bg-black/80 p-0.5">
                                         <div className="grid h-full grid-cols-1">
-
-                                            <div className="bg-white/95">
-                                                <div className="h-9"></div>
-                                                <div className="relative h-[330px] overflow-hidden bg-slate-900 p-4">
-                                                    <video
-                                                        ref={videoRef}
-                                                        id="my-player"
-                                                        className="video-js vjs-16-9 h-full w-full rounded-xl"
-                                                        controls
-                                                        preload="auto"
-                                                        data-setup={`{\n  \"timelineHoverPreviews\": true,\n  \"plugins\": {\n    \"mux\": {\n      \"debug\": true,\n      \"data\": {\n        \"env_key\": \"${muxVideoEnv}\",\n        \"video_title\": \"${slug}\",\n        \"viewer_user_id\": \"${viewerUserId}\"\n      }\n    }\n  }\n}`}
-                                                    >
-                                                        <source src={playbackSource.src} type={playbackSource.type} />
-                                                    </video>
-                                                    <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
-                                                        Watched: {videoWatchTime}s ({vidViewPercent}%)
-                                                    </div>
+                                            <div className="relative overflow-hidden bg-slate-900 p-4">
+                                                <video
+                                                    ref={videoRef}
+                                                    id="my-player"
+                                                    className="video-js vjs-16-9 h-full w-full rounded-xl"
+                                                    controls
+                                                    preload="auto"
+                                                    data-setup={`{\n  \"timelineHoverPreviews\": true,\n  \"plugins\": {\n    \"mux\": {\n      \"debug\": true,\n      \"data\": {\n        \"env_key\": \"${muxVideoEnv}\",\n        \"video_title\": \"${slug}\",\n        \"viewer_user_id\": \"${viewerUserId}\"\n      }\n    }\n  }\n}`}
+                                                >
+                                                    <source src={playbackSource.src} type={playbackSource.type} />
+                                                </video>
+                                                <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
+                                                    Watched: {videoWatchTime}s ({vidViewPercent}%)
                                                 </div>
-                                                <div className="h-9 bg-black"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -724,11 +719,10 @@ const ViewWebinar = () => {
                                             type="button"
                                             onClick={downloadHandout}
                                             disabled={isDownloadingHandout}
-                                            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 font-medium transition-all ${
-                                                isDownloadingHandout
+                                            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 font-medium transition-all ${isDownloadingHandout
                                                     ? "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed opacity-60"
                                                     : "border-indigo-300 text-indigo-600 hover:bg-indigo-50 cursor-pointer"
-                                            }`}
+                                                }`}
                                         >
                                             {isDownloadingHandout ? (
                                                 <Loader className="h-5 w-5 animate-spin" />
@@ -754,11 +748,10 @@ const ViewWebinar = () => {
                                         type="button"
                                         onClick={downloadCertificate}
                                         disabled={isDownloadingCertificate}
-                                        className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 font-semibold text-white transition-all ${
-                                            isDownloadingCertificate
+                                        className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 font-semibold text-white transition-all ${isDownloadingCertificate
                                                 ? "bg-gray-400 cursor-not-allowed opacity-60 hover:bg-gray-400"
                                                 : "bg-slate-400 hover:bg-slate-500 cursor-pointer"
-                                        }`}
+                                            }`}
                                     >
                                         {isDownloadingCertificate ? (
                                             <Loader className="h-5 w-5 text-amber-300 animate-spin" />
@@ -937,12 +930,6 @@ const ViewWebinar = () => {
                     </TabsContent>
                 </Tabs>
             </div>
-
-
-
-
-
-
         </div>
     )
 }

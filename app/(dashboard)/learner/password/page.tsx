@@ -119,7 +119,8 @@ const Password = () => {
                                                         id="password"
                                                         type={showCurrentPassword ? "text" : "password"}
                                                         placeholder="Enter password"
-                                                        className="pr-10"
+                                                              className="pr-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
+                                                                            
                                                         aria-invalid={fieldState.invalid}
                                                     />
 
@@ -171,7 +172,7 @@ const Password = () => {
                                                         id="password"
                                                         type={showNewPassword ? "text" : "password"}
                                                         placeholder="Enter password"
-                                                        className="pr-10"
+                                                        className="pr-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                         aria-invalid={fieldState.invalid}
                                                     />
 
@@ -221,7 +222,7 @@ const Password = () => {
                                                         id="password"
                                                         type={showConfirmPassword ? "text" : "password"}
                                                         placeholder="Enter password"
-                                                        className="pr-10"
+                                                        className="pr-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500 "
                                                         aria-invalid={fieldState.invalid}
                                                     />
 

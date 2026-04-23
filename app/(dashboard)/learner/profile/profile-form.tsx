@@ -102,7 +102,7 @@ const ProfileForm = () => {
 
             let formData = new FormData()
 
-            if(typeof uploadImage === "object") {
+            if (typeof uploadImage === "object") {
                 formData.append("profileImage", uploadImage)
             }
 
@@ -121,10 +121,10 @@ const ProfileForm = () => {
             let res = await response.json();
             console.log(res);
 
-            if(res.status === 200) {
+            if (res.status === 200) {
                 setSuccess(true);
                 setSuccessMessage(res.msg)
-            }else {
+            } else {
                 setError(true);
                 setErrorMessage(res.error.message)
             }
@@ -190,12 +190,12 @@ const ProfileForm = () => {
                                                         <div className="justify-start text-slate-600 text-sm font-normal font-['Inter'] leading-5">or drag and drop</div>
                                                         <div className="self-stretch text-center justify-start text-slate-600 text-xs font-normal font-['Inter'] leading-4">SVG, PNG, JPG or GIF (max. 800x400px)</div>
                                                         <input
+                                                              className="hidden focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                             type="file"
-                                                            className="hidden"
                                                             onChange={(e) => {
                                                                 const file = e.target.files?.[0];
 
-                                                                if (!file) return; 
+                                                                if (!file) return;
 
                                                                 setUploadImage(file)
 
@@ -236,6 +236,7 @@ const ProfileForm = () => {
                                                                             </div>
 
                                                                             <Input
+                                                                                  className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="firstName"
                                                                                 placeholder="Enter first name"
@@ -272,6 +273,7 @@ const ProfileForm = () => {
                                                                             </div>
 
                                                                             <Input
+                                                                                  className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="lastName"
                                                                                 placeholder="Enter last name"
@@ -314,10 +316,11 @@ const ProfileForm = () => {
                                                                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 
                                                                             <Input
+                                                                                  className="pl-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="phone"
                                                                                 placeholder="Enter your phone"
-                                                                                className="pl-10"
+                                                                                
                                                                                 aria-invalid={fieldState.invalid}
                                                                             />
                                                                         </div>
@@ -357,11 +360,12 @@ const ProfileForm = () => {
                                                                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 
                                                                             <Input
+                                                                                  className="pl-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="email"
                                                                                 type="email"
                                                                                 placeholder="Enter your email"
-                                                                                className="pl-10"
+                                                                                
                                                                                 aria-invalid={fieldState.invalid}
                                                                             />
                                                                         </div>
@@ -396,11 +400,11 @@ const ProfileForm = () => {
 
                                                                     <div className="relative w-full">
                                                                         <Input
+                                                                              className="pr-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                             {...field}
                                                                             id="password"
                                                                             type={show ? "text" : "password"}
                                                                             placeholder="Enter password"
-                                                                            className="pr-10"
                                                                             aria-invalid={fieldState.invalid}
                                                                         />
 
@@ -472,6 +476,7 @@ const ProfileForm = () => {
                                                                             </div>
 
                                                                             <Input
+                                                                                  className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="ptin"
                                                                                 placeholder="Enter PTIN (if applicable)"
@@ -505,6 +510,7 @@ const ProfileForm = () => {
                                                                             </div>
 
                                                                             <Input
+                                                                                  className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="CFPcode"
                                                                                 placeholder="Enter CFP ID (if applicable)"
@@ -537,10 +543,11 @@ const ProfileForm = () => {
                                                                             <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 
                                                                             <Input
+                                                                                  className="pl-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="companyname"
                                                                                 placeholder="Enter company name"
-                                                                                className="pl-10"
+                                                                    
                                                                                 aria-invalid={fieldState.invalid}
                                                                             />
                                                                         </div>
@@ -594,10 +601,11 @@ const ProfileForm = () => {
                                                                             </span>
 
                                                                             <Input
+                                                                                  className="pl-10 focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="billingAddress"
                                                                                 placeholder="Enter billing address"
-                                                                                className="pl-10"
+                                                                                
                                                                                 aria-invalid={fieldState.invalid}
                                                                             />
                                                                         </div>
@@ -629,11 +637,12 @@ const ProfileForm = () => {
 
                                                                     <div className="relative w-full">
                                                                         <Select value={field.value} onValueChange={field.onChange}>
-                                                                            <SelectTrigger className="w-full" id="country">
+                                                                            <SelectTrigger className="w-full focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
+                                                                             id="country">
                                                                                 <SelectValue placeholder="Select Country" />
                                                                             </SelectTrigger>
 
-                                                                            <SelectContent>
+                                                                            <SelectContent className="border-gray-200 z-50 bg-white">
                                                                                 {countryList.map(([code, name]) => (
                                                                                     <SelectItem key={code} value={code}>
                                                                                         <div className="flex items-center gap-2">
@@ -682,6 +691,7 @@ const ProfileForm = () => {
                                                                             <Input
                                                                                 {...field}
                                                                                 id="city"
+                                                                                className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 placeholder="Enter city"
                                                                                 aria-invalid={fieldState.invalid}
                                                                             />
@@ -716,6 +726,7 @@ const ProfileForm = () => {
                                                                             </div>
 
                                                                             <Input
+                                                                                className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="state"
                                                                                 placeholder="Enter state/province"
@@ -752,6 +763,7 @@ const ProfileForm = () => {
                                                                             </div>
 
                                                                             <Input
+                                                                                  className="focus-visible:border-blue-500 border-gray-200 focus-visible:ring-2 focus-visible:ring-blue-500"
                                                                                 {...field}
                                                                                 id="zipCode"
                                                                                 placeholder="Enter zip/postal code"

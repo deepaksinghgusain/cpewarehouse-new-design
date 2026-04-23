@@ -772,7 +772,7 @@ const BasicDetails = () => {
                                         </div>
 
                                         <div className="text-gray-600 text-sm">
-                                            CPA, EA, CFA, MBA
+                                            {/* CPA, EA, CFA, MBA */}
                                         </div>
                                     </div>
                                 </div>

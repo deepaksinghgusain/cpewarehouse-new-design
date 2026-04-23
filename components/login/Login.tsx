@@ -286,8 +286,8 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                             </div>
                         </div>
                     </div>
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogContent>
+                    <Dialog open={open}  onOpenChange={setOpen}>
+                        <DialogContent className='bg-white z-100'>
                             <DialogHeader>
                                 <DialogTitle>Login Error</DialogTitle>
                                 <DialogDescription>
