@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const LoginPage = async () => {
 
-    const res = await getPageContent('login');
+    const res = await getPageContent('login-page');
 
     let heroImageSection: any;
 
