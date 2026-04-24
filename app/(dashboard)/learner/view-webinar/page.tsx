@@ -12,6 +12,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { jsPDF } from 'jspdf';
+import { getHeader } from '@/services/common';
 
 const ViewWebinar = () => {
     const params = useParams<{ videoPath?: string[] }>();
@@ -46,6 +47,11 @@ const ViewWebinar = () => {
     const [nextQuesRemainingTime, setNextQuesRemainingTime] = useState(0);
     const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
     const [isDownloadingHandout, setIsDownloadingHandout] = useState(false);
+    const [scoreObtained, setScoreObtained] = useState(0);
+    const [totalScore, setTotalScore] = useState(0);
+    const [totalPercentage, setTotalPercentage] = useState("0");
+    const [passPercentage, setPassPercentage] = useState(70);
+    const [isShow, setIsShow] = useState(false);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const prTimeRef = useRef(0);
@@ -557,6 +563,85 @@ const ViewWebinar = () => {
             setErr("");
             setShowSubmitConfirm(true);
         }
+
+        console.log(finalAnswerJson);
+
+        SubmitFinal(finalAnswerJson);
+
+    };
+
+    const SubmitFinal = async (finalAnswerJson: any[]) => {
+        setShowSubmitConfirm(false);
+        try {
+            const todayDate = new Date().toISOString().split("T")[0];
+
+            // ✅ Get pass percentage
+            const headerRes = await getHeader(); // replace with actual API
+            const pass = headerRes?.data?.data?.attributes?.examPassPercentage || 70;
+            setPassPercentage(pass);
+
+            const record = {
+                data: {
+                    answerJson: finalAnswerJson, // make sure this exists in state
+                    exam: finalExamId,           // same here
+                    startedOn: todayDate,
+                    endedOn: todayDate,
+                },
+            };
+            const token = localStorage.getItem("token") || "";
+
+            // ✅ Submit exam
+            let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/user-exams", {
+                method: "POST",
+                body: JSON.stringify(record),
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "content-type": "application/json"
+                },
+            })
+
+
+            let res = await response.json();
+
+
+            if (
+                res.error?.status === 400 &&
+                res.error?.message
+                    ?.toLowerCase()
+                    .includes("already given the exam")
+            ) {
+                setErr("You have already submitted the exam. Multiple attempts are not allowed.");
+            }
+
+
+            if (res?.data) {
+                const score = res?.data.data.attributes.score;
+                const total = res?.data.data.attributes.totalScore;
+
+                setScoreObtained(score);
+                setTotalScore(total);
+
+                const percentage = ((score * 100) / total).toFixed(2);
+                setTotalPercentage(percentage);
+
+                if (parseFloat(percentage) >= pass) {
+                    // success modal
+                    setIsShow(true);
+                } else {
+                    setIsShow(false);
+                }
+            }
+        } catch (error: any) {
+
+            if (
+                error?.response?.status === 400 &&
+                error?.response?.data?.error?.message
+                    ?.toLowerCase()
+                    .includes("already given the exam")
+            ) {
+                setErr("You have already submitted the exam. Multiple attempts are not allowed.");
+            }
+        }
     };
 
     const materials = [
@@ -720,8 +805,8 @@ const ViewWebinar = () => {
                                             onClick={downloadHandout}
                                             disabled={isDownloadingHandout}
                                             className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 font-medium transition-all ${isDownloadingHandout
-                                                    ? "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed opacity-60"
-                                                    : "border-indigo-300 text-indigo-600 hover:bg-indigo-50 cursor-pointer"
+                                                ? "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed opacity-60"
+                                                : "border-indigo-300 text-indigo-600 hover:bg-indigo-50 cursor-pointer"
                                                 }`}
                                         >
                                             {isDownloadingHandout ? (
@@ -749,8 +834,8 @@ const ViewWebinar = () => {
                                         onClick={downloadCertificate}
                                         disabled={isDownloadingCertificate}
                                         className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 font-semibold text-white transition-all ${isDownloadingCertificate
-                                                ? "bg-gray-400 cursor-not-allowed opacity-60 hover:bg-gray-400"
-                                                : "bg-slate-400 hover:bg-slate-500 cursor-pointer"
+                                            ? "bg-gray-400 cursor-not-allowed opacity-60 hover:bg-gray-400"
+                                            : "bg-slate-400 hover:bg-slate-500 cursor-pointer"
                                             }`}
                                     >
                                         {isDownloadingCertificate ? (

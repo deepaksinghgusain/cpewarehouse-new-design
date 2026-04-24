@@ -4,6 +4,10 @@ export interface ApiResponse {
     data: any;
 }
 
+export async function getHeader() {
+    const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/api/global?populate=deep";
+    return await apiFetch(url)
+}
 
 export async function getCommonData() {
     const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/api/global?populate=deep";
