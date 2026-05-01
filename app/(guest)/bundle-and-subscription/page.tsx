@@ -6,25 +6,29 @@ import React from 'react'
 
 const page = async () => {
 
+    // let res : any;
+
     const res = await getPageContent('bundle-and-subscription');
     let heroImageSection: any;
     let accreditedPartners: any;
     let otherCourseBanner: any;
-    console.log(res);
-    
+  
     if (res) {
         heroImageSection = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.bundle-and-subscription')[0];
         accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
         otherCourseBanner = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.other-course-banner')[0];
     }
 
-    const result = await getAllPackages();
+    // let result : any;
 
+    const result = await getAllPackages();
+    
+    
     let packagedealData: any;
 
     if(result) {
         packagedealData = result.data;
-    }
+    }    
 
     return (
         <>
@@ -132,7 +136,7 @@ const page = async () => {
                                             <div className=" h-full w-full absolute">
                                                 <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M6.33398 14.1667L14.6673 5.83337M14.6673 5.83337H6.33398M14.6673 5.83337V14.1667"
-                                                        stroke="#155EEF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                                                        stroke="#155EEF" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
                                                 </svg>
                                             </div>
                                         </div>
