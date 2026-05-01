@@ -17,6 +17,8 @@ const FilterCourse = ({ getFilterValues }: { getFilterValues: any }) => {
 
         if (res) {
             const filters = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.filters')[0];
+            console.log(filters);
+            
 
             setFilters(filters)
         }
@@ -72,7 +74,7 @@ const FilterCourse = ({ getFilterValues }: { getFilterValues: any }) => {
 
                             </div>
 
-                            <img src={imageUrl + filter.icon.data.attributes.url} alt="" />
+                            <img src={imageUrl + filter?.icon?.data?.attributes?.url} alt="" />
 
                             <div className="px-0.5 justify-center items-center flex">
                                 <div className="text-[#667085] text-sm font-bold font-['Inter'] leading-tight">{filter.label}</div>
@@ -81,7 +83,7 @@ const FilterCourse = ({ getFilterValues }: { getFilterValues: any }) => {
                         <form >
                             <div className="w-full py-1 flex-col justify-start items-start flex overflow-hidden">
                                 {
-                                    filter.children.length > 0 && filter.children.map((children: any, index: number) => (
+                                    filter?.children?.length > 0 && filter?.children.map((children: any, index: number) => (
                                         <div className="self-stretch px-1.5 py-px justify-start items-center inline-flex" key={index}>
                                             <div className="grow shrink basis-0 h-9 px-2.5 py-[9px] rounded-md justify-start items-center gap-3 flex overflow-hidden">
                                                 <div className="grow shrink basis-0 h-[18px] justify-start items-center gap-2 flex">

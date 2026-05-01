@@ -41,9 +41,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
     let keywords = courseData?.keywords === null ? '' : courseData?.keywords?.split(',') || '';
     let courseCategory = coursesDetail?.data[0]?.attributes?.category?.data?.attributes?.title;
 
-    console.log(coursesDetail);
-    
-
     res = await getPageContent('course-detail');
 
     if (res) {
