@@ -6,16 +6,25 @@ import React from 'react'
 
 const page = async () => {
 
-    const res = await getPageContent('bundle-and-subscription')
-    const heroImageSection = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.bundle-and-subscription')[0];
-    const accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
-    const otherCourseBanner = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.other-course-banner')[0];
+    const res = await getPageContent('bundle-and-subscription');
+    let heroImageSection: any;
+    let accreditedPartners: any;
+    let otherCourseBanner: any;
+    console.log(res);
+    
+    if (res) {
+        heroImageSection = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.bundle-and-subscription')[0];
+        accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
+        otherCourseBanner = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.other-course-banner')[0];
+    }
 
     const result = await getAllPackages();
 
-    console.log(result);
+    let packagedealData: any;
 
-    const packagedealData = result.data;
+    if(result) {
+        packagedealData = result.data;
+    }
 
     return (
         <>

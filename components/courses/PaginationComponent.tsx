@@ -77,6 +77,7 @@ export default function PaginationComponent({
                             <PaginationLink
                                 isActive={currentPage === page}
                                 onClick={() => onPageChange(Number(page))}
+                                className="border-gray-200"
                             >
                                 {page}
                             </PaginationLink>

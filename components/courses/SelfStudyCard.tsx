@@ -88,7 +88,7 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                             <div className="w-full justify-start items-start gap-6 inline-flex">
                                                 <div className="flex-col justify-start items-center inline-flex mt-2">
                                                     <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">Credits:
-                                                        {course?.attributes?.credit} | {course?.attributes?.sub_title}
+                                                        {course?.attributes?.credit}
                                                     </div>
                                                 </div>
                                             </div>

@@ -699,7 +699,6 @@ function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
                 endDate
                 credit
                 fieldOfStudy
-                sub_title
                 price
                 shortDesc
                 slug
@@ -784,7 +783,6 @@ function getCoursesRecordedTitleGql(fortaxLaw: boolean, isActive: boolean) {
               endDate
               credit
               fieldOfStudy
-              sub_title
                 
               price
               shortDesc
@@ -869,7 +867,7 @@ function getCourseBookTitleGql(fortaxLaw: boolean, isActive: boolean) {
               endDate
               credit
               fieldOfStudy
-              sub_title
+              
                 
               price
               shortDesc
