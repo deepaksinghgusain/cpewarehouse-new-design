@@ -702,7 +702,7 @@ const ViewWebinar = () => {
                     <TabsList variant="line" className='w-1/3 bg-transparent'>
                         <TabsTrigger value="overview" className="text-xl  font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Overview</TabsTrigger>
                         <TabsTrigger value="final-exam" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Final Exam</TabsTrigger>
-                        <TabsTrigger value="faq" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Faq</TabsTrigger>
+                        <TabsTrigger value="faq" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">FAQ</TabsTrigger>
                     </TabsList>
                     <TabsContent value="overview">
                         <div className="w-full rounded-2xl bg-gray-100 p-6 shadow-sm">

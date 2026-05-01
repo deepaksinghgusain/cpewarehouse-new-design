@@ -5,6 +5,9 @@ import React from 'react'
 const AboutPage = async () => {
   const res = await getAboutus()
 
+  console.log(res?.data[0]?.attributes?.blocks);
+  
+
   let aboutFirst: any;
   let commitment: any;
   let values: any;
@@ -86,7 +89,7 @@ const AboutPage = async () => {
           </div>
 
           {
-            portfolio.section.length > 0 && portfolio.section.map((item: any, index: number) => {
+            portfolio.Section.length > 0 && portfolio.Section.map((item: any, index: number) => {
 
               if (index == 0) {
                 return <div key={index} className="about-container-1 self-stretch px-8 justify-start items-center gap-24 inline-flex">

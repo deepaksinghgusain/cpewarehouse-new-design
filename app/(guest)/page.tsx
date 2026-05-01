@@ -34,6 +34,8 @@ export default async function page() {
   let getInTouch: any;
 
   if (res) {
+    console.log(res);
+    
     rssFeed = res?.data?.attributes?.RssFeedUrl;
     partners = res?.data?.attributes?.blocks.filter((x: { __component: string; }) => x.__component === 'blocks.partner-section')[0];
     latestnews = res?.data?.attributes?.blocks.filter((x: { __component: string; }) => x.__component === 'blocks.latest-news')[0];
