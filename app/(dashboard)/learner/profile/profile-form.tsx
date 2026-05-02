@@ -824,7 +824,7 @@ const ProfileForm = () => {
                         </div >
                     </div >
                     <Dialog open={success} onOpenChange={setSuccess}>
-                        <DialogContent>
+                        <DialogContent  className='bg-white z-100'>
                             <DialogHeader>
                                 <DialogTitle>Success</DialogTitle>
                                 <DialogDescription>
@@ -835,7 +835,7 @@ const ProfileForm = () => {
                     </Dialog>
 
                     <Dialog open={error} onOpenChange={setError}>
-                        <DialogContent>
+                        <DialogContent  className='bg-white z-100'>
                             <DialogHeader>
                                 <DialogTitle>Error</DialogTitle>
                                 <DialogDescription>

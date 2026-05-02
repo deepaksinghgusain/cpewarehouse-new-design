@@ -268,7 +268,7 @@ const Password = () => {
                 </Form>
             </div>
             <Dialog open={success} onOpenChange={setSuccess}>
-                <DialogContent>
+                <DialogContent  className='bg-white z-100'>
                     <DialogHeader>
                         <DialogDescription>
 
@@ -307,7 +307,7 @@ const Password = () => {
             </Dialog>
 
             <Dialog open={error} onOpenChange={setError}>
-                <DialogContent>
+                <DialogContent  className='bg-white z-100'>
                     <DialogHeader>
                         <DialogTitle>Error</DialogTitle>
                         <DialogDescription>
