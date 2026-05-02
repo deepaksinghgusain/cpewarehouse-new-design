@@ -130,7 +130,7 @@ export async function getUpcomingCourse(IDarray: any) {
     query: getCourses(IDarray),
     fetchPolicy: "network-only",
   });
- 
+
 
   if (!data) return {};
 
@@ -526,105 +526,148 @@ function getCoursesWithTitleGql(
 
 function getCoursesDetail(slug: string) {
   return gql`query {
-        courses(filters: { slug: { eq: "${slug}" } }) {
-          data {
-            id
-            attributes {
-              title
-              credit
-              shortDesc
-              startDate
-              endDate
-              programNumber
-              medium
-              fieldOfStudy
-              price
-              discount
-              videoUrl
-              webinarId
-              keywords
-              slug
-              redirection_Link
-              certificateTemplate {
-                data {
-                  attributes {
-                    url
-                  }
-                }
+    courses(filters:{slug:{eq:"${slug}"}}) {
+      data {
+        id
+         
+        attributes {
+          title
+          credit 
+          shortDesc
+          startDate
+          endDate
+          programNumber
+          medium
+          fieldOfStudy
+          price
+          discount
+          videoUrl
+          webinarId
+          image {
+            data  
+            { 
+          		attributes {
+                name
+                url
+                 alternativeText
+                 caption
+                width
+                height
+                mime
+                previewUrl
               }
-              image {
-                data {
-                  attributes {
-                    name
-                    url
-                    alternativeText
-                    caption
-                    width
-                    height
-                    mime
-                    previewUrl
-                  }
-                }
+          	}
+          }
+          fieldOfStudy
+          keywords
+          slug
+          redirection_Link
+          reviews {
+            title
+            sub_title
+            
+            reviews {
+              date
+              message 
+              by
+            }
+          }
+          certificateTemplate{
+            data{
+              attributes{
+                url
               }
-              category {
-                data {
-                  attributes {
-                    title
-                    faqs {
-                      faq {
-                        question
-                        answer
-                      }
-                    }
-                  }
-                }
-              }
-              tabs {
+            }
+          }
+           category{
+            data{
+              attributes{
                 title
-                featureTitle
-                content
-                index
-                image {
-                  data {
-                    attributes {
-                      url
-                    }
+               faqs{
+                  faq{
+                    question
+                    answer
                   }
+              }
+              }
+            }
+          }
+            faqs {
+              id
+            title
+            description
+            list {
+              question
+              answer
+            }
+          
+          }
+            outline{
+          id,
+          title,
+          list {
+            value
+          }
+        }
+
+        includes {
+            title 
+            list {
+              image {
+                 data{
+                attributes{
+                  url
                 }
               }
-              instructors(pagination: { limit: -1 }) {
-                data {
-                  attributes {
-                    firstName
-                    lastName
-                    bioData
-                    shortDesc
-                    image {
-                      data {
-                        attributes {
-                          url
-                        }
-                      }
-                    }
-                  }
-                }
               }
-              courses {
-                data {
-                  id
-                  attributes {
-                    title
-                    slug
-                    shortDesc
-                    startDate
-                    endDate
-                  }
+              title
+            }
+          }
+
+           attend {
+            title
+            list {
+              value
+            }
+          }
+            
+            tabs {
+            title
+            featureTitle
+            content
+            index
+            image{
+              data{
+                attributes{
+                  url
                 }
               }
             }
           }
+             instructors(	
+              pagination: { limit: -1 }){
+            data{
+              attributes{
+                firstName
+                lastName
+                bioData
+                shortDesc
+                image{
+                  data{
+                  attributes{
+                    url
+                  }
+                }
+              }
+              
+            }
+          }
+        }
+          
         }
       }
+    }
+  }
   `;
 }
 

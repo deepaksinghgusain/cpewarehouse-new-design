@@ -17,8 +17,6 @@ const CourseCatalogPage = async () => {
         accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
         otherCourseBanner = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.other-course-banner')[0];
     }
-
-    console.log(accreditedPartners.list);
     
 
     return (

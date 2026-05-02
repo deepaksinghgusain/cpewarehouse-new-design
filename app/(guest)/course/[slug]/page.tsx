@@ -32,7 +32,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
         relatedBlock = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.related-block')[0];
     }
 
-    let coursesDetail = await getcoursesBySlug(slug);
+    let coursesDetail = await getcoursesBySlug(slug);    
+
     let courseId = coursesDetail?.data[0]?.id;
     let courseData = coursesDetail?.data[0]?.attributes;
     let instructor = courseData.instructors.data[0]?.attributes;
@@ -110,7 +111,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                     <AddToCardComponent courseData={courseData} instructor={instructor} />
                 </section >
 
-                <section className="mt-20 ">
+             <section className="mt-20 ">
                     <div
                         className="w-[90%] mx-auto self-stretch border-b border-[#dee1e9] flex flex-col justify-start items-start gap-2">
                         <Tabs defaultValue="Course Outline" className="w-full bg-transparent border-b border-[#dee1e9]">
@@ -148,7 +149,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                     <div className="px-8 mt-8 rounded-xl justify-start gap-8 inline-flex border-b border-[#e4e7ec]">
 
                                         {
-                                            coursesDetail?.data[0]?.attributes?.outline.length > 0 && coursesDetail?.data[0]?.attributes?.outline.map((outline: any, index: number) => (
+                                            coursesDetail?.data[0]?.attributes?.outline && coursesDetail?.data[0]?.attributes?.outline.length > 0 && coursesDetail?.data[0]?.attributes?.outline.map((outline: any, index: number) => (
                                                 <div className="w-[592px] rounded-2xl flex-col justify-start items-start inline-flex overflow-hidden" key={index}>
                                                     <div
                                                         className="self-stretch h-[88px] px-8 pt-8 pb-6 border-b border-[#e4e7ec] flex-col justify-start items-start gap-8 flex">
@@ -343,9 +344,12 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                             {coursesDetail?.data[0]?.attributes?.faqs?.title}
                                                         </div>
                                                     </div>
-                                                    <div className="self-stretch justify-start"><span
+                                                    {
+                                                        coursesDetail?.data[0]?.attributes?.faqs?.description &&  <div className="self-stretch justify-start"><span
                                                         className="text-Colors-Text-text-tertiary-(600) text-lg font-normal font-['Inter'] leading-7"
                                                         dangerouslySetInnerHTML={{ __html: coursesDetail?.data[0]?.attributes?.faqs?.description }}></span></div>
+                                                    }
+                                                   
                                                 </div>
                                                 <div className="self-stretch min-w-80 flex flex-col justify-start items-center">
                                                     <div className="self-stretch inline-flex justify-start items-start gap-6">
@@ -543,7 +547,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 <div className="py-8">
                                     <div className="w-96 bg-white rounded-xl shadow-lg flex flex-col overflow-hidden">
 
-                                        {/* Image */}
+                                       
                                         <div className="px-6 pt-6">
                                             <div className="h-32 overflow-hidden rounded-md">
                                                 <video
@@ -554,7 +558,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                             </div>
                                         </div>
 
-                                        {/* Content */}
                                         <div className="px-6 pt-6 text-center flex flex-col gap-4">
 
                                             <h3 className="text-lg font-semibold text-gray-900">
@@ -569,7 +572,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                                         </div>
 
-                                        {/* Button */}
                                         <div className="px-6 py-8">
                                             <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-full transition">
                                                 Explore now
@@ -606,7 +608,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             }
                         </div>
                     </div>
-                </section >
+                </section > 
             </>
         )
     }
