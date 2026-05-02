@@ -218,7 +218,7 @@ export default async function page() {
 
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
             {
-              homepagefacultymembers.data.length > 0 && homepagefacultymembers.data.map((faculty: any, index: number) => (
+              homepagefacultymembers.data.length > 0 && homepagefacultymembers.data.slice(0,3).map((faculty: any, index: number) => (
                 <div key={index} className="self-stretch h-96 min-w-80 relative" style={
                   {
                     backgroundImage: `url(${imageUrl + faculty.attributes.image.data.attributes.url})`,
