@@ -150,7 +150,7 @@ const RegisterForm = () => {
 
                     <div
                         className="w-[768px] py-4 bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex overflow-hidden">
-                        <div className="self-stretch h-[392px] px-6 py-4 flex-col justify-start items-start gap-6 flex">
+                        <div className="self-stretch px-6 py-4 flex-col justify-start items-start gap-6 flex">
                             <div className="self-stretch h-[54px] flex-col justify-start items-start gap-5 flex">
                                 <div className="self-stretch justify-start items-start gap-4 inline-flex">
                                     <div className="grow shrink basis-0 self-stretch flex-col justify-center items-start gap-1 inline-flex">
@@ -317,7 +317,7 @@ const RegisterForm = () => {
                                     />
                                 </FieldGroup>
                             </div>
-                            <div className="w-[744px] h-[181px] flex-col justify-start items-start gap-6 flex">
+                            <div className="w-[744px] flex-col justify-start items-start gap-6 flex">
                                 <div className="flex-col justify-start items-start gap-1.5 flex">
                                     <div className="w-[720px] inline-flex flex-col justify-start items-start gap-1.5">
                                         <FieldGroup>
@@ -370,13 +370,13 @@ const RegisterForm = () => {
                                         </FieldGroup>
                                     </div>
                                 </div>
-                                <div className="self-stretch h-[955px]"></div>
+                                {/* <div className="self-stretch"></div>
                                 <div
                                     className="self-stretch px-4 py-2.5 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 inline-flex overflow-hidden">
                                     <div className="px-0.5 justify-center items-center flex">
                                         <div className="text-white text-base font-semibold font-['Inter'] leading-normal">Get started</div>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>
