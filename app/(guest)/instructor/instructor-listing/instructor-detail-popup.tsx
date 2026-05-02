@@ -68,13 +68,13 @@ export default function FacultySection({ res }: any) {
 
             {/* ===== Dialog ===== */}
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="bg-white z-1000 w-full h-screen rounded-xl">
-                    <div className="bg-white p-6 rounded-2xl shadow-xl ">
-                        <div className="w-full max-w-[1280px] p-8 inline-flex flex-col justify-start items-start gap-6">
+                <DialogContent className="bg-white !fixed !inset-[0px] !max-w-none rounded-2xl !translate-x-0 !translate-y-0 top-0 left-0 rounded-none z-100 overflow-y-auto">
+                    <div className="">
+                        <div className="w-full p-8 inline-flex flex-col justify-start items-start gap-6">
                             <div className="self-stretch inline-flex justify-start items-start gap-6">
                                 <div className="w-40 h-40 relative rounded-full">
                                     <div
-                                        className="w-40 h-40 left-0 top-0 absolute rounded-full shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]  outline-4 outline-Component-colors-Components-Avatars-avatar-profile-photo-border overflow-hidden">
+                                        className="w-40 h-40 left-0 top-0 absolute rounded-full shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]  outline-4 overflow-hidden">
                                         <div
                                             className="w-40 h-40 left-0 top-0 absolute rounded-full border border-Component-colors-Components-Avatars-avatar-contrast-border/10">
                                             <img src={imageUrl + selectedFaculty?.attributes?.image?.data?.attributes?.url} alt="" />
@@ -120,10 +120,6 @@ export default function FacultySection({ res }: any) {
                             </div>
                         </div>
                     </div>
-
-                    <DialogFooter>
-                        <Button onClick={() => setOpen(false)}>Close</Button>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog >
         </>
