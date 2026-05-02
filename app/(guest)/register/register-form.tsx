@@ -572,7 +572,7 @@ const RegisterForm = () => {
                                                             <SelectValue placeholder="Select Country" />
                                                         </SelectTrigger>
 
-                                                        <SelectContent>
+                                                        <SelectContent className='bg-white z-100 border-gray-200'>
                                                             {countryList.map(([code, name]) => (
                                                                 <SelectItem key={code} value={code}>
                                                                     <div className="flex items-center gap-2">
