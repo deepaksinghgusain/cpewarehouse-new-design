@@ -81,7 +81,7 @@ const RegisterForm = () => {
 
     return (
         <Form {...form}>
-            <form className='space-y-4 mt-10' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+            <form className='space-y-4 ' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
                 <section className="container mx-auto w-1/2">
                     <div className="h-[177px] flex-col justify-start items-center gap-6 inline-flex">
                         <div className="w-[768px] h-[165px] flex-col justify-start items-start gap-6 flex">
@@ -185,6 +185,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="firstName"
+                                                            className='border-gray-200'
                                                             placeholder="Enter first name"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -221,6 +222,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="lastName"
+                                                            className='border-gray-200'
                                                             placeholder="Enter last name"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -257,6 +259,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="lastname"
+                                                            className='border-gray-200'
                                                             placeholder="Enter last name"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -300,8 +303,8 @@ const RegisterForm = () => {
                                                         {...field}
                                                         id="email"
                                                         type="email"
+                                                        className='border-gray-200 pl-10'
                                                         placeholder="Enter your email"
-                                                        className="pl-10"
                                                         aria-invalid={fieldState.invalid}
                                                     />
                                                 </div>
@@ -341,7 +344,7 @@ const RegisterForm = () => {
                                                                 id="password"
                                                                 type={show ? "text" : "password"}
                                                                 placeholder="Enter password"
-                                                                className="pr-10"
+                                                                className='border-gray-200 pr-10'
                                                                 aria-invalid={fieldState.invalid}
                                                             />
 
@@ -412,6 +415,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="ptin"
+                                                            className='border-gray-200'
                                                             placeholder="Enter PTIN (if applicable)"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -445,6 +449,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="CFPcode"
+                                                            className='border-gray-200'
                                                             placeholder="Enter CFP ID (if applicable)"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -476,8 +481,8 @@ const RegisterForm = () => {
                                                     <Input
                                                         {...field}
                                                         id="companyname"
+                                                        className='border-gray-200 pl-10'
                                                         placeholder="Enter company name"
-                                                        className="pl-10"
                                                         aria-invalid={fieldState.invalid}
                                                     />
                                                 </div>
@@ -532,7 +537,7 @@ const RegisterForm = () => {
                                                         {...field}
                                                         id="billingAddress"
                                                         placeholder="Enter billing address"
-                                                        className="pl-10"
+                                                        className='border-gray-200 pl-10'
                                                         aria-invalid={fieldState.invalid}
                                                     />
                                                 </div>
@@ -563,7 +568,7 @@ const RegisterForm = () => {
 
                                                 <div className="relative w-full">
                                                     <Select value={field.value} onValueChange={field.onChange}>
-                                                        <SelectTrigger className="w-full" id="country">
+                                                        <SelectTrigger className="w-full border-gray-200" id="country">
                                                             <SelectValue placeholder="Select Country" />
                                                         </SelectTrigger>
 
@@ -616,6 +621,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="city"
+                                                            className='border-gray-200'
                                                             placeholder="Enter city"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -652,6 +658,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="state"
+                                                            className='border-gray-200'
                                                             placeholder="Enter state/province"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -688,6 +695,7 @@ const RegisterForm = () => {
                                                         <Input
                                                             {...field}
                                                             id="zipCode"
+                                                            className='border-gray-200'
                                                             placeholder="Enter zip/postal code"
                                                             aria-invalid={fieldState.invalid}
                                                         />
@@ -738,7 +746,7 @@ const RegisterForm = () => {
                         </div>
 
                         <div className='w-[95%] mx-auto'>
-                            <Button type='submit' className="rounded-full cursor-pointer bg-[#2970fe] hover:bg-[#134ab7] px-5 py-3 w-full h-[50px] font-semibold font-['Inter'] leading-7  text-lg" variant="default">
+                            <Button type='submit' className="rounded-full text-white cursor-pointer bg-[#2970fe] hover:bg-[#134ab7] px-5 py-3 w-full h-[50px] font-semibold font-['Inter'] leading-7  text-lg" variant="default">
                                 Create Account
                             </Button>
                         </div>

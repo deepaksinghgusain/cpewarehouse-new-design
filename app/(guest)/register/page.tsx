@@ -20,8 +20,8 @@ const RegisterPage = async () => {
     return (
         <>
             <section>
-                <div className="inline-flex justify-start items-start py-10">
-                    <Link href="/" className="pl-6 pr-5 inline-flex flex-col justify-start items-start">
+                <div className="inline-flex justify-start items-start py-5">
+                    <Link href="/" className="pl-5 pr-5 inline-flex flex-col justify-start items-start">
                         <img className="w-full h-full" src={ logo  } />
                     </Link>
                 </div>
@@ -29,7 +29,7 @@ const RegisterPage = async () => {
 
             <section className="bg-[#f4f9ff]">
                 <div className="container mx-auto w-1/2">
-                    <div className="h-[132px] flex-col justify-center items-center gap-6 inline-flex">
+                    <div className="h-auto flex-col justify-center items-center gap-6 inline-flex">
                         <div className="self-stretch h-[116px] flex-col justify-center items-center gap-6 flex">
                             <div className="w-[768px] h-[116px] flex-col justify-center items-start gap-6 flex">
                                 <div className="self-stretch grow shrink basis-0 flex-col justify-start items-start gap-6 flex">
