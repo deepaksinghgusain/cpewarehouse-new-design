@@ -33,9 +33,7 @@ export default async function page() {
   let approval: any;
   let getInTouch: any;
 
-  if (res) {
-    console.log(res);
-    
+  if (res) {    
     rssFeed = res?.data?.attributes?.RssFeedUrl;
     partners = res?.data?.attributes?.blocks.filter((x: { __component: string; }) => x.__component === 'blocks.partner-section')[0];
     latestnews = res?.data?.attributes?.blocks.filter((x: { __component: string; }) => x.__component === 'blocks.latest-news')[0];
