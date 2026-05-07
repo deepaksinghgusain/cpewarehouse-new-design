@@ -17,6 +17,8 @@ const CourseCatalogPage = async () => {
         accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
         otherCourseBanner = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.other-course-banner')[0];
     }
+
+    console.log(res);
     
 
     return (
@@ -70,9 +72,9 @@ const CourseCatalogPage = async () => {
                         <div className="h-80 w-full px-1 flex-col justify-start items-center gap-16 flex">
                             <div className="self-stretch h-80 p-16 justify-center items-start gap-8 inline-flex">
                                 {
-                                    accreditedPartners.list.length > 0 && accreditedPartners.list.map((l: any, index: number) => (
+                                    accreditedPartners?.list.length > 0 && accreditedPartners?.list.map((l: any, index: number) => (
                                         <div className="w-[180px] h-[142px] px-6 py-8 bg-white/30 rounded-2xl border border-white/30 backdrop-blur-xl flex-col justify-start items-center gap-5 inline-flex" key={index}>
-                                            <img className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down" src={imageUrl + l?.image?.data[0].attributes?.url} />
+                                            <img className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down" src={imageUrl + l?.image?.data.attributes?.url} />
                                         </div>
                                     ))
                                 }

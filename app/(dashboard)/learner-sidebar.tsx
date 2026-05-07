@@ -30,7 +30,7 @@ export default function LearnerSidebar() {
 
     const pathName = usePathname();
 
-    const [logo, setLogo] = useState("http://srv1246425.hstgr.cloud:3000/uploads/CPEW_Logo_230_42_light_bg_f108e1dbca_5125244a0f.png");
+    const [logo, setLogo] = useState("");
 
     const getHeaderData = async () => {
         const response: any = await getCommonData()
@@ -50,13 +50,15 @@ export default function LearnerSidebar() {
             {/* Logo */}
             <div className="px-6 sticky py-6 top-0 z-50 bg-white w-full">
                 <Link href="/">
-                    <Image
+                    {
+                        logo && <Image
                         height={42}
                         width={100}
                         src={logo}
                         alt="logo"
                         className="w-full h-[42px] object-contain"
                     />
+                    }
                 </Link>
 
             </div>

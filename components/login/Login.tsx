@@ -44,7 +44,7 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
         },
     })
 
-    const [logo, setLogo] = useState("http://srv1246425.hstgr.cloud:3000/uploads/CPEW_Logo_230_42_light_bg_f108e1dbca_5125244a0f.png");
+    const [logo, setLogo] = useState("");
 
     const getHeaderData = async () => {
         const response: any = await getCommonData()
@@ -125,7 +125,9 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                         <div className="flex-col  justify-center ">
                             <div className="inline-flex justify-start items-start">
                                 <Link href="/" className="pl-6 pr-5 inline-flex flex-col justify-start items-start">
-                                    <img className="w-full h-full" src={logo} />
+                                   {
+                                     logo &&   <img className="w-full h-full" src={logo} />
+                                   }
                                 </Link>
                             </div>
                             <div className="self-stretch p-9 flex-col justify-start s flex">

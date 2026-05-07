@@ -3,7 +3,7 @@ import Link from 'next/link'
 import RegisterForm from './register-form'
 
 const RegisterPage = async () => {
-    let logo = "http://srv1246425.hstgr.cloud:3000/uploads/CPEW_Logo_230_42_light_bg_f108e1dbca_5125244a0f.png";
+    let logo = "";
 
     const response: any = await getCommonData()
 
@@ -22,7 +22,9 @@ const RegisterPage = async () => {
             <section>
                 <div className="inline-flex justify-start items-start py-5">
                     <Link href="/" className="pl-5 pr-5 inline-flex flex-col justify-start items-start">
-                        <img className="w-full h-full" src={ logo  } />
+                       {
+                         logo &&  <img className="w-full h-full" src={ logo  } />
+                       }
                     </Link>
                 </div>
             </section>

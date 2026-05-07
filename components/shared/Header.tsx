@@ -7,7 +7,7 @@ import Search from './Search'
 import { usePathname } from 'next/navigation'
 
 export const Header = () => {
-    const [logo, setLogo] = useState("http://srv1246425.hstgr.cloud:3000/uploads/CPEW_Logo_230_42_light_bg_f108e1dbca_5125244a0f.png");
+    const [logo, setLogo] = useState("");
 
     const getHeaderData = async () => {
         const response: any = await getCommonData()
@@ -31,7 +31,9 @@ export const Header = () => {
                         <nav className="flex justify-between gap-8">
                             <div className="flex items-center w-[300px]">
                                 <Link href="/">
-                                    <Image src={logo} alt="LOGO" height={200} width={200} />
+                                   {
+                                    logo &&  <Image src={logo} alt="LOGO" height={200} width={200} />
+                                   }
                                 </Link>
                             </div>
                             <div className="relative pr-3 md:pr-0 py-1 lg:w-[600px]">
