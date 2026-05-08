@@ -7,8 +7,11 @@ import LiveCourseCard from './LiveCourseCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import SelfStudyCard from './SelfStudyCard';
 import EbookCard from './EbookCard';
+import LoadingUI from '../ui/loading';
 
 const CourseCatalog = () => {
+
+    const [loading, setLoading] = useState(false);
 
     const [course, setCourses] = useState<any>(
         {
@@ -30,6 +33,8 @@ const CourseCatalog = () => {
     }
 
     async function getCourse() {
+        setLoading(true);
+
         let resCourse: any = await getAllCoursesForLive();
 
         let liveCourse: any = [];
@@ -65,11 +70,17 @@ const CourseCatalog = () => {
             ebookCourseListing: ebookCourse,
             selfStudyCourseListing: selfStudy
         })
+
+        setLoading(false)
     }
 
     useEffect(() => {
         getCourse();
     }, [])
+
+    if(loading) {
+        return <LoadingUI />
+    }
 
     return (
         <section className="container mx-auto my-10 flex">

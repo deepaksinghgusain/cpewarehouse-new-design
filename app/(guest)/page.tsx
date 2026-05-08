@@ -33,7 +33,7 @@ export default async function page() {
   let approval: any;
   let getInTouch: any;
 
-  if (res) {    
+  if (res) {
     rssFeed = res?.data?.attributes?.RssFeedUrl;
     partners = res?.data?.attributes?.blocks.filter((x: { __component: string; }) => x.__component === 'blocks.partner-section')[0];
     latestnews = res?.data?.attributes?.blocks.filter((x: { __component: string; }) => x.__component === 'blocks.latest-news')[0];
@@ -218,7 +218,7 @@ export default async function page() {
 
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
             {
-              homepagefacultymembers.data.length > 0 && homepagefacultymembers.data.slice(0,3).map((faculty: any, index: number) => (
+              homepagefacultymembers.data.length > 0 && homepagefacultymembers.data.slice(0, 3).map((faculty: any, index: number) => (
                 <div key={index} className="self-stretch h-96 min-w-80 relative" style={
                   {
                     backgroundImage: `url(${imageUrl + faculty.attributes.image.data.attributes.url})`,
@@ -259,14 +259,14 @@ export default async function page() {
               <div className="self-stretch justify-start items-start gap-4 inline-flex">
                 <div className="px-[18px] py-3 bg-[#2970fe] rounded-[28px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                   <div className="px-0.5 justify-center items-center flex">
-                    <Link href={getInTouch.button.href } className="text-white text-base font-semibold font-['Inter'] leading-normal">
+                    <Link href={getInTouch.button.href} className="text-white text-base font-semibold font-['Inter'] leading-normal">
                       {getInTouch.button.label}
                     </Link>
                   </div>
                 </div>
               </div>
             </div>
-            <img className="h-[512px] relative" src={imageUrl + getInTouch.image.data.attributes.url } />
+            <img className="h-[512px] relative" src={imageUrl + getInTouch.image.data.attributes.url} />
           </div>
         </div>
       </section>

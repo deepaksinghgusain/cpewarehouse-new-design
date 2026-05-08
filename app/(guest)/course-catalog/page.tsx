@@ -18,9 +18,6 @@ const CourseCatalogPage = async () => {
         otherCourseBanner = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.other-course-banner')[0];
     }
 
-    console.log(res);
-    
-
     return (
         <>
             <section className="w-[90%] mx-auto">
