@@ -2,8 +2,9 @@
 
 import { imageUrl } from '@/lib/constants';
 import { checkAlreadyCoursePurchased, getCart } from '@/services/cart';
-import { Link } from 'lucide-react'
+import { ChevronRight } from 'lucide-react';
 import moment from 'moment-timezone'
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
@@ -194,9 +195,9 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
     }
 
     return (
-        <div className="h-[530px] w-full pb-8 bg-white justify-start items-center gap-16 inline-flex">
+        <div className="w-full mt-10 pb-8 bg-white grid grid-cols-6 gap-2">
 
-            <div className="grid grid-cols-2 flex-col justify-start items-start gap-12 inline-flex w-full">
+            <div className="col-span-4 grid grid-cols-2 flex-col justify-start items-start gap-12 inline-flex w-full">
                 <div className="flex-col justify-start items-start gap-6 flex">
                     <div className="self-stretch  flex-col justify-start items-start gap-4 flex">
                         <div className="justify-start items-center gap-3 inline-flex">
@@ -204,16 +205,21 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                                 <Link href="/course-catalog"
                                     className="text-[#475467] text-sm font-medium font-['Inter'] leading-tight">Course catalogue</Link>
                             </div>
-                            <div>
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M6 12L10 8L6 4" stroke="#D0D5DD" strokeWidth="1.33333" strokeLinecap="round"
-                                        strokeLinejoin="round" />
-                                </svg>
+                            <div className="relative  overflow-hidden">
+                                <ChevronRight className='w-4 h-4' />
+                            </div>
+                            <div className="justify-center items-center flex">
+                                <div className="text-sm font-semibold font-['Inter'] leading-tight">
+                                    {courseData?.category?.data?.attributes?.title === 'Recorded' ? 'Self Study' :
+                                        courseData?.category?.data?.attributes?.title}
+                                </div>
+                            </div>
+                             <div className="relative  overflow-hidden">
+                                <ChevronRight className='w-4 h-4' />
                             </div>
                             <div className="justify-center items-center flex">
                                 <div className="text-[#088ab2] text-sm font-semibold font-['Inter'] leading-tight">
-                                    {courseData?.category?.data?.attributes?.title === 'Recorded' ? 'Self Study' :
-                                        courseData?.category?.data?.attributes?.title}
+                                    {courseData?.fieldOfStudy}
                                 </div>
                             </div>
                         </div>
@@ -247,7 +253,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
 
                 <div className="self-stretch h-[30px]"></div>
             </div>
-            <div className="h-[434px] w-1/2 flex-col justify-start items-start gap-4 inline-flex">
+            <div className="col-span-2 justify-start items-start gap-4 inline-flex">
                 <div
                     className="h-[412px] w-full rounded-xl  shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] flex-col justify-start items-end flex overflow-hidden">
 
@@ -267,7 +273,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                         {
                             courseData?.category?.data?.attributes?.title !== 'Recorded' &&
                             courseData?.category?.data?.attributes?.title !== 'eBook' && <div className="self-stretch pt-2 flex-col justify-center items-end flex">
-                                <div className="self-stretch h-[25px] pb-6 flex-col justify-start items-start flex"></div>
+                                <div className="self-stretch pb-6 flex-col justify-start items-start flex"></div>
                                 <div className="self-stretch px-6 pb-6 justify-start items-center gap-3">
                                     <div className="w-full self-stretch flex-col justify-start items-start gap-5">
                                         <div className="self-stretch flex-col justify-start items-start gap-4 flex">
@@ -294,18 +300,17 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="w-[173px]"></div>
                                 </div>
                             </div>
                         }
 
                         <div
-                            className="self-stretch h-[207px] w-full bg-white rounded-xl pt-2 flex-col justify-start items-center flex overflow-hidden">
+                            className="self-stretch w-full bg-white rounded-xl pt-2 flex-col justify-start items-center flex overflow-hidden">
 
                             {
                                 courseData?.category?.data?.attributes?.title !== 'Recorded' &&
                                 courseData?.category?.data?.attributes?.title !== 'eBook' && <div className="self-stretch h-[69px] px-6 pt-3 flex-col justify-start items-start gap-5 flex">
-                                    <div className="self-stretch h-[57px] flex-col justify-start items-start gap-3 flex">
+                                    <div className="self-stretch flex-col justify-start items-start gap-3 flex">
                                         <div className="self-stretch justify-center items-center gap-6 inline-flex">
                                             <div onClick={() => setSeats(seats - 1)} className="p-3 bg-white cursor-pointer rounded-lg  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#d0d5dd] justify-center items-center gap-2 flex overflow-hidden">
                                                 <div className="w-5 h-5 relative  overflow-hidden">
@@ -341,7 +346,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                                 </div>
                             }
 
-                            <div className="self-stretch h-[76px] pt-3 flex-col justify-start items-start flex">
+                            <div className="self-stretch pt-3 flex-col justify-start items-start flex">
                                 <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex" style={{ width: "100%", margin: "auto" }}>
                                     <div
                                         onClick={addToCart}
@@ -355,7 +360,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                                 </div>
                             </div>
                             <div
-                                className="w-full px-[22px] py-4 rounded-[10px] justify-center items-center gap-2.5 inline-flex overflow-hidden">
+                                className="w-full px-[22px] py-4 rounded-[10px]  justify-center items-center gap-2.5 inline-flex overflow-hidden">
                                 <div className="px-0.5 justify-start items-center flex">
                                     <div><span className="text-[#475467] text-xl font-normal font-['Inter'] leading-[30px] mr-2">For
                                         Group Enrollments</span><span className="text-[#18212f] text-xl font-['Inter'] leading-[30px]">
@@ -375,7 +380,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                                 </div>
                                 <div className="w-6 h-6 relative  overflow-hidden"></div>
                             </div>
-                            <div className="flex h-20 mt-2 justify-center items-center">
+                            <div className="flex  justify-center items-center">
                                 <div className="mr-2 cursor-pointer">
                                     <svg fill="#000000" width="24" height="24" version="1.1" id="XMLID_274_"
                                         xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"

@@ -30,7 +30,6 @@ const page = async () => {
 
     return (
         <>
-
             <section className="w-[90%] mx-auto">
                 <div className="justify-center items-center gap-8 inline-flex">
                     <div className="grow shrink basis-0 flex-col justify-start items-start gap-12 inline-flex">

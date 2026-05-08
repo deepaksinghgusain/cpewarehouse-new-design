@@ -32,7 +32,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
         relatedBlock = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.related-block')[0];
     }
 
-    let coursesDetail = await getcoursesBySlug(slug);    
+    let coursesDetail = await getcoursesBySlug(slug);
 
     let courseId = coursesDetail?.data[0]?.id;
     let courseData = coursesDetail?.data[0]?.attributes;
@@ -62,7 +62,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                     return (item?.attributes?.title?.toString().toLowerCase().includes(element.toString().toLowerCase()))
                         && (item.attributes?.category?.data?.attributes?.title == courseCategory)
                 })
-
 
                 filteredResult?.forEach((element: any) => {
                     const facultyname = getInstructorName(element?.attributes?.instructors)
@@ -111,7 +110,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                     <AddToCardComponent courseData={courseData} instructor={instructor} />
                 </section >
 
-             <section className="mt-20 ">
+                <section className="mt-20 ">
                     <div
                         className="w-[90%] mx-auto self-stretch border-b border-[#dee1e9] flex flex-col justify-start items-start gap-2">
                         <Tabs defaultValue="Course Outline" className="w-full bg-transparent border-b border-[#dee1e9]">
@@ -345,11 +344,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                         </div>
                                                     </div>
                                                     {
-                                                        coursesDetail?.data[0]?.attributes?.faqs?.description &&  <div className="self-stretch justify-start"><span
-                                                        className="text-Colors-Text-text-tertiary-(600) text-lg font-normal font-['Inter'] leading-7"
-                                                        dangerouslySetInnerHTML={{ __html: coursesDetail?.data[0]?.attributes?.faqs?.description }}></span></div>
+                                                        coursesDetail?.data[0]?.attributes?.faqs?.description && <div className="self-stretch justify-start"><span
+                                                            className="text-Colors-Text-text-tertiary-(600) text-lg font-normal font-['Inter'] leading-7"
+                                                            dangerouslySetInnerHTML={{ __html: coursesDetail?.data[0]?.attributes?.faqs?.description }}></span></div>
                                                     }
-                                                   
+
                                                 </div>
                                                 <div className="self-stretch min-w-80 flex flex-col justify-start items-center">
                                                     <div className="self-stretch inline-flex justify-start items-start gap-6">
@@ -489,9 +488,9 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                 <section className="border-b border-[#45a7c5] mt-8">
                     <div className="w-[90%] mx-auto">
-                        <div className=" h-auto  flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
+                        <div className="">
 
-                            <div className="grid grid-cols-5 gap-4 justify-between">
+                            <div className="grid grid-cols-6 gap-30">
                                 <div className='col-span-3'>
                                     {
                                         coursesDetail?.data[0]?.attributes?.includes && <div className=" mt-8">
@@ -544,10 +543,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                         }
                                     </div>
                                 </div>
-                                <div className="py-8">
+                                <div className='col-span-1'></div>
+                                <div className="py-8 col-span-2">
                                     <div className="w-96 bg-white rounded-xl shadow-lg flex flex-col overflow-hidden">
 
-                                       
+
                                         <div className="px-6 pt-6">
                                             <div className="h-32 overflow-hidden rounded-md">
                                                 <video
@@ -608,7 +608,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             }
                         </div>
                     </div>
-                </section > 
+                </section >
             </>
         )
     }
