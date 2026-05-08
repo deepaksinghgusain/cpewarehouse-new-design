@@ -325,7 +325,7 @@ const AboutPage = async () => {
           <div className="px-8">
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 gap-12">
               {values.list.length > 0 && values.list.map((item: any, index: number) => (
-                <div className="flex-col justify-start items-start">
+                <div className="flex-col justify-start items-start" key={index}>
                   <div className="w-12 h-12 p-3 bg-white rounded-[10px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#e4e7ec] justify-center items-center inline-flex overflow-hidden">
                     <div className="w-6 h-6 relative flex-col justify-start items-start flex overflow-hidden">
                       <img src={imageUrl + item.image?.data?.attributes.url} alt="" />

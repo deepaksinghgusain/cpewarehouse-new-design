@@ -336,7 +336,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                             <div className=" justify-start items-start inline-flex">
                                                 {
                                                     sponsorship.list.length > 0 && sponsorship.list.map((list: any, index: number) => (
-                                                        <div className="grow shrink basis-0 px-4 pt-6 flex-col justify-start items-center gap-5 inline-flex">
+                                                        <div className="grow shrink basis-0 px-4 pt-6 flex-col justify-start items-center gap-5 inline-flex" key={index}>
                                                             <div className="self-stretch justify-start items-start gap-3 inline-flex">
                                                                 <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
                                                                     <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
