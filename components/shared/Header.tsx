@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import Search from './Search'
 import { usePathname } from 'next/navigation'
+import { CartComponent } from './cart'
 
 export const Header = () => {
     const [logo, setLogo] = useState("");
@@ -27,7 +28,7 @@ export const Header = () => {
         return (
             <div className='border-b border-gray-300'>
                 <div className='w-[90%] mx-auto'>
-                    <header className="flex justify-center fixed px-2 py-6 top-0 left-0 bg-white z-100 w-[100%]">
+                    <header className="flex justify-center fixed px-2 py-6 top-0 left-0 bg-white z-10 w-[100%]">
                         <nav className="flex justify-between gap-8">
                             <div className="flex items-center w-[300px]">
                                 <Link href="/">
@@ -58,10 +59,11 @@ export const Header = () => {
                             </div >
 
                             <div className='flex justify-end w-[400px] gap-8 items-center'>
-                                <Link href="/checkout"
+                                <CartComponent />
+                                {/* <Link href="/checkout"
                                     className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7 flex items-center">
                                     <Image src="/assets/images/cart.gif" height={30} width={30} className="h-[30px] w-[30px]" alt="" />
-                                </Link>
+                                </Link> */}
 
                                 <Link href="/login" className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7">Log in</Link>
 

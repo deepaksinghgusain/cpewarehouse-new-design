@@ -5,6 +5,7 @@ import moment from "moment-timezone";
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import PaginationComponent from './PaginationComponent';
+import AddToCart from './add-to-cart';
 
 const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
     const timezone = moment.tz.guess();
@@ -156,7 +157,8 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                     </div>
 
                                 </div>
-                                <div className="absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden">
+                                <AddToCart course={course} quantity={1} />
+                                {/* <div className="absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden">
                                     <div className="justify-start text-[#156fee] text-base font-semibold font-['Inter'] leading-normal z-10 ">Add to cart
                                     </div>
                                     <div className="w-5 h-5 relative overflow-hidden">
@@ -167,7 +169,7 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                             </svg>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         )) : <div>No Record</div>
                     }
