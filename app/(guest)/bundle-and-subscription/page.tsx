@@ -1,3 +1,4 @@
+import AddToCart from '@/components/courses/add-to-cart'
 import { imageUrl } from '@/lib/constants'
 import { getPageContent } from '@/services/common'
 import { getAllPackages } from '@/services/course'
@@ -124,20 +125,7 @@ const page = async () => {
                                         </div>
 
                                     </div>
-                                    <div
-                                        className="absolute bottom-1 left-2 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden">
-                                        <div className="justify-start text-[#156fee] text-base font-semibold font-['Inter'] leading-normal z-10 ">Add to
-                                            cart
-                                        </div>
-                                        <div className="w-5 h-5 relative overflow-hidden">
-                                            <div className=" h-full w-full absolute">
-                                                <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M6.33398 14.1667L14.6673 5.83337M14.6673 5.83337H6.33398M14.6673 5.83337V14.1667"
-                                                        stroke="#155EEF" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <AddToCart course={{...course, id: course.id}} type="package" quantity={1} />
                                 </div>
                             ))
                         }

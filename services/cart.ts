@@ -7,6 +7,20 @@ export async function getCart(cartId: any) {
     return await apiFetch(url)
 }
 
+function normalizeCartPayload(cartData: any) {
+  return cartData?.data ? cartData : { data: cartData };
+}
+
+export async function createCart(cartData: any) {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/carts`;
+  return await apiFetch(url, { method: "POST", body: normalizeCartPayload(cartData) });
+}
+
+export async function updateCartAPI(cartId: number | string, cartData: any) {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/carts/${cartId}`;
+  return await apiFetch(url, { method: "PUT", body: normalizeCartPayload(cartData) });
+}
+
 export async function checkAlreadyCoursePurchased(id: number, email: string) {
     const { data }: { data: any } = await client.query({
         query: getAlreadyCoursePurchasedGQL(id, email),

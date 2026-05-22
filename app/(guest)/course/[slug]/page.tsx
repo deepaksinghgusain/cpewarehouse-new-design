@@ -107,7 +107,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
         return (
             <>
                 <section className="w-[90%] mx-auto">
-                    <AddToCardComponent courseData={courseData} instructor={instructor} />
+                    <AddToCardComponent courseData={{...courseData, id: courseId}} instructor={instructor} />
                 </section >
 
                 <section className="mt-20 ">

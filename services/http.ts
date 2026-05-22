@@ -20,10 +20,16 @@ export async function apiFetch(
     revalidate,
   } = options;
 
+  console.log(url);
+  
+  // Get token from localStorage if available (client-side)
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const res = await fetch(url, {
     method,
     headers: {
+      "Content-Type": "application/json",
+      ...(token && { "Authorization": `Bearer ${token}` }),
       ...headers
     },
     body: body ? JSON.stringify(body) : undefined,

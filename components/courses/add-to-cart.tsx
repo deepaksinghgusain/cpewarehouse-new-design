@@ -3,214 +3,74 @@
 import { checkAlreadyCoursePurchased } from '@/services/cart';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
+import { addToCartRequest } from '@/store/actions/cart-actions';
 
-const AddToCart = ({ course, quantity }: { course: any, quantity: number }) => {
+const AddToCart = ({ course, quantity, type }: { course: any, quantity: number, type?: string }) => {
 
     const [isPurchased, setIsPurchased] = useState(false)
-    const [cartId, setIsCartId] = useState(0)
-    const [cartData, setCartData] = useState<any>({})
+    const dispatch = useDispatch()
     const router = useRouter()
-
-    async function getcardCount() {
-        if (cartId > 0) {
-            try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/carts/${cartId}?populate=deep`
-                )
-
-                const resp = await res.json()
-
-                if (resp?.data != null) {
-                    setIsCartId(resp.data.id)
-                    setCartData(resp.data)
-
-                    // set cart quantity
-                    const cartQty =
-                        resp?.data?.attributes?.CartItem?.length || 0
-
-                    // optional localStorage update
-                    localStorage.setItem("cartQty", String(cartQty))
-                }
-            } catch (error) {
-                localStorage.setItem("cartId", "0")
-                localStorage.setItem("cartQty", "0")
-            }
-        }
-    }
-
-    function updateTotal() {
-        let total = 0;
-        cartData.data.CartItem.map((ci: any, index: any) => {
-            if (ci.course != undefined) {
-
-                if (ci.courseId > 0) {
-                    total += (ci.course.discount || ci.course.discountedPrice || ci.course.discounted_price) > 0 ? (ci.course.discount * ci.qty || ci.course.discountedPrice * ci.qty || ci.course.discounted_price * ci.qty) : (ci.course.price * ci.qty)
-                } else {
-                    if (ci.course.discounted_price != null && ci.course.discounted_price > 0) {
-                        total += ci.course.discounted_price * ci.qty;
-                    } else if (ci.course.price != null && ci.course.price >= 0) {
-                        total += ci.course.price * ci.qty;
-                    } else {
-                        total += ci.course.includedCoursePrice * ci.qty;
-                    }
-
-                }
-            }
-        });
-        cartData.data.total = total
-        cartData.data.finalPrice = total;
-
-        setCartData((prev: any) => ({ ...prev }))
-    }
-
-    async function updateCart() {
-        try {
-
-            let res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/carts/${cartId}`, {
-                method: 'PUT',
-                body: JSON.stringify(cartData),
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-
-            res = await res.json();
-
-            await getcardCount();
-            router.push('/learner/shopping-cart');
-
-        } catch (err: any) {
-            if (err.error.error.status === 403) {
-                router.push('/auth/login')
-            }
-        }
-    }
 
     async function enrollNow2(selectedCourse: any) {
 
-        console.log("selectedCourse", selectedCourse);
+        console.log("Add to cart clicked for course:", selectedCourse)
 
         // if cart does not exist then create a cart
-        const courseid = selectedCourse.data[0]["id"] || 0;
-        const price = selectedCourse.data[0]['attributes']['price']
-        const category = selectedCourse?.data[0]?.attributes['category']?.data?.attributes['title'] || '';
-        if (new Date(selectedCourse.data[0].attributes['endDate']) < new Date() && category == 'Live') {
+        const courseid = selectedCourse["id"] || 0;
+        const price = selectedCourse['attributes']['price']
+        const category = selectedCourse?.attributes['category']?.data?.attributes['title'] || '';
+        console.log(category)
+        if (new Date(selectedCourse.attributes['endDate']) < new Date() && category == 'Live') {
             return;
         }
 
         if (localStorage.getItem('token')) {
             const email = localStorage.getItem('email') || ''
 
-
             let res = await checkAlreadyCoursePurchased(courseid, email)
+            console.log("Already purchased response:", res);
 
-            const dts = res?.data.userCourses.data
+            const dts = res?.data?.userCourses?.data || []
             if (dts.length == 0) {
                 setIsPurchased(false);  // no course found for the user
             }
             if (dts.length > 0 && dts[0].attributes?.course?.data.id == courseid) {
                 setIsPurchased(true); // course already purchased
             }
-            if (isPurchased) {
+            if (isPurchased) return;
 
-            }
-            else {
+            let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
+                ? selectedCourse.attributes.discount
+                : selectedCourse.attributes.price;
 
-                if (cartId == 0 && courseid > 0) {
+            const totalprice = realPrice * quantity;
 
-                    setCartData({
-                        "courseId": Number(courseid),
-                        "qty": quantity,
-                        "packageId": 0,
-                        "course": selectedCourse.data[0].attributes,
-                        "Enrollment": []
-                    });
-
-                    console.log("Selected Course", selectedCourse);
-
-                    // const totalprice = selectedCourse?.price * this.seats;
-                    let realPrice: any;
-                    if ((selectedCourse.data[0].attributes.discount != null && selectedCourse.data[0].attributes.discount != 0)) {
-                        realPrice = selectedCourse.data[0].attributes.discount
-                    } else {
-                        realPrice = selectedCourse.data[0].attributes.price
-                    }
-
-
-                    const totalprice = realPrice * quantity;
-                    setCartData((prev: any) => ({
-                        ...prev,
-                        total: totalprice,
-                        finalPrice: prev.finalPrice + totalprice
-                    }));
-
-                    res = await fetch(`${process.env.NEXT_PUBLIC_API_END_POINT}/carts`, {
-                        method: 'POST',
-                        body: JSON.stringify(cartData),
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-
-                    const resp = await res.json();
-
-                    if (resp.data != null) {
-
-                        getcardCount();
-                        // SHOW MESSAGE (COURSE ADD SUCCESSFULL)
-                        localStorage.setItem('cartId', resp.data.id)
-                        router.push('/learner/shopping-cart')
-                    }
-                    else {
-                        // SHOW EROR MESSAGE (SOMETHING WENT WRONG)
-                    }
-
-                }
-
-                if (cartId > 0) {
-                    // check if item being selected already exists
-                    let matchingCourse = cartData?.data?.CartItem.filter((data: any) => data.courseId == courseid)[0] || undefined;
-                    if (matchingCourse != undefined || matchingCourse != null) {
-                        // update quantity
-                        matchingCourse.qty = quantity
-                    }
-                    else {
-                        let realPrice: any;
-                        if ((selectedCourse.data[0].attributes.discount != null && selectedCourse.data[0].attributes.discount != 0)) {
-                            realPrice = selectedCourse.data[0].attributes.discount
-                        } else {
-                            realPrice = selectedCourse.data[0].attributes.price
-                        }
-
-                        // its new item to be added
-                        setCartData((prev: any) => ({
-                            ...prev,
-                            "courseId": Number(courseid),
-                            "qty": quantity,
-                            "course": selectedCourse.data[0].attributes,
-                            "packageId": 0,
-                            "Enrollment": []
-                        }))
-                    }
-                    updateTotal();
-                }
-                updateTotal();
-                updateCart();
+            const payload = {
+                courseId: Number(courseid),
+                qty: quantity,
+                course: selectedCourse.attributes,
+                total: totalprice,
+                packageId: Number(type === "package" ? selectedCourse.id : 0),
             }
 
+            dispatch(addToCartRequest(payload))
         } else {
-            setCartData((prev: any) => ({
-                ...prev,
-                "courseId": Number(courseid),
-                "qty": quantity,
-                "course": selectedCourse.data[0].attributes,
-                "packageId": 0,
-                "Enrollment": []
-            }))
+            // not logged in: save a local cart and redirect to login
+            let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
+                ? selectedCourse.attributes.discount
+                : selectedCourse.attributes.price;
 
-            updateTotal()
-            localStorage.setItem('cartData', JSON.stringify(cartData));
-            router.push('/auth/login')
+            const payload = {
+                courseId: Number(courseid),
+                qty: quantity,
+                course: selectedCourse.attributes,
+                total: realPrice * quantity,
+                packageId: Number(type === "package" ? selectedCourse.id : 0),
+            }
+
+            localStorage.setItem('cartData', JSON.stringify(payload))
+            router.push('/login')
         }
     }
 

@@ -6,9 +6,19 @@ import React, { useEffect, useState } from 'react'
 import Search from './Search'
 import { usePathname } from 'next/navigation'
 import { CartComponent } from './cart'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState, AppDispatch } from '@/store/store'
+import { userLogoutRequest } from '@/store/actions/user-actions'
+import { useRouter } from 'next/navigation'
 
 export const Header = () => {
     const [logo, setLogo] = useState("");
+    const [dropdownOpen, setDropdownOpen] = useState(false)
+    const pathname = usePathname();
+    const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>()
+    const user: any = useSelector((state: RootState) => state.user.user)
+    const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated)
 
     const getHeaderData = async () => {
         const response: any = await getCommonData()
@@ -18,7 +28,12 @@ export const Header = () => {
         setLogo(logo)
     }
 
-    const pathname = usePathname();
+    const handleLogout = () => {
+        dispatch(userLogoutRequest())
+        localStorage.removeItem('token')
+        localStorage.removeItem('userData')
+        router.push('/')
+    }
 
     useEffect(() => {
         getHeaderData();
@@ -32,9 +47,9 @@ export const Header = () => {
                         <nav className="flex justify-between gap-8">
                             <div className="flex items-center w-[300px]">
                                 <Link href="/">
-                                   {
-                                    logo &&  <Image src={logo} alt="LOGO" height={200} width={200} />
-                                   }
+                                    {
+                                        logo && <Image src={logo} alt="LOGO" height={200} width={200} />
+                                    }
                                 </Link>
                             </div>
                             <div className="relative pr-3 md:pr-0 py-1 lg:w-[600px]">
@@ -60,20 +75,49 @@ export const Header = () => {
 
                             <div className='flex justify-end w-[400px] gap-8 items-center'>
                                 <CartComponent />
-                                {/* <Link href="/checkout"
-                                    className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7 flex items-center">
-                                    <Image src="/assets/images/cart.gif" height={30} width={30} className="h-[30px] w-[30px]" alt="" />
-                                </Link> */}
 
-                                <Link href="/login" className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7">Log in</Link>
+                                {isAuthenticated && user ? (
+                                    <div className="relative" tabIndex={0} onBlur={() => setDropdownOpen(false)}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setDropdownOpen((prev) => !prev)}
+                                            className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-[#101828] text-lg font-semibold"
+                                        >
+                                            <span>{user?.firstName || user?.username || 'My Account'}</span>
+                                            <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
 
-                                <div
-                                    className="px-4 py-2.5 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
-                                    <div className="px-0.5 justify-center items-center flex">
-                                        <Link href="/register" className="text-white text-lg font-semibold font-['Inter'] leading-7">Create
-                                            profile</Link>
+                                        {dropdownOpen && (
+                                            <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 bg-white shadow-lg z-50">
+                                                <Link
+                                                    href="/learner/profile"
+                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    Profile
+                                                </Link>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleLogout}
+                                                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    Logout
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
+                                ) : (
+                                    <>
+                                        <Link href="/login" className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7">Log in</Link>
+
+                                        <div className="px-4 py-2.5 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
+                                            <div className="px-0.5 justify-center items-center flex">
+                                                <Link href="/register" className="text-white text-lg font-semibold font-['Inter'] leading-7">Create profile</Link>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </nav >
                     </header >

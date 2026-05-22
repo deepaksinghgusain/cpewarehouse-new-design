@@ -1,5 +1,6 @@
 "use client";
 
+import EnrollNowCart from '@/components/courses/enroll-now';
 import { imageUrl } from '@/lib/constants';
 import { checkAlreadyCoursePurchased, getCart } from '@/services/cart';
 import { ChevronRight } from 'lucide-react';
@@ -9,6 +10,8 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
 const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
+    console.log(courseData);
+    
     const timezone = moment.tz.guess();
     const timezoneAbbrv = moment().tz(timezone).format('z');
     const firstLetter = timezoneAbbrv.charAt(0);
@@ -67,131 +70,6 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
         getcardCount(cartId);
         router.push('/learner/shopping-cart');
 
-    }
-
-    const addToCart = async () => {
-        console.log("add to cart");
-
-        let cartData: any;
-        localStorage.setItem("slug", slug)
-        console.log("selectedCourse", courseData);
-        let cartId = 0;
-
-        // if cart does not exist then create a cart
-        const courseid = courseData.data[0]["id"] || 0;
-        const price = courseData.data[0]['attributes']['price']
-        const category = courseData?.data[0]?.attributes['category']?.data?.attributes['title'] || '';
-        if (new Date(courseData.data[0].attributes['endDate']) < new Date() && category == 'Live') {
-            console.log("course is expired");
-            return;
-        }
-
-        if (localStorage.getItem('token')) {
-            const email = localStorage.getItem('email') || ''
-
-            let res = await checkAlreadyCoursePurchased(courseid, email)
-
-            const dts = res?.data.userCourses.data
-            let isPurchased = false
-            if (dts.length == 0) {
-                isPurchased = false  // no course found for the user
-            }
-            if (dts.length > 0 && dts[0].attributes?.course?.data.id == courseid) {
-                isPurchased = dts[0].attributes?.course?.data.id == courseid // course already purchased
-            }
-            if (isPurchased) {
-
-            } else {
-                if (cartId == 0 && courseid > 0) {
-
-                    setAddItems((prevValues: any): any => {
-                        return [
-                            ...prevValues,
-                            {
-                                courseId: Number(courseid),
-                                qty: seats,
-                                packageId: 0,
-                                course: courseData.data[0].attributes,
-                                Enrollment: []
-                            }
-                        ];
-                    });
-
-                    console.log("Selected Course", courseData);
-
-                    // const totalprice = selectedCourse?.price * this.seats;
-                    let realPrice: any;
-                    if ((courseData.data[0].attributes.discount != null && courseData.data[0].attributes.discount != 0)) {
-                        realPrice = courseData.data[0].attributes.discount
-                    } else {
-                        realPrice = courseData.data[0].attributes.price
-                    }
-
-
-                    const totalprice = realPrice * seats;
-                    cartData.data.total = totalprice
-                    cartData.data.finalPrice = totalprice
-
-                    const token = localStorage.getItem("token");
-
-                    let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/carts", {
-                        method: "POST",
-                        body: JSON.stringify(cartData),
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "content-type": "application/json"
-                        },
-                    })
-
-                    let resp = await response.json();
-
-                    if (resp?.data != null) {
-
-                        getcardCount(cartId);
-                        // SHOW MESSAGE (COURSE ADD SUCCESSFULL)
-                        localStorage.setItem('cartId', resp.data.id)
-                        router.push('/learner/shopping-cart')
-                    }
-                    else {
-                        // SHOW EROR MESSAGE (SOMETHING WENT WRONG)
-                    }
-                }
-            }
-
-            if (cartId > 0) {
-                // check if item being selected already exists
-                let matchingCourse = cartData.data.CartItem.filter((data: any) => data.courseId == courseid)[0] || undefined;
-                if (matchingCourse != undefined || matchingCourse != null) {
-                    matchingCourse.qty = seats
-                }
-                else {
-                    let realPrice: any;
-                    if ((courseData.data[0].attributes.discount != null && courseData.data[0].attributes.discount != 0)) {
-                        realPrice = courseData.data[0].attributes.discount
-                    } else {
-                        realPrice = courseData.data[0].attributes.price
-                    }
-
-                    // its new item to be added
-
-                    setAddItems((prevValues: any): any => {
-                        return [
-                            ...prevValues,
-                            {
-                                courseId: Number(courseid),
-                                qty: seats,
-                                packageId: 0,
-                                course: courseData.data[0].attributes,
-                                Enrollment: []
-                            }
-                        ];
-                    });
-                }
-                updateTotal();
-            }
-            updateTotal();
-            updateCart(cartId, courseData);
-        }
     }
 
     return (
@@ -346,19 +224,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                                 </div>
                             }
 
-                            <div className="self-stretch pt-3 flex-col justify-start items-start flex">
-                                <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex" style={{ width: "100%", margin: "auto" }}>
-                                    <div
-                                        onClick={addToCart}
-                                        className="grow cursor-pointer shrink basis-0 h-[40px]  px-[18px] py-3 bg-[#2970fe] rounded-[28px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
-                                        <div className="px-0.5 justify-center items-center flex">
-                                            <div className="text-white  font-bold font-['Inter'] leading-7" style={{ fontSize: "18px" }}>
-                                                {courseData?.category?.data?.attributes?.title == 'eBook' ? 'GET ACCESS' : 'Enroll now'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <EnrollNowCart course={courseData} quantity={seats} />
                             <div
                                 className="w-full px-[22px] py-4 rounded-[10px]  justify-center items-center gap-2.5 inline-flex overflow-hidden">
                                 <div className="px-0.5 justify-start items-center flex">
