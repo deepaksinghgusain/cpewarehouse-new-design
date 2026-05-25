@@ -1,5 +1,5 @@
 import { call, put, select, takeLatest } from "redux-saga/effects";
-import { CART_ADD_REQUEST, CART_UPDATE_REQUEST } from "../actions/cart-actions";
+import { CART_ADD_REQUEST, CART_UPDATE_REQUEST, CART_GET_REQUEST } from "../actions/cart-actions";
 import { createCart, updateCartAPI, getCart } from "@/services/cart";
 import { setCart } from "../reducers/cart-reducer";
 
@@ -54,7 +54,7 @@ function* handleAddToCart(action: any): Generator<any, any, any> {
       if (resp && resp.data) {
         localStorage.setItem("cartId", String(resp.data.id));
         const full = yield call(getCart, resp.data.id);
-        console.log(full)
+        console.log({full})
         yield put(setCart(full));
       }
     } else {
@@ -64,6 +64,7 @@ function* handleAddToCart(action: any): Generator<any, any, any> {
       if (resp && resp.data) {
         console.log("Cart updated:", resp.data);
         const full = yield call(getCart, cartId);
+        console.log({full});
         yield put(setCart(full));
       }
     }
@@ -152,9 +153,9 @@ function buildFullCartBody(cartState: any, payload: any) {
       userId: typeof window !== "undefined" ? Number(localStorage.getItem("userId") || 0) : 0,
       total,
       CartItem: items,
-      discountCode: "",
-      discountPrice: 0,
-      finalPrice: total,
+      discountCode: payload.discountCode || "",
+      discountPrice: payload.discountPrice ?? 0,
+      finalPrice: payload.finalPrice ?? total,
     },
   };
 }
@@ -177,7 +178,27 @@ function* handleUpdateCart(action: any): Generator<any, any, any> {
   }
 }
 
+function* handleGetCart(action: any): Generator<any, any, any> {
+  try {
+    const payload = action.payload;
+    const cartId = payload?.cartId || (typeof window !== "undefined" ? localStorage.getItem("cartId") : null);
+    
+    if (!cartId) {
+      console.warn("No cart ID found");
+      return;
+    }
+
+    const full = yield call(getCart, cartId);
+    if (full && full.data) {
+      yield put(setCart(full));
+    }
+  } catch (err) {
+    console.error("get cart error", err);
+  }
+}
+
 export function* watchCart(): Generator {
   yield takeLatest(CART_ADD_REQUEST as any, handleAddToCart as any);
   yield takeLatest(CART_UPDATE_REQUEST as any, handleUpdateCart as any);
+  yield takeLatest(CART_GET_REQUEST as any, handleGetCart as any);
 }

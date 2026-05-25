@@ -4,12 +4,18 @@ interface CartState {
 	items: any[];
 	cartId?: number | string | null;
 	total?: number;
+	discountCode: string;
+	discountPrice: number;
+	finalPrice: number;
 }
 
 const initialState: CartState = {
 	items: [],
 	cartId: null,
 	total: 0,
+	discountCode: "",
+	discountPrice: 0,
+	finalPrice: 0
 };
 
 const cartSlice = createSlice({
@@ -36,6 +42,21 @@ const cartSlice = createSlice({
 
 			state.items = items;
 			state.cartId = payload?.data?.id || payload?.id || payload.cartId || state.cartId;
+
+			state.discountCode = payload?.data?.attributes?.discountCode;
+			state.discountPrice = payload?.data?.attributes?.discountPrice;
+			state.finalPrice = payload?.data?.attributes?.finalPrice;
+
+			if (state.finalPrice === 0) {
+				let finalPrice = items.reduce((acc: number, item: any) => {
+					const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+					const qty = item.qty || item.quantity || 1;
+					return acc + price * qty;
+				}, 0);
+				if(finalPrice) {
+					state.finalPrice = Number(finalPrice);
+				}
+			}
 
 			const payloadTotal =
 				payload?.data?.attributes?.total ??

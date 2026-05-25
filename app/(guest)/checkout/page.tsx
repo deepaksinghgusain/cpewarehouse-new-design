@@ -1,9 +1,543 @@
+"use client";
+
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState, AppDispatch } from '@/store/store'
+import { updateCartRequest } from '@/store/actions/cart-actions'
+import moment from 'moment'
+import Image from 'next/image'
+import { Minus, Plus, Trash2 } from 'lucide-react'
+import { imageUrl as imageUrlConstant } from '@/lib/constants'
+import { addOrderApi, applyCouponApi, getCheckoutUrl, updateOrderStatus } from '@/services/cart';
 
 const CheckoutPage = () => {
+    const dispatch = useDispatch<AppDispatch>()
+    const cart = useSelector((s: RootState) => s.cart);
+    const user = useSelector((s: RootState) => s.user);
+    console.log("Cart data in checkout page:", cart);
+    const items = cart?.items || [];
+    const enrollments = items.reduce((acc: number, it: any) => acc + (it.qty || it.quantity || 1), 0);
+    const subtotal = items.reduce((acc: number, it: any) => acc + ((it.course?.price || 0) * (it.qty || 1)), 0);
+    const [agreeTerms, setAgreeTerms] = React.useState(false);
+    const [couponValue, setCouponValue] = React.useState('');
+    const [couponErrMsg, setCouponErrMsg] = React.useState('');
+    const [couponRes, setCouponRes] = React.useState(false);
+    const [couponType, setCouponType] = React.useState('');
+    const [couponValueOFF, setCouponValueOFF] = React.useState<number>(0);
+    const [finalPrice, setFinalPrice] = React.useState<number | string>(Number(cart?.total ?? subtotal) || 0);
+    const displayedTotal = couponRes ? Number(finalPrice) : Number(cart?.total ?? subtotal);
+    const couponLabel = couponType === 'amountOff' ? `- US$${couponValueOFF.toFixed(2)}` : couponType === 'percentOff' ? `- ${couponValueOFF}%` : '';
+
+    const addToCalendar = (course: any) => {
+        const calendarData = [
+            'data:text/calendar;charset=utf8,',
+            'BEGIN:VCALENDAR',
+            'PRODID:-//Syncfusion Inc//Scheduler//EN',
+            'VERSION:2.0',
+            'CALSCALE:GREGORIAN',
+            'METHOD:PUBLISH',
+            'X-WR-CALNAME:Calendar',
+            'X-WR-TIMEZONE:Asia/Calcutta',
+            'BEGIN:VEVENT',
+            `LOCATION:${course?.venue_location || ''}`,
+            `SUMMARY:${course?.title || ''}`,
+            `UID:${course?.id || ''}`,
+            'TRANSP:TRANSPARENT',
+            `DTSTART;TZID=America/New_York:${moment(course?.start_Date).format('YYYYMMDDTHHmmss')}`,
+            `DTEND;TZID=America/New_York:${moment(course?.end_Date).format('YYYYMMDDTHHmmss')}`,
+            `DESCRIPTION:${course?.short_desc || ''}`,
+            'ISREADONLY:false',
+            'END:VEVENT',
+            'END:VCALENDAR',
+        ];
+
+        const calendarString = calendarData.filter((value) => typeof value !== 'undefined' && value !== null).join('\n');
+        window.open(calendarString.trim());
+    }
+
+    const getImage = (data: any) => {
+        const format = JSON.parse(data?.formats || 'null');
+        if (!format) {
+            return imageUrlConstant + (data?.url || '');
+        }
+
+        return imageUrlConstant + format.thumbnail.url;
+    }
+
+    const checkout = (agreeTerms: boolean, enrolls: any[], addOrder: () => void) => {
+        if (!agreeTerms) return;
+
+        const filteredEnrolls = enrolls.filter((data: any) => data.name !== '' || data.email !== '');
+        console.log('enrolls ', filteredEnrolls);
+        addOrder();
+    }
+
+    const applyCoupon = async () => {
+        const trimmedCoupon = couponValue.trim();
+        if (!trimmedCoupon) {
+            setCouponErrMsg('Please enter a coupon code.');
+            setCouponRes(false);
+            return;
+        }
+
+        setCouponErrMsg('');
+        try {
+            const couponResp = await applyCouponApi(trimmedCoupon);
+            const fp = Number(cart?.total ?? subtotal) || 0;
+
+            if (couponResp?.statusCode !== 200) {
+                setCouponErrMsg(couponResp?.message || 'Invalid Coupon.');
+                setCouponRes(false);
+                return;
+            }
+
+            if (couponResp.amount_off != null) {
+                if (couponResp.amount_off >= fp) {
+                    setCouponErrMsg('Invalid Coupon.');
+                    setCouponRes(false);
+                    return;
+                }
+
+                const updatedPrice = Number((fp - couponResp.amount_off).toFixed(2));
+                setCouponType('amountOff');
+                setCouponValueOFF(couponResp.amount_off);
+                setFinalPrice(updatedPrice);
+                setCouponRes(true);
+                dispatch(updateCartRequest({ discountCode: trimmedCoupon, discountPrice: couponResp.amount_off, finalPrice: updatedPrice }));
+                return;
+            }
+
+            if (couponResp.percent_off != null) {
+                const discountAmount = Number(((fp * couponResp.percent_off) / 100).toFixed(2));
+                const updatedPrice = Number((fp - discountAmount).toFixed(2));
+                setCouponType('percentOff');
+                setCouponValueOFF(couponResp.percent_off);
+                setFinalPrice(updatedPrice);
+                setCouponRes(true);
+                dispatch(updateCartRequest({ discountCode: trimmedCoupon, discountPrice: couponResp.percent_off, finalPrice: updatedPrice }));
+                return;
+            }
+
+            setCouponErrMsg('Invalid Coupon.');
+            setCouponRes(false);
+        } catch (error) {
+            console.error('applyCoupon error', error);
+            setCouponErrMsg('Failed to validate coupon. Please try again.');
+            setCouponRes(false);
+        }
+    }
+
+    const addOrder = async () => {
+
+        try {
+
+            const originalCartItems: any[] = cart.items || [];
+
+            // CLONE ITEMS TO AVOID IMMUTABLE OBJECT ERRORS
+            const cartItems: any[] = originalCartItems.map((item: any) => ({
+                ...item,
+                course: { ...item.course },
+                Enrolls: item.Enrolls
+                    ? item.Enrolls.map((en: any) => ({ ...en }))
+                    : [],
+            }));
+
+            const cartData: any = cart;
+
+            const couponType: string = cart.discountCode;
+
+            const couponValue: string =
+                Number(cart.discountPrice) > 0
+                    ? cart.discountCode
+                    : '';
+
+            const finalPrice: number = cart.finalPrice;
+
+            const gtagData: any[] = [];
+            const checkoutData: any[] = [];
+
+            let checkPTIN = false;
+            let checkName = false;
+            let checklastname = false;
+            let checkEmail = false;
+            let errorText = false;
+            let emailMessage = '';
+
+            let freeEvents = 0;
+            let lengthOfCartItems = cartItems.length;
+
+            console.log('items', cartItems);
+
+            cartItems.map((data: any, index: number) => {
+
+                // FREE EVENT CHECK
+                if (data.course.price === 0 && data.courseId > 0) {
+
+                    freeEvents++;
+
+                } else {
+
+                    if (
+                        data.course.price != null &&
+                        data.course.price == 0
+                    ) {
+
+                        freeEvents++;
+
+                    } else {
+
+                        if (
+                            data.course.price == null &&
+                            data.course.includedCoursePrice == 0
+                        ) {
+                            freeEvents++;
+                        }
+                    }
+                }
+
+                // PRICE
+                const eachPrice: any =
+                    (data?.course?.discounted_price ||
+                        data?.course?.discount) > 0
+                        ? (
+                            data?.course?.discounted_price ||
+                            data?.course?.discount
+                        )
+                        : (
+                            data?.course?.price >= 0 &&
+                            data?.course?.price != null
+                        )
+                            ? data?.course?.price
+                            : data?.course?.includedCoursePrice;
+
+                let couponDiscountedPrice: any = eachPrice;
+
+                if (couponType == 'percentOff') {
+
+                    const discountedAmount: any = (
+                        (eachPrice * couponValueOFF) / 100
+                    ).toFixed(2);
+
+                    couponDiscountedPrice = (
+                        eachPrice - discountedAmount
+                    ).toFixed(2);
+
+                } else if (couponType == 'amountOff') {
+
+                    const discountedAmount: any = (
+                        couponValueOFF /
+                        (lengthOfCartItems * data.qty)
+                    ).toFixed(2);
+
+                    couponDiscountedPrice = (
+                        eachPrice - discountedAmount
+                    ).toFixed(2);
+                }
+
+                const priceIncents: any = (
+                    Number(couponDiscountedPrice) * 100
+                ).toFixed(0);
+
+                // CHECKOUT DATA
+                checkoutData.push({
+                    name: data.course.title,
+                    default_price_data: {
+                        currency: 'USD',
+                        unit_amount_decimal:
+                            couponDiscountedPrice == null
+                                ? 0
+                                : priceIncents,
+                    },
+                    images: [imageUrlConstant + data.course.url],
+                    qty: data.qty,
+                    coupon: '',
+                    orderId: 0,
+                    discountCoupon:
+                        couponRes == true
+                            ? {
+                                name: couponValue || '',
+                                value: couponValueOFF || '',
+                                type: couponType || '',
+                                email: localStorage.getItem('email'),
+                            }
+                            : {},
+                });
+
+                // GTAG
+                gtagData.push({
+                    id: data.course.id,
+                    name: data.course.title,
+                    quantity: data.qty,
+                    price: couponDiscountedPrice,
+                    category: 'TaxCourse',
+                    brand: 'CPE',
+                });
+
+                // IMAGE
+                let imageURL = '';
+
+                try {
+
+                    const format = JSON.parse(
+                        cartItems[index]?.course?.formats || '{}'
+                    );
+
+                    imageURL = format?.thumbnail?.url || '';
+
+                } catch (err) {
+
+                    console.log('Image parse error', err);
+                }
+
+                // TITLE
+                cartItems[index]['title'] =
+                    cartItems[index]['course']['title'];
+
+                // REMOVE ID
+                delete cartItems[index]['id'];
+
+                // PARTICULAR PRICE
+                let particularPrice;
+
+                if (
+                    cartItems[index]['course']['discount'] > 0 ||
+                    cartItems[index]['course']['discounted_price'] > 0
+                ) {
+
+                    particularPrice =
+                        cartItems[index]['course']['discount'] ||
+                        cartItems[index]['course']['discounted_price'];
+
+                } else if (
+                    cartItems[index]['course']['price']
+                ) {
+
+                    particularPrice =
+                        cartItems[index]['course']['price'];
+
+                } else {
+
+                    particularPrice =
+                        cartItems[index]['course']['includedCoursePrice'];
+                }
+
+                cartItems[index]['price'] = particularPrice;
+
+                let noOfEnroll =
+                    cartItems[index]?.Enrolls?.length || 1;
+
+                // FINAL PRICE
+                if (
+                    couponValue != null &&
+                    couponType == 'amountOff'
+                ) {
+
+                    cartItems[index]['finalPrice'] = (
+                        particularPrice -
+                        (
+                            couponValueOFF /
+                            (lengthOfCartItems * noOfEnroll)
+                        )
+                    ).toFixed(2);
+
+                } else if (
+                    couponValue != null &&
+                    couponType == 'percentOff'
+                ) {
+
+                    cartItems[index]['finalPrice'] = (
+                        particularPrice -
+                        ((couponValueOFF * particularPrice) / 100)
+                    ).toFixed(2);
+
+                } else {
+
+                    cartItems[index]['finalPrice'] =
+                        particularPrice;
+                }
+
+                cartItems[index]['category'] =
+                    cartItems[index]['course']['category'];
+
+                cartItems[index]['imageUrl'] = imageURL;
+
+                // ENROLLS
+                data?.Enrolls?.map((en: any, i: number) => {
+
+                    delete cartItems[index]['Enrollment'];
+
+                    delete cartItems[index]['id'];
+
+                    if (
+                        cartItems[index]['Enrolls'][i]?.ptin === ''
+                    ) {
+                        checkPTIN = true;
+                    }
+
+                    if (
+                        cartItems[index]['Enrolls'][i]?.email === ''
+                    ) {
+
+                        checkEmail = true;
+
+                    } else {
+
+                        let emailPattern =
+                            /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
+
+                        const result = emailPattern.test(
+                            cartItems[index]['Enrolls'][i]?.email
+                        );
+
+                        if (!result) {
+                            emailMessage =
+                                'please enter valid email address';
+                        }
+                    }
+
+                    if (
+                        cartItems[index]['Enrolls'][i]?.name === ''
+                    ) {
+                        checkName = true;
+                    }
+
+                    if (
+                        cartItems[index]['Enrolls'][i]?.lastname === ''
+                    ) {
+                        checklastname = true;
+                    }
+                });
+            });
+
+
+            // ORDER DATA
+            const orderData = {
+                data: {
+                    OrderItems: cartItems,
+                    userId: user?.user?.id,
+                    totalPrice: cartData?.data?.finalPrice,
+                    discountCode:
+                        couponRes == true ? couponValue : '',
+                    discountPrice:
+                        couponRes == true ? couponValueOFF : 0,
+                    finalPrice,
+                    stripeOrderId: '',
+                    orderStatus: 'pending',
+                    discountType:
+                        couponRes == true ? couponType : '',
+                    userName: localStorage.getItem('username'),
+                    email: localStorage.getItem('email'),
+                    receiptUrl: '',
+                },
+            };
+
+            console.log('ORDER DATA', orderData);
+
+            // PAID EVENTS
+            if (lengthOfCartItems !== freeEvents) {
+
+                let od: any = await addOrderApi(orderData);
+
+                console.log({orderData})
+
+                console.log(
+                    'ORDER RESPONSE',
+                    JSON.stringify(od, null, 2)
+                );
+
+                if (errorText) {
+                    return;
+                }
+
+                // SAFE CHECK
+                if (!od || !od.data || !od.data.id) {
+
+                    console.error(
+                        'Invalid order response',
+                        od
+                    );
+
+                    return;
+                }
+
+                const orderId = od.data.id;
+
+                checkoutData.forEach((cd: any) => {
+
+                    cd.orderId = orderId;
+
+                    cd.customerid =
+                        localStorage.getItem('cid') || '';
+
+                    cd.email =
+                        localStorage.getItem('email') || '';
+                });
+
+                checkoutUrl(checkoutData);
+
+            } else {
+
+                // FREE EVENT FLOW
+                const uniqueStripeId =
+                    Date.now().toString();
+
+                orderData.data.orderStatus = 'succeeded';
+
+                orderData.data.stripeOrderId =
+                    uniqueStripeId;
+
+                let od: any = await addOrderApi(orderData);
+
+                console.log(
+                    'FREE ORDER RESPONSE',
+                    JSON.stringify(od, null, 2)
+                );
+
+                if (
+                    od &&
+                    od.data &&
+                    od.data.attributes &&
+                    od.data.attributes.orderStatus ===
+                    'succeeded'
+                ) {
+
+                    const eventData = {
+                        type: 'payment_intent.succeeded',
+                        data: {
+                            object: {
+                                id: uniqueStripeId,
+                            },
+                        },
+                    };
+
+                    let res =
+                        await updateOrderStatus(eventData);
+
+                    if (res) {
+
+                        window.location.href = '/success';
+
+                        window.location.reload();
+                    }
+                }
+            }
+
+        } catch (error) {
+
+            console.error('ADD ORDER ERROR', error);
+        }
+    };
+
+    const checkoutUrl = async (data: any) => {
+        console.log({data})
+        let ckData: any = await getCheckoutUrl(data);
+        console.log({ckData});
+        window.open(ckData.url, '_self');
+    }
+
     return (
         <>
             <section className="container mx-auto ">
@@ -122,364 +656,100 @@ const CheckoutPage = () => {
                                     <th className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 text-left pl-4">Price</th>
                                 </thead>
                                 <tbody>
-                                    <tr className="border-b border-[#e4e7ec]">
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-start items-start gap-2 flex">
-                                                <div className="self-stretch justify-start items-start gap-2 inline-flex">
-                                                    <div
-                                                        className="pl-2 pr-2.5 py-0.5 bg-[#ecfcf2] rounded-full border border-[#aaefc6] justify-start items-center gap-1.5 flex">
-                                                        <div className="w-2 h-2 relative">
-                                                            <div className="w-1.5 h-1.5 left-[1px] top-[1px] absolute bg-[#17b169] rounded-full"></div>
-                                                        </div>
-                                                        <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">Live
-                                                            webinar
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-[88px] flex-col justify-start items-start gap-2 flex">
-                                                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">Mastering
-                                                        Charitable
-                                                        Remainder Trusts – Planning and Compliance with Form 5227 </div>
-                                                    <div className="self-stretch text-[#475467] text-sm font-normal font-['Inter'] leading-normal">Tue Oct
-                                                        22
-                                                        2024 |
-                                                        1:00 PM - 4:00 PM ET</div>
-                                                </div>
-                                                <div className="justify-center items-center gap-2 inline-flex overflow-hidden">
-                                                    <div className="text-[#156fee] text-base font-semibold font-['Inter'] leading-normal">Add to my
-                                                        Calendar
-                                                    </div>
-                                                    <div className="w-5 h-5 relative  overflow-hidden">
-                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                d="M17.5 6.66675H2.5M13.3333 1.66675V4.16675M6.66667 1.66675V4.16675M10 15.0001V10.0001M7.5 12.5001H12.5M6.5 18.3334H13.5C14.9001 18.3334 15.6002 18.3334 16.135 18.0609C16.6054 17.8212 16.9878 17.4388 17.2275 16.9684C17.5 16.4336 17.5 15.7335 17.5 14.3334V7.33342C17.5 5.93328 17.5 5.23322 17.2275 4.69844C16.9878 4.22803 16.6054 3.84558 16.135 3.6059C15.6002 3.33341 14.9001 3.33341 13.5 3.33341H6.5C5.09987 3.33341 4.3998 3.33341 3.86502 3.6059C3.39462 3.84558 3.01217 4.22803 2.77248 4.69844C2.5 5.23322 2.5 5.93328 2.5 7.33341V14.3334C2.5 15.7335 2.5 16.4336 2.77248 16.9684C3.01217 17.4388 3.39462 17.8212 3.86502 18.0609C4.3998 18.3334 5.09987 18.3334 6.5 18.3334Z"
-                                                                stroke="#155EEF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-center items-start gap-2 flex">
-                                                <div className="self-stretch h-[57px] py-3 flex-col justify-center items-start gap-5 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch grow shrink basis-0 justify-center items-center gap-4 inline-flex">
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-white rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative bg-[#f4f8ff]  overflow-hidden">
-                                                                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="minus">
-                                                                            <path id="Icon" d="M4.16797 10.5H15.8346" stroke="#2970FF" stroke-width="1.66667"
-                                                                                stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-center text-[#101828] text-base font-bold font-['Inter'] leading-loose">01
-                                                            </div>
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-[#f4f8ff] rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative  overflow-hidden">
-                                                                    <svg width="20" height="20" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="plus">
-                                                                            <rect width="20" height="20" transform="translate(0 0.5)" fill="#F5F8FF" />
-                                                                            <path id="Icon" d="M10.0013 4.66675V16.3334M4.16797 10.5001H15.8346" stroke="#2970FF"
-                                                                                stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-6 py-3 justify-start items-center gap-2 inline-flex">
-                                                    <div className="w-5 h-5 relative  overflow-hidden"></div>
-                                                    <div className="text-[#475467] text-base font-semibold font-['Inter'] leading-normal">Remove</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch py-2 justify-start items-center gap-4 inline-flex">
-                                                <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex"></div>
-                                                </div>
-                                                <div className="justify-end items-center gap-4 flex">
-                                                    <div className="justify-end flex-col items-center gap-1.5 flex overflow-hidden">
-                                                        <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">
-                                                            US$2199
-                                                        </div>
-                                                        <div
-                                                            className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">
-                                                            US$298
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr className="border-b border-[#e4e7ec]">
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-start items-start gap-2 flex">
-                                                <div className="self-stretch justify-start items-start gap-2 inline-flex">
-                                                    <div
-                                                        className="px-2.5 py-0.5 bg-[#fdf1f9] rounded-full border border-[#fbceee] justify-start items-center flex">
-                                                        <div className="text-center text-[#c01573] text-sm font-medium font-['Inter'] leading-tight">Self
-                                                            Study </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-[88px] flex-col justify-start items-start gap-2 flex">
-                                                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">Mastering
-                                                        Charitable
-                                                        Remainder Trusts – Planning and Compliance with Form 5227 </div>
-                                                    <div className="self-stretch text-[#475467] text-sm font-normal font-['Inter'] leading-normal">Tue Oct
-                                                        22
-                                                        2024 |
-                                                        1:00 PM - 4:00 PM ET</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-center items-start gap-2 flex">
-                                                <div className="self-stretch h-[57px] py-3 flex-col justify-center items-start gap-5 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch grow shrink basis-0 justify-center items-center gap-4 inline-flex">
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-white rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative bg-[#f4f8ff]  overflow-hidden">
-                                                                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="minus">
-                                                                            <path id="Icon" d="M4.16797 10.5H15.8346" stroke="#2970FF" stroke-width="1.66667"
-                                                                                stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-center text-[#101828] text-base font-bold font-['Inter'] leading-loose">01
-                                                            </div>
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-[#f4f8ff] rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative  overflow-hidden">
-                                                                    <svg width="20" height="20" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="plus">
-                                                                            <rect width="20" height="20" transform="translate(0 0.5)" fill="#F5F8FF" />
-                                                                            <path id="Icon" d="M10.0013 4.66675V16.3334M4.16797 10.5001H15.8346" stroke="#2970FF"
-                                                                                stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-6 py-3 justify-start items-center gap-2 inline-flex">
-                                                    <div className="w-5 h-5 relative  overflow-hidden"></div>
-                                                    <div className="text-[#475467] text-base font-semibold font-['Inter'] leading-normal">Remove</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch py-2 justify-start items-center gap-4 inline-flex">
-                                                <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex"></div>
-                                                </div>
-                                                <div className="justify-end items-center gap-4 flex-col flex">
-                                                    <div className="justify-end items-center gap-1.5 flex overflow-hidden">
-                                                        <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">
-                                                            US$2199
-                                                        </div>
-                                                    </div>
-                                                    <div className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">
-                                                        US$298
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    {items.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={3} className="px-6 py-4 text-sm text-gray-500">Your cart is empty.</td>
+                                        </tr>
+                                    ) : (
+                                        items.map((item: any, idx: number) => {
+                                            const qty = item.qty || item.quantity || 1;
+                                            const title = item.course?.data?.attributes?.title || item.course?.data?.attributes?.name || item.course?.attributes?.title || item.title || item.name || item.course?.title || 'Untitled Course';
+                                            const date = item.course?.data?.attributes?.date || item.date || '';
+                                            const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+                                            const lineTotal = price * qty;
 
-                                    <tr className="border-b border-[#e4e7ec]">
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-start items-start gap-2 flex">
-                                                <div className="self-stretch justify-start items-start gap-2 inline-flex">
-                                                    <div
-                                                        className="pl-2 pr-2.5 py-0.5 bg-[#ecfcf2] rounded-full border border-[#aaefc6] justify-start items-center gap-1.5 flex">
-                                                        <div className="w-2 h-2 relative">
-                                                            <div className="w-1.5 h-1.5 left-[1px] top-[1px] absolute bg-[#17b169] rounded-full"></div>
-                                                        </div>
-                                                        <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">Live
-                                                            webinar
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-[88px] flex-col justify-start items-start gap-2 flex">
-                                                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">Mastering
-                                                        Charitable
-                                                        Remainder Trusts – Planning and Compliance with Form 5227 </div>
-                                                    <div className="self-stretch text-[#475467] text-sm font-normal font-['Inter'] leading-normal">Tue Oct
-                                                        22
-                                                        2024 |
-                                                        1:00 PM - 4:00 PM ET</div>
-                                                </div>
-                                                <div className="justify-center items-center gap-2 inline-flex overflow-hidden">
-                                                    <div className="text-[#156fee] text-base font-semibold font-['Inter'] leading-normal">Add to my
-                                                        Calendar
-                                                    </div>
-                                                    <div className="w-5 h-5 relative  overflow-hidden">
-                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                d="M17.5 6.66675H2.5M13.3333 1.66675V4.16675M6.66667 1.66675V4.16675M10 15.0001V10.0001M7.5 12.5001H12.5M6.5 18.3334H13.5C14.9001 18.3334 15.6002 18.3334 16.135 18.0609C16.6054 17.8212 16.9878 17.4388 17.2275 16.9684C17.5 16.4336 17.5 15.7335 17.5 14.3334V7.33342C17.5 5.93328 17.5 5.23322 17.2275 4.69844C16.9878 4.22803 16.6054 3.84558 16.135 3.6059C15.6002 3.33341 14.9001 3.33341 13.5 3.33341H6.5C5.09987 3.33341 4.3998 3.33341 3.86502 3.6059C3.39462 3.84558 3.01217 4.22803 2.77248 4.69844C2.5 5.23322 2.5 5.93328 2.5 7.33341V14.3334C2.5 15.7335 2.5 16.4336 2.77248 16.9684C3.01217 17.4388 3.39462 17.8212 3.86502 18.0609C4.3998 18.3334 5.09987 18.3334 6.5 18.3334Z"
-                                                                stroke="#155EEF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-center items-start gap-2 flex">
-                                                <div className="self-stretch h-[57px] py-3 flex-col justify-center items-start gap-5 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch grow shrink basis-0 justify-center items-center gap-4 inline-flex">
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-white rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative bg-[#f4f8ff]  overflow-hidden">
-                                                                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="minus">
-                                                                            <path id="Icon" d="M4.16797 10.5H15.8346" stroke="#2970FF" stroke-width="1.66667"
-                                                                                stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-center text-[#101828] text-base font-bold font-['Inter'] leading-loose">01
-                                                            </div>
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-[#f4f8ff] rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative  overflow-hidden">
-                                                                    <svg width="20" height="20" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="plus">
-                                                                            <rect width="20" height="20" transform="translate(0 0.5)" fill="#F5F8FF" />
-                                                                            <path id="Icon" d="M10.0013 4.66675V16.3334M4.16797 10.5001H15.8346" stroke="#2970FF"
-                                                                                stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-6 py-3 justify-start items-center gap-2 inline-flex">
-                                                    <div className="w-5 h-5 relative  overflow-hidden"></div>
-                                                    <div className="text-[#475467] text-base font-semibold font-['Inter'] leading-normal">Remove</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch py-2 justify-start items-center gap-4 inline-flex">
-                                                <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex"></div>
-                                                </div>
-                                                <div className="justify-end items-center gap-4 flex">
-                                                    <div className="justify-end flex-col items-center gap-1.5 flex overflow-hidden">
-                                                        <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">
-                                                            US$2199
-                                                        </div>
-                                                        <div
-                                                            className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">
-                                                            US$298
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr className="border-b border-[#e4e7ec]">
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-start items-start gap-2 flex">
-                                                <div className="self-stretch justify-start items-start gap-2 inline-flex">
-                                                    <div
-                                                        className="px-2.5 py-0.5 bg-[#fdf1f9] rounded-full border border-[#fbceee] justify-start items-center flex">
-                                                        <div className="text-center text-[#c01573] text-sm font-medium font-['Inter'] leading-tight">Self
-                                                            Study </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-[88px] flex-col justify-start items-start gap-2 flex">
-                                                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">Mastering
-                                                        Charitable
-                                                        Remainder Trusts – Planning and Compliance with Form 5227 </div>
-                                                    <div className="self-stretch text-[#475467] text-sm font-normal font-['Inter'] leading-normal">Tue Oct
-                                                        22
-                                                        2024 |
-                                                        1:00 PM - 4:00 PM ET</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-center items-start gap-2 flex">
-                                                <div className="self-stretch h-[57px] py-3 flex-col justify-center items-start gap-5 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch grow shrink basis-0 justify-center items-center gap-4 inline-flex">
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-white rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative bg-[#f4f8ff]  overflow-hidden">
-                                                                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="minus">
-                                                                            <path id="Icon" d="M4.16797 10.5H15.8346" stroke="#2970FF" stroke-width="1.66667"
-                                                                                stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-center text-[#101828] text-base font-bold font-['Inter'] leading-loose">01
-                                                            </div>
-                                                            <div
-                                                                className="w-[26px] h-[26px] bg-[#f4f8ff] rounded shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] justify-center items-center gap-2 flex overflow-hidden">
-                                                                <div className="w-5 h-5 relative  overflow-hidden">
-                                                                    <svg width="20" height="20" viewBox="0 0 20 21" fill="none"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <g id="plus">
-                                                                            <rect width="20" height="20" transform="translate(0 0.5)" fill="#F5F8FF" />
-                                                                            <path id="Icon" d="M10.0013 4.66675V16.3334M4.16797 10.5001H15.8346" stroke="#2970FF"
-                                                                                stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="self-stretch h-6 py-3 justify-start items-center gap-2 inline-flex">
-                                                    <div className="w-5 h-5 relative  overflow-hidden"></div>
-                                                    <div className="text-[#475467] text-base font-semibold font-['Inter'] leading-normal">Remove</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="self-stretch py-2 justify-start items-center gap-4 inline-flex">
-                                                <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex"></div>
-                                                </div>
-                                                <div className="justify-end items-center gap-4 flex-col flex">
-                                                    <div className="justify-end items-center gap-1.5 flex overflow-hidden">
-                                                        <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">
-                                                            US$2199
-                                                        </div>
-                                                    </div>
-                                                    <div className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">
-                                                        US$298
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            const increaseQty = () => dispatch(updateCartRequest({ item, qty: qty + 1 }))
+                                            const decreaseQty = () => {
+                                                if (qty <= 1) return
+                                                dispatch(updateCartRequest({ item, qty: qty - 1 }))
+                                            }
+                                            const removeItem = () => dispatch(updateCartRequest({ item, remove: true }))
 
+                                            const imageUrl = (imageUrlConstant || '') + (item.course?.data?.attributes?.image?.data?.attributes?.url || item.course?.url || item.image || '')
+
+                                            return (
+                                                <tr key={item.id || item.courseId || idx} className="border-b border-[#e4e7ec]">
+                                                    <td>
+                                                        <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-start items-start gap-2 flex">
+                                                            <div className="self-stretch justify-start items-start gap-2 inline-flex">
+                                                                <div className="flex items-start gap-4">
+                                                                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-slate-100">
+                                                                        {imageUrl ? (
+                                                                            <Image src={imageUrl} alt={title} width={96} height={96} className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            <Image src="/assets/images/cart.gif" alt={title} width={96} height={96} className="w-full h-full object-cover" />
+                                                                        )}
+                                                                    </div>
+                                                                    <div className={"pl-2 pr-2.5 py-0.5 rounded-full justify-start items-center gap-1.5 flex " + (item.type === 'Self Study' ? 'bg-[#fdf1f9] border border-[#fbceee]' : 'bg-[#ecfcf2] border border-[#aaefc6]')}
+                                                                    >
+                                                                        <div className="w-2 h-2 relative">
+                                                                            <div className="w-1.5 h-1.5 left-[1px] top-[1px] absolute bg-[#17b169] rounded-full"></div>
+                                                                        </div>
+                                                                        <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">{item.type || 'Live webinar'}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="self-stretch h-[88px] flex-col justify-start items-start gap-2 flex">
+                                                                <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">{title}</div>
+                                                                <div className="self-stretch text-[#475467] text-sm font-normal font-['Inter'] leading-normal">{date}</div>
+                                                            </div>
+                                                            <div className="justify-center items-center gap-2 inline-flex overflow-hidden">
+                                                                <div className="text-[#156fee] text-base font-semibold font-['Inter'] leading-normal">Add to my Calendar</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-center items-start gap-2 flex">
+                                                            <div className="self-stretch h-[57px] py-3 flex-col justify-center items-start gap-5 flex">
+                                                                <div className="grow shrink basis-0 flex-col justify-start items-start gap-3 flex">
+                                                                    <div className="self-stretch grow shrink basis-0 justify-center items-center gap-4 inline-flex">
+                                                                        <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+                                                                            <button onClick={decreaseQty} className="px-3 py-2 cursor-pointer"><Minus className="w-4 h-4" /></button>
+                                                                            <span className="px-4 text-sm">{qty}</span>
+                                                                            <button onClick={increaseQty} className="px-3 py-2 cursor-pointer"><Plus className="w-4 h-4" /></button>
+                                                                        </div>
+                                                                        <button onClick={removeItem} className="ml-4 cursor-pointer"><Trash2 className="w-5 h-5 text-red-500" /></button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="self-stretch h-6 py-3 justify-start items-center gap-2 inline-flex">
+                                                                <div className="w-5 h-5 relative  overflow-hidden"></div>
+                                                                <div className="text-[#475467] text-base font-semibold font-['Inter'] leading-normal">&nbsp;</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="self-stretch py-2 justify-start items-center gap-4 inline-flex">
+                                                            <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
+                                                                <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex"></div>
+                                                            </div>
+                                                            <div className="justify-end items-center gap-4 flex">
+                                                                <div className="justify-end flex-col items-center gap-1.5 flex overflow-hidden">
+                                                                    <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`US$${lineTotal}`}</div>
+                                                                    {item.originalPrice && (
+                                                                        <div className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">{`US$${item.originalPrice}`}</div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
                                 </tbody>
                             </table>
+
                             <div className="py-1 justify-start items-start gap-6 inline-flex">
                                 <div className=" px-6 py-4 flex-col justify-start items-start gap-2 inline-flex">
                                     <div className="py-2.5 rounded-lg justify-center items-center gap-1.5 inline-flex overflow-hidden">
@@ -493,33 +763,55 @@ const CheckoutPage = () => {
                                             <div className="self-stretch h-12 flex-col justify-start items-start gap-1.5 flex">
                                                 <div className="self-stretch py-3 bg-white rounded-lg gap-2 inline-flex">
                                                     <div className="grow shrink basis-0 h-6 justify-start items-center gap-2 flex">
-                                                        <Input />
+                                                        <Input value={couponValue} onChange={(e: any) => setCouponValue(e?.target?.value || '')} />
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="px-4 py-2.5 bg-[#7f98f9] rounded-lg  gap-1.5 flex overflow-hidden">
+                                        <button
+                                            type="button"
+                                            onClick={() => applyCoupon()}
+                                            className="px-4 py-2.5 bg-[#7f98f9] rounded-lg  gap-1.5 flex overflow-hidden"
+                                            disabled={!couponValue}
+                                        >
                                             <div className="px-0.5 justify-center items-center flex">
                                                 <div className="text-white text-base font-semibold font-['Inter'] leading-normal">Apply</div>
                                             </div>
-                                        </div>
+                                        </button>
                                     </div>
                                 </div>
+                                {couponErrMsg && (
+                                    <div className="text-sm text-red-600 px-6 pt-2">{couponErrMsg}</div>
+                                )}
 
                             </div>
                             <div className="px-6 py-4 flex-col justify-start items-start gap-1 flex">
                                 <div className="self-stretch py-2 border-b border-[#e4e7ec] justify-start items-center gap-4 inline-flex">
                                     <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
-                                        <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex"></div>
+                                        <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex">
+                                            <div className="self-stretch text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">Sub Total</div>
+                                        </div>
                                     </div>
                                     <div className="justify-end items-center gap-4 flex">
                                         <div className="justify-end items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">
-                                                US$2199
-                                            </div>
+                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$${subtotal}`}</div>
                                         </div>
                                     </div>
                                 </div>
+                                {(couponRes || cart.discountCode) && (
+                                    <div className="self-stretch py-2 border-b border-[#e4e7ec] justify-start flex items-center gap-4">
+                                        <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
+                                            <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex">
+                                                <div className="self-stretch text-[#101828] text-base font-medium font-['Inter'] leading-5">Coupon: {couponValue || cart.discountCode}</div>
+                                            </div>
+                                        </div>
+                                        <div className="justify-start items-center gap-4 flex">
+                                            <div className="justify-center items-center gap-1.5 flex overflow-hidden">
+                                                <div className="text-[#ef4444] text-base font-semibold font-['Inter'] leading-6">-{couponLabel || cart.discountPrice}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="self-stretch py-2 border-b border-[#e4e7ec] justify-start items-center gap-4 inline-flex">
                                     <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
                                         <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex">
@@ -528,29 +820,38 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="justify-start items-center gap-4 flex">
                                         <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">US$1799</div>
+                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$${cart.finalPrice.toFixed(2)}`}</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="self-stretch justify-center items-center gap-2 inline-flex overflow-hidden">
                                     <div className="justify-center items-center flex">
-                                        <Checkbox className="w-5 h-5 border-2 border-blue-500 accent-blue-600 text-white rounded-[#30px]" />
+                                        <Checkbox
+                                            id="agree_terms"
+                                            checked={agreeTerms}
+                                            onCheckedChange={(v) => setAgreeTerms(Boolean(v))}
+                                            className="w-5 h-5 border-2 border-blue-500 rounded-[#30px] data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                                        />
                                     </div>
-                                    <div className="grow shrink basis-0"><span
-                                        className="text-[#475467] text-base font-normal font-['Inter'] leading-normal">By placing this order, I
-                                        acknowledge that I have read and agree to the </span><span
-                                            className="text-[#475467] text-base font-normal font-['Inter'] underline leading-normal">purchase terms
-                                            and
-                                            conditions</span></div>
+                                    <div className="grow shrink basis-0">
+                                        <label htmlFor="agree_terms" className="cursor-pointer">
+                                            <span className="text-[#475467] text-base font-normal font-['Inter'] leading-normal">By placing this order, I
+                                                acknowledge that I have read and agree to the&nbsp;</span>
+                                            <span className="text-[#475467] text-base font-normal font-['Inter'] underline leading-normal">purchase terms
+                                                and
+                                                conditions</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div className=" w-full px-6 py-4 flex-col justify-start items-start gap-1 flex">
                                 <div className="self-stretch  pt-3 flex-col justify-start items-start flex">
                                     <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex">
                                         <div
+                                            onClick={() => addOrder()}
                                             className="grow shrink basis-0 px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                                             <div className="px-0.5 justify-center items-center flex">
-                                                <div className="text-white text-lg font-semibold font-['Inter'] leading-7">Pay Now</div>
+                                                <div className="text-white text-lg font-semibold font-['Inter'] leading-7 cursor-pointer">Pay Now</div>
                                             </div>
                                         </div>
                                     </div>
@@ -567,8 +868,7 @@ const CheckoutPage = () => {
                                                     <div className="self-stretch justify-start"><span
                                                         className="text-Colors-Text-text-primary-(900) text-lg font-bold font-['Inter'] leading-7">Add
                                                         participants details </span><span
-                                                            className="text-Colors-Text-text-primary-(900) text-lg font-medium font-['Inter'] leading-7">(Enrollments
-                                                            6)</span></div>
+                                                            className="text-Colors-Text-text-primary-(900) text-lg font-medium font-['Inter'] leading-7">(Enrollments {enrollments})</span></div>
                                                     <div
                                                         className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-base font-normal font-['Inter'] leading-normal">
                                                         First & last name will appear on CPE certificate.</div>

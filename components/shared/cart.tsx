@@ -23,9 +23,16 @@ import { imageUrl as imageUrlConstant } from "@/lib/constants"
 
 export function CartComponent() {
     const dispatch = useDispatch<AppDispatch>()
+
     const cartItems = useSelector((state: RootState) => state.cart.items)
+    const cart = useSelector((state: RootState) => state.cart)
+
+    console.log("Cart :", cart);
+
     const cartTotal = useSelector((state: RootState) => state.cart.total || 0)
     const [open, setOpen] = useState(false)
+
+    const subtotal = cartItems.reduce((acc: number, it: any) => acc + ((it.course?.price || 0) * (it.qty || 1)), 0);
 
     const increaseQty = (item: any) => {
         const qty = (item.qty || item.quantity || 1) + 1
@@ -183,8 +190,28 @@ export function CartComponent() {
 
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between text-lg font-semibold">
+                                    <span>Sub Total</span>
+                                    <span>{subtotal}</span>
+                                </div>
+                            </div>
+
+                            {cart.discountCode && (
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between text-lg font-semibold">
+                                        <span>Discount Code</span>
+                                        <span>{cart.discountCode}</span>
+                                    </div>
+                                    <div className="flex items-center text-red-500 justify-between text-lg font-semibold">
+                                        <span>Discount Price</span>
+                                        <span>-{cart.discountPrice}</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between text-lg font-semibold">
                                     <span>Total</span>
-                                    <span>{total}</span>
+                                    <span>{cart.finalPrice}</span>
                                 </div>
                             </div>
 

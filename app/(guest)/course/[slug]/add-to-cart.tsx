@@ -36,16 +36,15 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
             if (ci.course != undefined) {
 
                 if (ci.courseId > 0) {
-                    total += (ci.course.discount || ci.course.discountedPrice || ci.course.discounted_price) > 0 ? (ci.course.discount * ci.qty || ci.course.discountedPrice * ci.qty || ci.course.discounted_price * ci.qty) : (ci.course.price * ci.qty)
+                    total += (ci.course.discount || ci.course.discountPrice ) > 0 ? (ci.course.discount * ci.qty || ci.course.discountPrice * ci.qty || ci.course.discountPrice * ci.qty) : (ci.course.price * ci.qty)
                 } else {
-                    if (ci.course.discounted_price != null && ci.course.discounted_price > 0) {
-                        total += ci.course.discounted_price * ci.qty;
+                    if (ci.course.discountPrice != null && ci.course.discountPrice > 0) {
+                        total += ci.course.discountPrice * ci.qty;
                     } else if (ci.course.price != null && ci.course.price >= 0) {
                         total += ci.course.price * ci.qty;
                     } else {
                         total += ci.course.includedCoursePrice * ci.qty;
                     }
-
                 }
             }
         });
