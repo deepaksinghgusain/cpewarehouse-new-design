@@ -10,6 +10,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '@/store/store'
 import { userLogoutRequest } from '@/store/actions/user-actions'
 import { useRouter } from 'next/navigation'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu'
+import { ChevronDown } from 'lucide-react'
 
 export const Header = () => {
     const [logo, setLogo] = useState("");
@@ -77,36 +79,35 @@ export const Header = () => {
                                 <CartComponent />
 
                                 {isAuthenticated && user ? (
-                                    <div className="relative" tabIndex={0} onBlur={() => setDropdownOpen(false)}>
-                                        <button
-                                            type="button"
-                                            onClick={() => setDropdownOpen((prev) => !prev)}
-                                            className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-[#101828] text-lg font-semibold"
-                                        >
-                                            <span>{user?.firstName || user?.username || 'My Account'}</span>
-                                            <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
+                                    <DropdownMenu modal={false}>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="px-4 py-2.5 cursor-pointer bg-white rounded-lg border border-gray-300 shadow-sm flex items-center gap-2">
+                                                <span className="text-base font-semibold text-slate-700">
+                                                    {user?.firstName || user?.username || 'My Account'}
+                                                </span>
+                                                <ChevronDown className="w-4 h-4" />
+                                            </button>
+                                        </DropdownMenuTrigger>
 
-                                        {dropdownOpen && (
-                                            <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 bg-white shadow-lg z-50">
-                                                <Link
-                                                    href="/learner/profile"
-                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                >
-                                                    Profile
-                                                </Link>
-                                                <button
-                                                    type="button"
-                                                    onClick={handleLogout}
-                                                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                >
-                                                    Logout
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
+                                        <DropdownMenuContent align="end" className="w-44 z-50 bg-white rounded-md border border-gray-200 shadow-lg">
+                                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                                <Link href="/learner/dashboard" prefetch={false}>Dashboard</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                                <Link href="/learner/certificates" prefetch={false}>Certificates</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                                <Link href="/learner/invoice" prefetch={false}>Invoices</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                                <Link href="/learner/profile" prefetch={false}>Profile</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                                                Logout
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+
                                 ) : (
                                     <>
                                         <Link href="/login" className="text-[#475467] text-lg font-semibold font-['Inter'] leading-7">Log in</Link>
