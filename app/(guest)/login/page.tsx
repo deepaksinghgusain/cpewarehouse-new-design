@@ -1,6 +1,5 @@
 import LoginPageComponent from '@/components/login/Login'
 import { getPageContent } from '@/services/common';
-import Link from 'next/link'
 
 const LoginPage = async () => {
 

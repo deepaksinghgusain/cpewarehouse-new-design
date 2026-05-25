@@ -169,8 +169,6 @@ const CheckoutPage = () => {
             let freeEvents = 0;
             let lengthOfCartItems = cartItems.length;
 
-            console.log('items', cartItems);
-
             cartItems.map((data: any, index: number) => {
 
                 // FREE EVENT CHECK
@@ -418,7 +416,7 @@ const CheckoutPage = () => {
                 data: {
                     OrderItems: cartItems,
                     userId: user?.user?.id,
-                    totalPrice: cartData?.data?.finalPrice,
+                    totalPrice: cart?.finalPrice,
                     discountCode:
                         couponRes == true ? couponValue : '',
                     discountPrice:

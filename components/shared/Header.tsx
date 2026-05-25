@@ -15,7 +15,6 @@ import { ChevronDown } from 'lucide-react'
 
 export const Header = () => {
     const [logo, setLogo] = useState("");
-    const [dropdownOpen, setDropdownOpen] = useState(false)
     const pathname = usePathname();
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>()
