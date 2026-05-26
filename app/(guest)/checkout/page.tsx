@@ -239,7 +239,7 @@ const CheckoutPage = () => {
         setCouponErrMsg('');
         try {
             const couponResp = await applyCouponApi(trimmedCoupon);
-            const fp = Number(cart?.total ?? subtotal) || 0;
+            const fp = Number(cart?.finalPrice ?? subtotal) || 0;
 
             if (couponResp?.statusCode !== 200) {
                 setCouponErrMsg(couponResp?.message || 'Invalid Coupon.');
