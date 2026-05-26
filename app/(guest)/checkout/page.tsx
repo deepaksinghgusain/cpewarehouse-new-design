@@ -50,7 +50,7 @@ const CheckoutPage = () => {
         }[]
     }[]>([])
     const displayedTotal = couponRes ? Number(finalPrice) : Number(cart?.total ?? subtotal);
-    const couponLabel = couponType === 'amountOff' ? `- $${couponValueOFF.toFixed(2)}` : couponType === 'percentOff' ? `- ${couponValueOFF}%` : '';
+    const couponLabel = couponType === 'amountOff' ? `- $ ${couponValueOFF.toFixed(2)}` : couponType === 'percentOff' ? `- ${couponValueOFF}%` : '';
 
     React.useEffect(() => {
         const itemsArr = cart.items || [];
@@ -184,6 +184,7 @@ const CheckoutPage = () => {
 
         const hasError = errorsByItem.some((it) => it.enrolls.some((er) => Object.keys(er).length > 0));
         setParticipantErrorsByItem(errorsByItem as any);
+
         if (hasError) {
             setFormSubmitError('Please fill all required participant fields before placing your order.');
             try {
@@ -205,7 +206,9 @@ const CheckoutPage = () => {
         // build filtered enrolls (flattened) if needed and proceed
         const filteredEnrolls: any[] = [];
         participantDetailsByItem.forEach((it) => it.enrolls.forEach((e) => { if (e.name || e.email) filteredEnrolls.push(e); }));
+
         console.log('enrolls ', filteredEnrolls);
+        
         addOrder();
     }
 
@@ -588,13 +591,6 @@ const CheckoutPage = () => {
 
                 let od: any = await addOrderApi(orderData);
 
-                console.log({ orderData })
-
-                console.log(
-                    'ORDER RESPONSE',
-                    JSON.stringify(od, null, 2)
-                );
-
                 if (errorText) {
                     return;
                 }
@@ -679,9 +675,7 @@ const CheckoutPage = () => {
     };
 
     const checkoutUrl = async (data: any) => {
-        console.log({ data })
         let ckData: any = await getCheckoutUrl(data);
-        console.log({ ckData });
         window.open(ckData.url, '_self');
     }
 
@@ -882,9 +876,9 @@ const CheckoutPage = () => {
                                                             </div>
                                                             <div className="justify-end items-center gap-4 flex">
                                                                 <div className="justify-end flex-col items-center gap-1.5 flex overflow-hidden">
-                                                                    <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$${lineTotal}`}</div>
+                                                                    <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${lineTotal}`}</div>
                                                                     {item.originalPrice && (
-                                                                        <div className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">{`$${item.originalPrice}`}</div>
+                                                                        <div className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">{`$ ${item.originalPrice}`}</div>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -905,12 +899,16 @@ const CheckoutPage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="w-[361px] justify-start items-start gap-4 inline-flex">
+                                    <div className="w-[361px] justify-start items-center gap-4 inline-flex">
                                         <div className="w-[253px] flex-col justify-start items-start gap-1.5 inline-flex">
                                             <div className="self-stretch h-12 flex-col justify-start items-start gap-1.5 flex">
                                                 <div className="self-stretch py-3 bg-white rounded-lg gap-2 inline-flex">
                                                     <div className="grow shrink basis-0 h-6 justify-start items-center gap-2 flex">
-                                                        <Input value={couponValue} onChange={(e: any) => setCouponValue(e?.target?.value || '')} />
+                                                        <Input 
+                                                            value={couponValue} 
+                                                            onChange={(e: any) => setCouponValue(e?.target?.value || '')}
+                                                            className="border border-gray-200 focus:border-blue-500 focus:outline-none"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -918,7 +916,7 @@ const CheckoutPage = () => {
                                         <button
                                             type="button"
                                             onClick={() => applyCoupon()}
-                                            className="px-4 py-2.5 bg-[#7f98f9] rounded-lg  gap-1.5 flex overflow-hidden"
+                                            className="px-4 py-1.5 bg-[#7f98f9] rounded-lg  gap-1.5 flex overflow-hidden"
                                             disabled={!couponValue}
                                         >
                                             <div className="px-0.5 justify-center items-center flex">
@@ -941,7 +939,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="justify-end items-center gap-4 flex">
                                         <div className="justify-end items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$${subtotal}`}</div>
+                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${subtotal}`}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -967,7 +965,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="justify-start items-center gap-4 flex">
                                         <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$${cart.finalPrice.toFixed(2)}`}</div>
+                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$ ${cart.finalPrice.toFixed(2)}`}</div>
                                         </div>
                                     </div>
                                 </div>
