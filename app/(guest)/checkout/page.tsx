@@ -30,6 +30,7 @@ const CheckoutPage = () => {
     const [couponType, setCouponType] = React.useState('');
     const [couponValueOFF, setCouponValueOFF] = React.useState<number>(0);
     const [finalPrice, setFinalPrice] = React.useState<number | string>(Number(cart?.total ?? subtotal) || 0);
+    const [formSubmitError, setFormSubmitError] = React.useState('');
     const [participantDetailsByItem, setParticipantDetailsByItem] = React.useState<{
         enrolls: {
             name: string
@@ -98,6 +99,11 @@ const CheckoutPage = () => {
         );
     }
 
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        checkout(agreeTerms, addOrder);
+    }
+
     const addToCalendar = (course: any) => {
         const calendarData = [
             'data:text/calendar;charset=utf8,',
@@ -135,7 +141,11 @@ const CheckoutPage = () => {
     }
 
     const checkout = (agreeTerms: boolean, addOrder: () => void) => {
-        if (!agreeTerms) return;
+        setFormSubmitError('');
+        if (!agreeTerms) {
+            setFormSubmitError('Please agree to the terms and conditions before placing your order.');
+            return;
+        }
 
         // remove focus from any active input (robust)
         try {
@@ -172,6 +182,7 @@ const CheckoutPage = () => {
         const hasError = errorsByItem.some((it) => it.enrolls.some((er) => Object.keys(er).length > 0));
         setParticipantErrorsByItem(errorsByItem as any);
         if (hasError) {
+            setFormSubmitError('Please fill all required participant fields before placing your order.');
             try {
                 if (foundFirstError && typeof document !== 'undefined') {
                     const { itemIndex, enrollIndex, field } = foundFirstError;
@@ -773,7 +784,7 @@ const CheckoutPage = () => {
                     </div>
                 </div>
 
-                <div className="px-4 flex-col justify-start items-start inline-flex">
+                <form onSubmit={handleSubmit} className="px-4 flex-col justify-start items-start inline-flex">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="w-full">
                             <table className="w-full">
@@ -976,14 +987,18 @@ const CheckoutPage = () => {
                             <div className=" w-full px-6 py-4 flex-col justify-start items-start gap-1 flex">
                                 <div className="self-stretch  pt-3 flex-col justify-start items-start flex">
                                     <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex">
-                                        <div
-                                            onClick={() => checkout(agreeTerms, addOrder)}
-                                            className="grow shrink basis-0 px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
+                                        <button
+                                            type="submit"
+                                            className="grow shrink basis-0 px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden"
+                                        >
                                             <div className="px-0.5 justify-center items-center flex">
                                                 <div className="text-white text-lg font-semibold font-['Inter'] leading-7 cursor-pointer">Pay Now</div>
                                             </div>
-                                        </div>
+                                        </button>
                                     </div>
+                                    {formSubmitError && (
+                                        <div className="px-6 pt-2 text-sm text-red-600">{formSubmitError}</div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -1102,7 +1117,7 @@ const CheckoutPage = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </section >
         </>
     )
