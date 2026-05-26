@@ -12,11 +12,13 @@ import Image from 'next/image'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { imageUrl as imageUrlConstant } from '@/lib/constants'
 import { addOrderApi, applyCouponApi, getCheckoutUrl, updateOrderStatus } from '@/services/cart';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 const CheckoutPage = () => {
     const dispatch = useDispatch<AppDispatch>()
     const cart = useSelector((s: RootState) => s.cart);
     const user = useSelector((s: RootState) => s.user);
+    const currentUser = user?.user || {};
     console.log("Cart data in checkout page:", cart);
     const items = cart?.items || [];
     const enrollments = items.reduce((acc: number, it: any) => acc + (it.qty || it.quantity || 1), 0);
@@ -28,8 +30,73 @@ const CheckoutPage = () => {
     const [couponType, setCouponType] = React.useState('');
     const [couponValueOFF, setCouponValueOFF] = React.useState<number>(0);
     const [finalPrice, setFinalPrice] = React.useState<number | string>(Number(cart?.total ?? subtotal) || 0);
+    const [participantDetailsByItem, setParticipantDetailsByItem] = React.useState<{
+        enrolls: {
+            name: string
+            lastname: string
+            email: string
+            ptin: string
+        }[]
+    }[]>([])
+    const [participantErrorsByItem, setParticipantErrorsByItem] = React.useState<{
+        enrolls: {
+            name?: string
+            lastname?: string
+            email?: string
+            ptin?: string
+        }[]
+    }[]>([])
     const displayedTotal = couponRes ? Number(finalPrice) : Number(cart?.total ?? subtotal);
     const couponLabel = couponType === 'amountOff' ? `- US$${couponValueOFF.toFixed(2)}` : couponType === 'percentOff' ? `- ${couponValueOFF}%` : '';
+
+    React.useEffect(() => {
+        const itemsArr = cart.items || [];
+        const rebuiltDetails = itemsArr.map((it: any, idx: number) => {
+            const qty = it.qty || it.quantity || 1;
+            const existingEnrolls = participantDetailsByItem?.[idx]?.enrolls || [];
+            const enrolls = Array.from({ length: qty }, (_, i) => {
+                const existing = existingEnrolls[i] || { name: '', lastname: '', email: '', ptin: '' };
+                return {
+                    name: existing.name || String(currentUser.firstName || ''),
+                    lastname: existing.lastname || String(currentUser.lastName || ''),
+                    email: existing.email || String(currentUser.email || ''),
+                    ptin: existing.ptin || String((currentUser as any).ptin || ''),
+                };
+            });
+            return { enrolls };
+        });
+
+        const rebuiltErrors = itemsArr.map((it: any, idx: number) => {
+            const qty = it.qty || it.quantity || 1;
+            const existingErrors = participantErrorsByItem?.[idx]?.enrolls || [];
+            return { enrolls: Array.from({ length: qty }, (_, i) => existingErrors[i] || {}) };
+        });
+
+        setParticipantDetailsByItem(rebuiltDetails as any);
+        setParticipantErrorsByItem(rebuiltErrors as any);
+    }, [cart.items, currentUser.firstName, currentUser.lastName, currentUser.email, (currentUser as any).ptin]);
+
+    // participantCourseTitles can be derived from cart.items when rendering
+
+    const updateParticipantDetail = (itemIndex: number, enrollIndex: number, field: string, value: string) => {
+        setParticipantDetailsByItem((current) =>
+            current.map((it, idx) => {
+                if (idx !== itemIndex) return it;
+                return {
+                    enrolls: it.enrolls.map((en, ei) => (ei === enrollIndex ? { ...en, [field]: value } : en)),
+                };
+            })
+        );
+        // clear corresponding error for field
+        setParticipantErrorsByItem((current) =>
+            current.map((it, idx) => {
+                if (idx !== itemIndex) return it;
+                return {
+                    enrolls: it.enrolls.map((er, ei) => (ei === enrollIndex ? { ...er, [field]: undefined } : er)),
+                };
+            })
+        );
+    }
 
     const addToCalendar = (course: any) => {
         const calendarData = [
@@ -67,12 +134,78 @@ const CheckoutPage = () => {
         return imageUrlConstant + format.thumbnail.url;
     }
 
-    const checkout = (agreeTerms: boolean, enrolls: any[], addOrder: () => void) => {
+    const checkout = (agreeTerms: boolean, addOrder: () => void) => {
         if (!agreeTerms) return;
 
-        const filteredEnrolls = enrolls.filter((data: any) => data.name !== '' || data.email !== '');
+        // remove focus from any active input (robust)
+        try {
+            if (typeof document !== 'undefined') {
+                const els = Array.from(document.querySelectorAll('input, textarea, select')) as HTMLElement[];
+                els.forEach((el) => {
+                    try { el.blur(); } catch (err) { /* ignore */ }
+                });
+            }
+        } catch (err) {
+            console.warn('blur failed', err);
+        }
+
+        // validate nested participant details
+        const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i;
+        const errorsByItem = participantDetailsByItem.map((it) => ({ enrolls: it.enrolls.map(() => ({})) }));
+        let foundFirstError: { itemIndex: number; enrollIndex: number; field: string } | null = null;
+
+        participantDetailsByItem.forEach((it, itemIndex) => {
+            it.enrolls.forEach((p, enrollIndex) => {
+                const e: any = {};
+                if (!p.name || !String(p.name).trim()) e.name = 'First name is required';
+                if (!p.lastname || !String(p.lastname).trim()) e.lastname = 'Last name is required';
+                if (!p.email || !String(p.email).trim()) e.email = 'Email is required';
+                else if (!emailPattern.test(String(p.email).trim())) e.email = 'Please enter a valid email address';
+                errorsByItem[itemIndex].enrolls[enrollIndex] = e;
+                if (!foundFirstError && Object.keys(e).length > 0) {
+                    const field = Object.keys(e)[0];
+                    foundFirstError = { itemIndex, enrollIndex, field };
+                }
+            });
+        });
+
+        const hasError = errorsByItem.some((it) => it.enrolls.some((er) => Object.keys(er).length > 0));
+        setParticipantErrorsByItem(errorsByItem as any);
+        if (hasError) {
+            try {
+                if (foundFirstError && typeof document !== 'undefined') {
+                    const { itemIndex, enrollIndex, field } = foundFirstError;
+                    const selector = `[data-item-index="${itemIndex}"][data-enroll-index="${enrollIndex}"][data-field="${field}"]`;
+                    const el = document.querySelector(selector) as HTMLElement | null;
+                    if (el && typeof el.focus === 'function') {
+                        el.focus();
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            } catch (err) {
+                console.warn('focus first error failed', err);
+            }
+            return;
+        }
+
+        // build filtered enrolls (flattened) if needed and proceed
+        const filteredEnrolls: any[] = [];
+        participantDetailsByItem.forEach((it) => it.enrolls.forEach((e) => { if (e.name || e.email) filteredEnrolls.push(e); }));
         console.log('enrolls ', filteredEnrolls);
         addOrder();
+    }
+
+    const buildCartItemsWithParticipantEnrolls = (items: any[]) => {
+        return (items || []).map((item: any, idx: number) => {
+            const qty = item.qty || item.quantity || 1;
+            const Enrolls = (participantDetailsByItem?.[idx]?.enrolls || Array.from({ length: qty }, () => ({ name: '', lastname: '', email: '', ptin: '' }))).map((p: any) => ({
+                name: p.name,
+                lastname: p.lastname,
+                email: p.email,
+                ptin: p.ptin,
+            }));
+            return { ...item, Enrolls };
+        });
     }
 
     const applyCoupon = async () => {
@@ -137,12 +270,10 @@ const CheckoutPage = () => {
             const originalCartItems: any[] = cart.items || [];
 
             // CLONE ITEMS TO AVOID IMMUTABLE OBJECT ERRORS
-            const cartItems: any[] = originalCartItems.map((item: any) => ({
+            const cartItems: any[] = buildCartItemsWithParticipantEnrolls(originalCartItems).map((item: any) => ({
                 ...item,
                 course: { ...item.course },
-                Enrolls: item.Enrolls
-                    ? item.Enrolls.map((en: any) => ({ ...en }))
-                    : [],
+                Enrolls: item.Enrolls ? item.Enrolls.map((en: any) => ({ ...en })) : [],
             }));
 
             const cartData: any = cart;
@@ -439,7 +570,7 @@ const CheckoutPage = () => {
 
                 let od: any = await addOrderApi(orderData);
 
-                console.log({orderData})
+                console.log({ orderData })
 
                 console.log(
                     'ORDER RESPONSE',
@@ -530,9 +661,9 @@ const CheckoutPage = () => {
     };
 
     const checkoutUrl = async (data: any) => {
-        console.log({data})
+        console.log({ data })
         let ckData: any = await getCheckoutUrl(data);
-        console.log({ckData});
+        console.log({ ckData });
         window.open(ckData.url, '_self');
     }
 
@@ -846,7 +977,7 @@ const CheckoutPage = () => {
                                 <div className="self-stretch  pt-3 flex-col justify-start items-start flex">
                                     <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex">
                                         <div
-                                            onClick={() => addOrder()}
+                                            onClick={() => checkout(agreeTerms, addOrder)}
                                             className="grow shrink basis-0 px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                                             <div className="px-0.5 justify-center items-center flex">
                                                 <div className="text-white text-lg font-semibold font-['Inter'] leading-7 cursor-pointer">Pay Now</div>
@@ -857,7 +988,7 @@ const CheckoutPage = () => {
                             </div>
                         </div>
                         <div>
-                            <div className="min-w-[480px] px-8 pb-8 inline-flex flex-col justify-start items-center gap-3">
+                            <div className="min-w-[480px] w-full px-8 pb-8 inline-flex flex-col justify-start items-center gap-3">
                                 <div className="self-stretch flex flex-col justify-start items-start gap-6">
                                     <div className="self-stretch h-16 px-8 flex flex-col justify-start items-start gap-6">
                                         <div className="self-stretch flex flex-col justify-start items-start gap-5">
@@ -875,158 +1006,99 @@ const CheckoutPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div
-                                    className="h-72 rounded-xl outline-1 outline-offset-[-1px] outline-[#D0D5DD] flex flex-col justify-start items-start overflow-hidden">
-                                    <div className=" h-16 px-6 py-4 inline-flex justify-start items-center">
-                                        <div className="flex-1 justify-start text-[#101828] text-base font-medium font-['Inter'] leading-normal">
-                                            S and C Corporations : Officer Reasonable Compensation - Regulations, Risks and Defense</div>
-                                    </div>
-                                    <div className="self-stretch h-52 p-6 flex flex-col justify-start items-start gap-6">
-                                        <div className="justify-start text-[#101828] text-base font-medium font-['Inter'] leading-normal">
-                                            1</div>
-                                        <div className="h-11 grid grid-cols-2 w-full gap-6">
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div className="self-stretch flex-1 flex flex-col justify-start items-start gap-1.5">
-                                                    <div
-                                                        className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                        <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                            Chenise</div>
-                                                        <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                            *</div>
+                                {(cart.items || []).map((item: any, itemIndex: number) => (
+                                    <Card key={itemIndex} className="w-full border-gray-200">
+                                        <CardHeader>
+                                            <div className="text-[#101828] text-base font-bold mb-2">{item.course?.title || item.title || 'Course'}</div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            {(participantDetailsByItem?.[itemIndex]?.enrolls || Array.from({ length: item.qty || item.quantity || 1 })).map((participant: any, enrollIndex: number) => {
+                                                const err = participantErrorsByItem?.[itemIndex]?.enrolls?.[enrollIndex] || {};
+                                                return (
+                                                    <div key={enrollIndex} className="self-stretch h-52 p-6 flex flex-col justify-start items-start gap-6">
+                                                        <div className="w-full flex flex-col gap-1">
+                                                            <div className="text-[#344054] text-sm font-medium">Participant {enrollIndex + 1}</div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 h-11 w-full gap-6 mb-4">
+                                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
+                                                                <div className="self-stretch inline-flex justify-start items-center gap-0.5">
+                                                                    <div className="justify-start text-[#344054] text-sm font-medium">First name</div>
+                                                                    <div className="justify-start text-[#7E56D8] text-sm font-medium">*</div>
+                                                                </div>
+                                                                <div className={"self-stretch pb-1 " + (err?.name ? 'border-b border-red-500' : 'border-b border-[#D0D5DD]')}>
+                                                                    <Input
+                                                                        data-item-index={itemIndex}
+                                                                        data-enroll-index={enrollIndex}
+                                                                        data-field="name"
+                                                                        value={participant?.name || ''}
+                                                                        onChange={(e) => updateParticipantDetail(itemIndex, enrollIndex, 'name', e.target.value)}
+                                                                        placeholder="Enter first name"
+                                                                        className="border-none bg-transparent px-0 py-1 text-sm focus:outline-none focus:ring-0"
+                                                                    />
+                                                                    {err?.name && <div className="text-red-500 text-sm mt-1">{err.name}</div>}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
+                                                                <div className="self-stretch inline-flex justify-start items-center gap-0.5">
+                                                                    <div className="justify-start text-[#344054] text-sm font-medium">Last name</div>
+                                                                    <div className="justify-start text-[#7E56D8] text-sm font-medium">*</div>
+                                                                </div>
+                                                                <div className={"self-stretch pb-1 " + (err?.lastname ? 'border-b border-red-500' : 'border-b border-[#D0D5DD]')}>
+                                                                    <Input
+                                                                        data-item-index={itemIndex}
+                                                                        data-enroll-index={enrollIndex}
+                                                                        data-field="lastname"
+                                                                        value={participant?.lastname || ''}
+                                                                        onChange={(e) => updateParticipantDetail(itemIndex, enrollIndex, 'lastname', e.target.value)}
+                                                                        placeholder="Enter last name"
+                                                                        className="border-none bg-transparent px-0 py-1 text-sm"
+                                                                    />
+                                                                    {err?.lastname && <div className="text-red-500 text-sm mt-1">{err.lastname}</div>}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 w-full gap-6">
+                                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
+                                                                <div className="self-stretch inline-flex justify-start items-center gap-0.5">
+                                                                    <div className="justify-start text-[#344054] text-sm font-medium">Email address</div>
+                                                                    <div className="justify-start text-[#7E56D8] text-sm font-medium">*</div>
+                                                                </div>
+                                                                <div className={"self-stretch pb-1 " + (err?.email ? 'border-b border-red-500' : 'border-b border-[#D0D5DD]')}>
+                                                                    <Input
+                                                                        data-item-index={itemIndex}
+                                                                        data-enroll-index={enrollIndex}
+                                                                        data-field="email"
+                                                                        value={participant?.email || ''}
+                                                                        onChange={(e) => updateParticipantDetail(itemIndex, enrollIndex, 'email', e.target.value)}
+                                                                        placeholder="Enter email address"
+                                                                        className="border-none bg-transparent px-0 py-1 text-sm"
+                                                                    />
+                                                                    {err?.email && <div className="text-red-500 text-sm mt-1">{err.email}</div>}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
+                                                                <div className="self-stretch inline-flex justify-start items-center gap-0.5">
+                                                                    <div className="justify-start text-[#344054] text-sm font-medium">PTIN (If applicable)</div>
+                                                                </div>
+                                                                <div className="self-stretch border-b border-[#D0D5DD] pb-1">
+                                                                    <Input
+                                                                        data-item-index={itemIndex}
+                                                                        data-enroll-index={enrollIndex}
+                                                                        data-field="ptin"
+                                                                        value={participant?.ptin || ''}
+                                                                        onChange={(e) => updateParticipantDetail(itemIndex, enrollIndex, 'ptin', e.target.value)}
+                                                                        placeholder="Enter PTIN"
+                                                                        className="border-none bg-transparent px-0 py-1 text-sm"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div
-                                                    className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                    <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                        Marks</div>
-                                                    <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                        *</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="h-11  grid grid-cols-2 w-full gap-6">
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div className="self-stretch flex-1 flex flex-col justify-start items-start gap-1.5">
-                                                    <div
-                                                        className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                        <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                            connect@asterid.com</div>
-                                                        <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                            *</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div
-                                                    className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                    <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                        1111111111</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div
-                                    className=" max-w-[720px] min-w-[560px] rounded-xl shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline-1 outline-offset-[-1px] outline-[#D0D5DD] flex flex-col justify-start items-start overflow-hidden">
-                                    <div className=" h-16 px-6 py-4 inline-flex justify-start items-center">
-                                        <div className="flex-1 justify-start text-[#101828] text-base font-medium font-['Inter'] leading-normal">
-                                            S and C Corporations : Officer Reasonable Compensation - Regulations, Risks and Defense</div>
-                                    </div>
-                                    <div className="self-stretch h-52 p-6 flex flex-col justify-start items-start gap-6">
-                                        <div className="justify-start text-[#101828] text-base font-medium font-['Inter'] leading-normal">
-                                            1</div>
-                                        <div className="grid grid-cols-2 h-11 w-full gap-6">
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div className="self-stretch flex-1 flex flex-col justify-start items-start gap-1.5">
-                                                    <div
-                                                        className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                        <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                            First name</div>
-                                                        <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                            *</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div
-                                                    className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                    <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                        Last name</div>
-                                                    <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                        *</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="h-11 grid grid-cols-2 w-full gap-6">
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div className="self-stretch flex-1 flex flex-col justify-start items-start gap-1.5">
-                                                    <div
-                                                        className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                        <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                            Email address</div>
-                                                        <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                            *</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div
-                                                    className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                    <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                        PTIN (If applicable)</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="self-stretch h-52 p-6 flex flex-col justify-start items-start gap-6">
-                                        <div className="justify-start text-[#101828] text-base font-medium font-['Inter'] leading-normal">
-                                            2</div>
-                                        <div className="grid grid-cols-2 w-full h-11 gap-6">
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div className="self-stretch flex-1 flex flex-col justify-start items-start gap-1.5">
-                                                    <div
-                                                        className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                        <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                            First name</div>
-                                                        <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                            *</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div
-                                                    className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                    <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                        Last name</div>
-                                                    <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                        *</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 h-11 w-full gap-6">
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div className="self-stretch flex-1 flex flex-col justify-start items-start gap-1.5">
-                                                    <div
-                                                        className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                        <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                            Email address</div>
-                                                        <div className="justify-start text-[#7E56D8] text-sm font-medium font-['Inter'] leading-tight">
-                                                            *</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
-                                                <div
-                                                    className="self-stretch flex-1 border-b border-[#D0D5DD] inline-flex justify-start items-start gap-0.5">
-                                                    <div className="justify-start text-[#344054] text-sm font-medium font-['Inter'] leading-tight">
-                                                        PTIN (If applicable)</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                );
+                                            })}
+                                        </CardContent>
+                                    </Card>
+                                ))}
                             </div>
                         </div>
                     </div>
