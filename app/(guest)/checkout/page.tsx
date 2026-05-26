@@ -33,6 +33,7 @@ const CheckoutPage = () => {
     const [formSubmitError, setFormSubmitError] = React.useState('');
     const [participantDetailsByItem, setParticipantDetailsByItem] = React.useState<{
         enrolls: {
+            courseId: string,
             name: string
             lastname: string
             email: string
@@ -41,6 +42,7 @@ const CheckoutPage = () => {
     }[]>([])
     const [participantErrorsByItem, setParticipantErrorsByItem] = React.useState<{
         enrolls: {
+            courseId?: string,
             name?: string
             lastname?: string
             email?: string
@@ -48,7 +50,7 @@ const CheckoutPage = () => {
         }[]
     }[]>([])
     const displayedTotal = couponRes ? Number(finalPrice) : Number(cart?.total ?? subtotal);
-    const couponLabel = couponType === 'amountOff' ? `- US$${couponValueOFF.toFixed(2)}` : couponType === 'percentOff' ? `- ${couponValueOFF}%` : '';
+    const couponLabel = couponType === 'amountOff' ? `- $${couponValueOFF.toFixed(2)}` : couponType === 'percentOff' ? `- ${couponValueOFF}%` : '';
 
     React.useEffect(() => {
         const itemsArr = cart.items || [];
@@ -56,12 +58,13 @@ const CheckoutPage = () => {
             const qty = it.qty || it.quantity || 1;
             const existingEnrolls = participantDetailsByItem?.[idx]?.enrolls || [];
             const enrolls = Array.from({ length: qty }, (_, i) => {
-                const existing = existingEnrolls[i] || { name: '', lastname: '', email: '', ptin: '' };
+                const existing = existingEnrolls[i] || { name: '', lastname: '', email: '', ptin: '', courseId: it.courseId };
                 return {
                     name: existing.name || String(currentUser.firstName || ''),
                     lastname: existing.lastname || String(currentUser.lastName || ''),
                     email: existing.email || String(currentUser.email || ''),
                     ptin: existing.ptin || String((currentUser as any).ptin || ''),
+                    courseId: existing.courseId || it.courseId,
                 };
             });
             return { enrolls };
@@ -208,14 +211,17 @@ const CheckoutPage = () => {
 
     const buildCartItemsWithParticipantEnrolls = (items: any[]) => {
         return (items || []).map((item: any, idx: number) => {
+            const itemCourseId = item.courseId || item.id || item.course?.id || item.course?.data?.id || 0;
             const qty = item.qty || item.quantity || 1;
-            const Enrolls = (participantDetailsByItem?.[idx]?.enrolls || Array.from({ length: qty }, () => ({ name: '', lastname: '', email: '', ptin: '' }))).map((p: any) => ({
+            const Enrolls = (participantDetailsByItem?.[idx]?.enrolls || Array.from({ length: qty }, () => ({ name: '', lastname: '', email: '', ptin: '', courseId: itemCourseId }))).map((p: any) => ({
                 name: p.name,
                 lastname: p.lastname,
                 email: p.email,
                 ptin: p.ptin,
+                courseId: p.courseId || itemCourseId,
+                packageId: item.packageId || 0,
             }));
-            return { ...item, Enrolls };
+            return { ...item, Enrolls, Enrollment: Enrolls };
         });
     }
 
@@ -285,6 +291,7 @@ const CheckoutPage = () => {
                 ...item,
                 course: { ...item.course },
                 Enrolls: item.Enrolls ? item.Enrolls.map((en: any) => ({ ...en })) : [],
+                Enrollment: item.Enrollment ? item.Enrollment.map((en: any) => ({ ...en })) : item.Enrolls ? item.Enrolls.map((en: any) => ({ ...en })) : [],
             }));
 
             const cartData: any = cart;
@@ -875,9 +882,9 @@ const CheckoutPage = () => {
                                                             </div>
                                                             <div className="justify-end items-center gap-4 flex">
                                                                 <div className="justify-end flex-col items-center gap-1.5 flex overflow-hidden">
-                                                                    <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`US$${lineTotal}`}</div>
+                                                                    <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$${lineTotal}`}</div>
                                                                     {item.originalPrice && (
-                                                                        <div className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">{`US$${item.originalPrice}`}</div>
+                                                                        <div className="justify-start text-[#667085] text-xl font-normal font-['Inter'] line-through leading-9">{`$${item.originalPrice}`}</div>
                                                                     )}
                                                                 </div>
                                                             </div>

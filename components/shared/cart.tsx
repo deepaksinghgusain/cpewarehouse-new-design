@@ -191,7 +191,7 @@ export function CartComponent() {
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between text-lg font-semibold">
                                     <span>Sub Total</span>
-                                    <span>{subtotal}</span>
+                                    <span>${subtotal}</span>
                                 </div>
                             </div>
 
@@ -203,7 +203,7 @@ export function CartComponent() {
                                     </div>
                                     <div className="flex items-center text-red-500 justify-between text-lg font-semibold">
                                         <span>Discount Price</span>
-                                        <span>-{cart.discountPrice}</span>
+                                        <span>- ${cart.discountPrice}</span>
                                     </div>
                                 </div>
                             )}
@@ -211,7 +211,7 @@ export function CartComponent() {
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between text-lg font-semibold">
                                     <span>Total</span>
-                                    <span>{cart.finalPrice}</span>
+                                    <span>${cart.finalPrice}</span>
                                 </div>
                             </div>
 
