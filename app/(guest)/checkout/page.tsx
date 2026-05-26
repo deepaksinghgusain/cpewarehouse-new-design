@@ -1098,7 +1098,7 @@ const CheckoutPage = () => {
                                                             </div>
                                                             <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
                                                                 <div className="self-stretch inline-flex justify-start items-center gap-0.5">
-                                                                    <div className="justify-start text-[#344054] text-sm font-medium">PTIN (If applicable)</div>
+                                                                    <div className="justify-start text-[#344054] text-sm font-medium">PTIN (For Enrolled Agents only)</div>
                                                                 </div>
                                                                 <div className="self-stretch border-b border-[#D0D5DD] pb-1">
                                                                     <Input
