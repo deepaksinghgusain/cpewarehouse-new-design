@@ -170,7 +170,7 @@ export function CartComponent() {
                                                             $ {Number(price ?? 0).toFixed(2)} each
                                                         </p>
                                                         <p className="text-gray-700 text-sm mt-1">
-                                                            $ {Number((price * qty) ?? 0).toFixed(2)} total
+                                                            $ {(Number(price ?? 0) * Number(qty ?? 0)).toFixed(2)} total
                                                         </p>
                                                     </div>
 
