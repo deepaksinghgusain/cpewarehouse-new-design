@@ -939,7 +939,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="justify-end items-center gap-4 flex">
                                         <div className="justify-end items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${subtotal}`}</div>
+                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${subtotal?.toFixed(2)}`}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -952,7 +952,7 @@ const CheckoutPage = () => {
                                         </div>
                                         <div className="justify-start items-center gap-4 flex">
                                             <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                                <div className="text-[#ef4444] text-base font-semibold font-['Inter'] leading-6">-{couponLabel || cart.discountPrice}</div>
+                                                <div className="text-[#ef4444] text-base font-semibold font-['Inter'] leading-6">{couponLabel || cart.discountPrice}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -965,7 +965,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="justify-start items-center gap-4 flex">
                                         <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$ ${cart.finalPrice.toFixed(2)}`}</div>
+                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$ ${cart.finalPrice?.toFixed(2)}`}</div>
                                         </div>
                                     </div>
                                 </div>
