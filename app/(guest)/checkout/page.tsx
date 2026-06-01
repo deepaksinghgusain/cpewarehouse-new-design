@@ -61,7 +61,7 @@ const CheckoutPage = () => {
         }[]
     }[]>([])
     const displayedTotal = couponRes ? Number(finalPrice) : Number(cart?.total ?? subtotal);
-    const couponLabel = couponType === 'amountOff' ? `- $ ${couponValueOFF.toFixed(2)}` : couponType === 'percentOff' ? `- ${couponValueOFF}%` : '';
+    const couponLabel = couponType === 'amountOff' ? `- $ ${Number(couponValueOFF ?? 0).toFixed(2)}` : couponType === 'percentOff' ? `- ${Number(couponValueOFF ?? 0)}%` : '';
 
     React.useEffect(() => {
         const itemsArr = cart.items || [];
@@ -265,7 +265,7 @@ const CheckoutPage = () => {
                     return;
                 }
 
-                const updatedPrice = Number((fp - couponResp.amount_off).toFixed(2) ?? 0);
+                const updatedPrice = Number((Number(fp) - Number(couponResp.amount_off)).toFixed(2));
                 setCouponType('amountOff');
                 setCouponValueOFF(couponResp.amount_off);
                 setFinalPrice(updatedPrice);
@@ -275,8 +275,8 @@ const CheckoutPage = () => {
             }
 
             if (couponResp.percent_off != null) {
-                const discountAmount = Number(((fp * couponResp.percent_off) / 100).toFixed(2) ?? 0);
-                const updatedPrice = Number((fp - discountAmount).toFixed(2) ?? 0);
+                const discountAmount = Number(((Number(fp) * Number(couponResp.percent_off)) / 100).toFixed(2));
+                const updatedPrice = Number((Number(fp) - discountAmount).toFixed(2));
                 setCouponType('percentOff');
                 setCouponValueOFF(couponResp.percent_off);
                 setFinalPrice(updatedPrice);
@@ -378,29 +378,18 @@ const CheckoutPage = () => {
 
                 if (couponType == 'percentOff') {
 
-                    const discountedAmount: any = (
-                        (eachPrice * couponValueOFF) / 100
-                    ).toFixed(2);
+                    const discountedAmount: any = Number(((Number(eachPrice) * Number(couponValueOFF)) / 100).toFixed(2));
 
-                    couponDiscountedPrice = (
-                        eachPrice - discountedAmount
-                    ).toFixed(2);
+                    couponDiscountedPrice = Number((Number(eachPrice) - discountedAmount).toFixed(2));
 
                 } else if (couponType == 'amountOff') {
 
-                    const discountedAmount: any = (
-                        couponValueOFF /
-                        (lengthOfCartItems * data.qty)
-                    ).toFixed(2);
+                    const discountedAmount: any = Number((Number(couponValueOFF) / (lengthOfCartItems * (data.qty || 1))).toFixed(2));
 
-                    couponDiscountedPrice = (
-                        eachPrice - discountedAmount
-                    ).toFixed(2);
+                    couponDiscountedPrice = Number((Number(eachPrice) - discountedAmount).toFixed(2));
                 }
 
-                const priceIncents: any = (
-                    Number(couponDiscountedPrice) * 100
-                ).toFixed(0);
+                const priceIncents: any = Number((Number(couponDiscountedPrice || 0) * 100).toFixed(0));
 
                 // CHECKOUT DATA
                 checkoutData.push({
@@ -496,23 +485,14 @@ const CheckoutPage = () => {
                     couponType == 'amountOff'
                 ) {
 
-                    cartItems[index]['finalPrice'] = (
-                        particularPrice -
-                        (
-                            couponValueOFF /
-                            (lengthOfCartItems * noOfEnroll)
-                        )
-                    ).toFixed(2);
+                    cartItems[index]['finalPrice'] = Number((Number(particularPrice) - (Number(couponValueOFF) / (lengthOfCartItems * noOfEnroll))).toFixed(2));
 
                 } else if (
                     couponValue != null &&
                     couponType == 'percentOff'
                 ) {
 
-                    cartItems[index]['finalPrice'] = (
-                        particularPrice -
-                        ((couponValueOFF * particularPrice) / 100)
-                    ).toFixed(2);
+                    cartItems[index]['finalPrice'] = Number((Number(particularPrice) - ((Number(couponValueOFF) * Number(particularPrice)) / 100)).toFixed(2));
 
                 } else {
 
@@ -951,7 +931,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="justify-end items-center gap-4 flex">
                                         <div className="justify-end items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${subtotal ? subtotal.toFixed(2) : 0.00}`}</div>
+                                            <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${Number(subtotal ?? 0).toFixed(2)}`}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -964,7 +944,7 @@ const CheckoutPage = () => {
                                         </div>
                                         <div className="justify-start items-center gap-4 flex">
                                             <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                                <div className="text-[#ef4444] text-base font-semibold font-['Inter'] leading-6">{couponLabel || cart.discountPrice ? `$ ${cart.discountPrice ? cart.discountPrice.toFixed(2) : 0.00}` : ''}</div>
+                                                <div className="text-[#ef4444] text-base font-semibold font-['Inter'] leading-6">{couponLabel || cart.discountPrice ? `$ ${Number(cart.discountPrice ?? 0).toFixed(2)}` : ''}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -977,7 +957,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="justify-start items-center gap-4 flex">
                                         <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$ ${cart.finalPrice ? cart.finalPrice.toFixed(2) : 0.00}`}</div>
+                                            <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$ ${Number(cart.finalPrice ?? 0).toFixed(2)}`}</div>
                                         </div>
                                     </div>
                                 </div>

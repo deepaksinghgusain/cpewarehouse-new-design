@@ -167,10 +167,10 @@ export function CartComponent() {
                                                             </p>
                                                         )}
                                                         <p className="text-gray-500 text-sm">
-                                                            $ {price ? price.toFixed(2) : 0.00} each
+                                                            $ {Number(price ?? 0).toFixed(2)} each
                                                         </p>
                                                         <p className="text-gray-700 text-sm mt-1">
-                                                            $ { (price * qty) ? (price * qty).toFixed(2) : 0.00 } total
+                                                            $ {Number((price * qty) ?? 0).toFixed(2)} total
                                                         </p>
                                                     </div>
 
@@ -215,9 +215,9 @@ export function CartComponent() {
                                     <Separator className="my-4" />
 
                                     <div className="space-y-3">
-                                        <div className="flex items-center justify-between text-lg font-semibold">
+                                            <div className="flex items-center justify-between text-lg font-semibold">
                                             <span>Sub Total</span>
-                                            <span>$ {subtotal ? subtotal.toFixed(2) : 0.00}</span>
+                                            <span>$ {Number(subtotal ?? 0).toFixed(2)}</span>
                                         </div>
                                     </div>
 
@@ -229,7 +229,7 @@ export function CartComponent() {
                                             </div>
                                             <div className="flex items-center text-red-500 justify-between text-lg font-semibold">
                                                 <span>Discount Price</span>
-                                                <span>- $ {cart.discountPrice ? cart.discountPrice.toFixed(2) : 0.00}</span>
+                                                <span>- $ {Number(cart.discountPrice ?? 0).toFixed(2)}</span>
                                             </div>
                                         </div>
                                     )}
@@ -237,7 +237,7 @@ export function CartComponent() {
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between text-lg font-semibold">
                                             <span>Total</span>
-                                            <span>$ {cart.finalPrice ? cart.finalPrice.toFixed(2) : 0.00}</span>
+                                            <span>$ {Number(cart.finalPrice ?? 0).toFixed(2)}</span>
                                         </div>
                                     </div>
 
