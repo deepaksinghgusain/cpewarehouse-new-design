@@ -28,6 +28,17 @@ export function CartComponent() {
     const cart = useSelector((state: RootState) => state.cart)
     const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated)
 
+    const resolveText = (val: any) => {
+        if (val == null) return '';
+        if (typeof val === 'string' || typeof val === 'number') return val;
+        if (typeof val === 'object') {
+            if (val.data && (typeof val.data === 'string' || typeof val.data === 'number')) return val.data;
+            if (val.data && val.data.attributes) return val.data.attributes.title || val.data.attributes.name || '';
+            if (val.attributes) return val.attributes.title || val.attributes.name || '';
+        }
+        return '';
+    }
+
     console.log("Cart :", cart);
 
     const cartTotal = useSelector((state: RootState) => state.cart.total || 0)
@@ -100,11 +111,11 @@ export function CartComponent() {
                                 ) : (
                                     cartItems.map((item: any) => {
                                         console.log("Cart item:", item);
-                                        const title =
+                                        const rawTitle =
                                             item.course?.data?.attributes?.title ||
                                             item.course?.title ||
-                                            item.name ||
-                                            "Course"
+                                            item.name;
+                                        const title = resolveText(rawTitle) || "Course"
                                         const slug =
                                             item.course?.slug ||
                                             item.slug ||

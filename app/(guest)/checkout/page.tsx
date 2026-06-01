@@ -19,6 +19,17 @@ const CheckoutPage = () => {
     const cart = useSelector((s: RootState) => s.cart);
     const user = useSelector((s: RootState) => s.user);
     const currentUser = user?.user || {};
+    const resolveText = (val: any) => {
+        if (val == null) return '';
+        if (typeof val === 'string' || typeof val === 'number') return val;
+        if (typeof val === 'object') {
+            // GraphQL responses sometimes wrap values: { __typename, data }
+            if (val.data && (typeof val.data === 'string' || typeof val.data === 'number')) return val.data;
+            if (val.data && val.data.attributes) return val.data.attributes.title || val.data.attributes.name || '';
+            if (val.attributes) return val.attributes.title || val.attributes.name || '';
+        }
+        return '';
+    }
     console.log("Cart data in checkout page:", cart);
     const items = cart?.items || [];
     const enrollments = items.reduce((acc: number, it: any) => acc + (it.qty || it.quantity || 1), 0);
@@ -804,7 +815,8 @@ const CheckoutPage = () => {
                                     ) : (
                                         items.map((item: any, idx: number) => {
                                             const qty = item.qty || item.quantity || 1;
-                                            const title = item.course?.data?.attributes?.title || item.course?.data?.attributes?.name || item.course?.attributes?.title || item.title || item.name || item.course?.title || 'Untitled Course';
+                                            const rawTitle = item.course?.data?.attributes?.title || item.course?.data?.attributes?.name || item.course?.attributes?.title || item.title || item.name || item.course?.title;
+                                            const title = resolveText(rawTitle) || 'Untitled Course';
                                             const date = item.course?.data?.attributes?.date || item.date || '';
                                             const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
                                             const lineTotal = price * qty;
