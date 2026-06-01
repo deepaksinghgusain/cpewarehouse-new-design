@@ -156,10 +156,10 @@ export function CartComponent() {
                                                             </p>
                                                         )}
                                                         <p className="text-gray-500 text-sm">
-                                                            $ {price.toFixed(2)} each
+                                                            $ {price?.toFixed(2)} each
                                                         </p>
                                                         <p className="text-gray-700 text-sm mt-1">
-                                                            $ { (price * qty).toFixed(2) } total
+                                                            $ { (price * qty)?.toFixed(2) } total
                                                         </p>
                                                     </div>
 
@@ -206,7 +206,7 @@ export function CartComponent() {
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between text-lg font-semibold">
                                             <span>Sub Total</span>
-                                            <span>$ {subtotal.toFixed(2)}</span>
+                                            <span>$ {subtotal?.toFixed(2)}</span>
                                         </div>
                                     </div>
 
@@ -218,7 +218,7 @@ export function CartComponent() {
                                             </div>
                                             <div className="flex items-center text-red-500 justify-between text-lg font-semibold">
                                                 <span>Discount Price</span>
-                                                <span>- $ {cart.discountPrice.toFixed(2)}</span>
+                                                <span>- $ {cart.discountPrice?.toFixed(2)}</span>
                                             </div>
                                         </div>
                                     )}
@@ -226,7 +226,7 @@ export function CartComponent() {
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between text-lg font-semibold">
                                             <span>Total</span>
-                                            <span>$ {cart.finalPrice.toFixed(2)}</span>
+                                            <span>$ {cart.finalPrice?.toFixed(2)}</span>
                                         </div>
                                     </div>
 
