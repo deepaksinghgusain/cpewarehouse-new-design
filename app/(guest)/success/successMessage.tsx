@@ -1,8 +1,10 @@
 "use client";
 
+import { clearCartRequest } from "@/store/actions/cart-actions";
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, gql } from "@apollo/client";
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from "react-redux";
 
 const httpLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_API_BASE_URL + "/graphql",
@@ -73,6 +75,7 @@ function getOrdersBySeesionIdGql(sessionId: string) {
 const SuccessMessage = ({ session_id }: { session_id: any }) => {
 
     const [orderId, setOrderId] = useState("")
+    const dispatch = useDispatch();
 
     const getOrderDetail = async () => {
         const res = await getOrderBySessinId(session_id as string);
@@ -102,6 +105,9 @@ const SuccessMessage = ({ session_id }: { session_id: any }) => {
 
         console.log("Items Array for GTM:", itemsArray);
         console.log("Order Title for GTM:", title);
+
+        dispatch(clearCartRequest())
+        localStorage.removeItem("cartId")
     }
 
     useEffect(() => {
