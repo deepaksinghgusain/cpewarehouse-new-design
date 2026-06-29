@@ -4,6 +4,7 @@ export const CART_SET = "cart/CART_SET" as const;
 export const CART_REMOVE = "cart/CART_REMOVE" as const;
 export const CART_UPDATE_REQUEST = "cart/CART_UPDATE_REQUEST" as const;
 export const CART_GET_REQUEST = "cart/CART_GET_REQUEST" as const;
+export const CART_CLEAR_REQUEST = "cart/CART_CLEAR_REQUEST" as const;
 
 export const addToCartRequest = (payload: any) => ({
   type: CART_ADD_REQUEST,
@@ -33,4 +34,8 @@ export const updateCartRequest = (payload: any) => ({
 export const getCartRequest = (payload: any) => ({
   type: CART_GET_REQUEST,
   payload,
+});
+
+export const clearCartRequest = () => ({
+  type: CART_CLEAR_REQUEST,
 });

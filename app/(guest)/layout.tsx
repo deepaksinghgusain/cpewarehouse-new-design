@@ -3,6 +3,7 @@ import { Header } from '@/components/shared/Header';
 import LoadingUI from '@/components/ui/loading';
 import { Metadata } from 'next';
 import React from 'react'
+import ScrollToTop from "@/components/shared/ScrollToTop";
 
 
 export default function GuestLayout({
@@ -13,6 +14,7 @@ export default function GuestLayout({
     return (
         <div className='flex h-screen flex-col'>
             <Header />
+            <ScrollToTop />
             <main className='flex-1 wrapper'>{children}</main>
             <Footer />
         </div>

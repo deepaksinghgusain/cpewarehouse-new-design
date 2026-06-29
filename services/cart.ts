@@ -52,9 +52,6 @@ export async function checkAlreadyCoursePurchased(id: number, email: string) {
     return data;
 }
 
-
-
-
 function getAlreadyCoursePurchasedGQL(id: number, email: string) {
     return gql`query{
       userCourses( sort: ["purchasedOn:desc"],

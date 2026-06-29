@@ -1,7 +1,7 @@
 import { call, put, select, takeLatest } from "redux-saga/effects";
-import { CART_ADD_REQUEST, CART_UPDATE_REQUEST, CART_GET_REQUEST } from "../actions/cart-actions";
+import { CART_ADD_REQUEST, CART_UPDATE_REQUEST, CART_GET_REQUEST, CART_CLEAR_REQUEST } from "../actions/cart-actions";
 import { createCart, updateCartAPI, getCart } from "@/services/cart";
-import { setCart } from "../reducers/cart-reducer";
+import { setCart, clearCart } from "../reducers/cart-reducer";
 
 function buildCartRequestBody(payload: any) {
   const courseId = payload.courseId || 0;
@@ -197,8 +197,20 @@ function* handleGetCart(action: any): Generator<any, any, any> {
   }
 }
 
+function* handleClearCart(): Generator<any, any, any> {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("cartId");
+    }
+    yield put(clearCart());
+  } catch (err) {
+    console.error("clear cart error", err);
+  }
+}
+
 export function* watchCart(): Generator {
   yield takeLatest(CART_ADD_REQUEST as any, handleAddToCart as any);
   yield takeLatest(CART_UPDATE_REQUEST as any, handleUpdateCart as any);
   yield takeLatest(CART_GET_REQUEST as any, handleGetCart as any);
+  yield takeLatest(CART_CLEAR_REQUEST as any, handleClearCart as any);
 }

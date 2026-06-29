@@ -137,6 +137,47 @@ export async function getUpcomingCourse(IDarray: any) {
   return data?.courses;
 }
 
+export async function getOrderBySessinId(sessionId:string) {
+  const { data }: { data: any } = await client.query({
+    query: getOrdersBySeesionIdGql(sessionId),
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data;
+}
+
+function getOrdersBySeesionIdGql(sessionId:string){
+    return gql`query{
+      orders(filters:{stripeSessionId:{eq:"${sessionId}"}}){
+       data{
+         id,
+         attributes{
+           OrderItems{
+            title
+            courseId
+            packageId
+            price
+            finalPrice
+            Enrolls{
+              email
+            }
+          }
+          totalPrice 
+          finalPrice
+           orderStatus
+           stripeSessionId,
+           userId
+           email
+          
+         }
+       }
+     }
+       }`
+  }
+
+
 export function getCourses(IDarray: any) {
   return gql`
     query {
@@ -930,6 +971,7 @@ const packagesonly = gql`
   query {
     packages {
       data {
+      id
         attributes {
           title
           desc

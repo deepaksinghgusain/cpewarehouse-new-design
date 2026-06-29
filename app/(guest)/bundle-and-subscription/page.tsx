@@ -95,6 +95,7 @@ const page = async () => {
                                                 </div>
                                             }
 
+
                                             {
                                                 course.attributes?.category?.data?.attributes1?.title === "Tax" && <div
                                                     className="px-2.5 py-0.5 bg-[#fdf1f9] rounded-full border border-[#fbceee] justify-start items-center flex">

@@ -98,6 +98,9 @@ const cartSlice = createSlice({
 			state.items = [];
 			state.cartId = null;
 			state.total = 0;
+			state.discountCode = "";
+			state.discountPrice = 0;
+			state.finalPrice = 0;
 		}
 	},
 });

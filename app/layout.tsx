@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import "./globals.css";
 import ApolloWrapper from "@/components/providers/apollo-wrapper";
 
+import { ToastContainer } from 'react-toastify';
+
 import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -24,6 +26,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ApolloWrapper>{children}</ApolloWrapper>
+
+        <ToastContainer 
+          position="top-center" 
+          autoClose={3000}
+          className="custom-toast-container"
+          toastClassName="custom-toast" />
       </body>
     </html>
   );
