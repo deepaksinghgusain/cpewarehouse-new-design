@@ -1,3 +1,4 @@
+import EnrollNowCart from '@/components/courses/enroll-now';
 import PackageTabs from '@/components/packages/package-tab';
 import { imageUrl } from '@/lib/constants';
 import { getAllCourses } from '@/services/course';
@@ -207,9 +208,9 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                         <div
                                             className="h-[52px] px-[18px] py-3 bg-[#2970fe] rounded-[28px] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                                             <div className="px-0.5 justify-center items-center flex">
-                                                <Link href={heroImageSection?.button[0]?.href ?? ""}
-                                                    className="text-white text-lg font-semibold font-['Inter'] leading-7">
-                                                    {heroImageSection?.button[0]?.label}</Link>
+                                                <button
+                                                    className="text-white text-lg cursor-pointer font-semibold font-['Inter'] leading-7">
+                                                    {heroImageSection?.button[0]?.label}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -375,7 +376,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                                     <div className="self-stretch h-[212px] flex-col justify-start items-start gap-4 flex">
                                                         {
                                                             sponsorship.features.length > 0 && sponsorship.features.map((feature: any, index: number) => (
-                                                                <div className="self-stretch justify-start items-start gap-3 inline-flex">
+                                                                <div className="self-stretch justify-start items-start gap-3 inline-flex" key={index}>
                                                                     <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
                                                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                             <g id="Check icon">

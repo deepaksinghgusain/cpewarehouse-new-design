@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { addToCartRequest } from '@/store/actions/cart-actions';
+import { toast } from 'react-toastify';
 
-const EnrollNowCart = ({ course, quantity }: { course: any, quantity: number }) => {
+const EnrollNowCart = ({ course, quantity, type }: { course: any, quantity: number, type?: string }) => {
     console.log("EnrollNowCart rendered with course:", course, "and quantity:", quantity)
 
     const [isPurchased, setIsPurchased] = useState(false)
@@ -15,58 +16,68 @@ const EnrollNowCart = ({ course, quantity }: { course: any, quantity: number }) 
 
     async function enrollNow2(selectedCourse: any) {
 
-        console.log("Add to cart clicked for course:", selectedCourse)
-
         // if cart does not exist then create a cart
         const courseid = selectedCourse["id"] || 0;
-        const price = selectedCourse['price']
-        const category = selectedCourse['category']?.data?.attributes['title'] || '';
-        console.log(category)
-        if (new Date(selectedCourse['endDate']) < new Date() && category == 'Live') {
+        const price = selectedCourse['attributes']['price']
+        const category = selectedCourse?.attributes['category']?.data?.attributes['title'] || '';
+
+        if (new Date(selectedCourse.attributes['endDate']) < new Date() && category == 'Live') {
+
+            toast.error("Course expired")
             return;
         }
 
         if (localStorage.getItem('token')) {
+
             const email = localStorage.getItem('email') || ''
 
             let res = await checkAlreadyCoursePurchased(courseid, email)
-            console.log("Already purchased response:", res);
 
             const dts = res?.data?.userCourses?.data || []
+
             if (dts.length == 0) {
                 setIsPurchased(false);  // no course found for the user
             }
-            if (dts.length > 0 && dts[0].course?.data.id == courseid) {
+            if (dts.length > 0 && dts[0].attributes?.course?.data.id == courseid) {
                 setIsPurchased(true); // course already purchased
             }
-            if (isPurchased) return;
+            if (isPurchased) {
+                toast.error("You have allready purchased our course")
+                return;
+            };
 
-            let realPrice: any = (selectedCourse.discount != null && selectedCourse.discount != 0)
-                ? selectedCourse.discount
-                : selectedCourse.price;
+            let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
+                ? selectedCourse.attributes.discount
+                : selectedCourse.attributes.price;
 
             const totalprice = realPrice * quantity;
 
             const payload = {
-                courseId: Number(courseid),
+                courseId: type === "package" ? 0 : Number(courseid),
                 qty: quantity,
-                course: selectedCourse,
+                course: selectedCourse.attributes,
                 total: totalprice,
+                packageId: Number(type === "package" ? selectedCourse.id : 0),
             }
+
+            toast.success(`Item ${selectedCourse['title']} is add to cart successfully`)
 
             dispatch(addToCartRequest(payload))
         } else {
             // not logged in: save a local cart and redirect to login
-            let realPrice: any = (selectedCourse.discount != null && selectedCourse.discount != 0)
-                ? selectedCourse.discount
-                : selectedCourse.price;
+            let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
+                ? selectedCourse.attributes.discount
+                : selectedCourse.attributes.price;
 
             const payload = {
-                courseId: Number(courseid),
+                courseId: type === "package" ? 0 : Number(courseid),
                 qty: quantity,
-                course: selectedCourse,
+                course: selectedCourse.attributes,
                 total: realPrice * quantity,
+                packageId: Number(type === "package" ? selectedCourse.id : 0),
             }
+
+            toast.error(`Please Login first`)
 
             localStorage.setItem('cartData', JSON.stringify(payload))
             router.push('/login')
@@ -87,7 +98,6 @@ const EnrollNowCart = ({ course, quantity }: { course: any, quantity: number }) 
                 </div>
             </div>
         </div>
-
     )
 }
 

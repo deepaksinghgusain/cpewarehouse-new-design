@@ -68,7 +68,6 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
         let resp = await response.json();
         getcardCount(cartId);
         router.push('/learner/shopping-cart');
-
     }
 
     return (
@@ -105,9 +104,9 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                         </div>
                         <div className="pl-1 pr-2.5 py-1 rounded-full justify-start items-center gap-3 inline-flex">
                             <div className="justify-start text-gray-500 text-base font-semibold font-['Inter'] line-through leading-9">
-                                US {courseData?.price}
+                                ${courseData?.price * seats}
                             </div>
-                            <div className="text-[#0e9384] text-[32px] font-semibold font-['Inter'] leading-[38px]">US
+                            <div className="text-[#0e9384] text-[32px] font-semibold font-['Inter'] leading-[38px]">$ 
                                 {(courseData?.price - (courseData?.discount ?? 0)) * seats}
                             </div>
                         </div>
