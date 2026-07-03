@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { addToCartRequest } from '@/store/actions/cart-actions';
 import { toast } from 'react-toastify';
 
-const AddToCart = ({ course, quantity, type }: { course: any, quantity: number, type?: string }) => {
+const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, quantity: number, type?: string, absolute?: boolean }) => {
 
     const [isPurchased, setIsPurchased] = useState(false)
     const dispatch = useDispatch()
@@ -84,16 +84,38 @@ const AddToCart = ({ course, quantity, type }: { course: any, quantity: number, 
     }
 
     return (
-        <div onClick={() => enrollNow2(course)} className="absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden cursor-pointer">
-            <div className="justify-start text-[#156fee] text-base font-semibold font-['Inter'] leading-normal z-10 ">Add to cart
+        <div
+            onClick={() => enrollNow2(course)}
+            className={
+                absolute
+                    ? "absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden cursor-pointer"
+                    : "group add-to-card w-[200px] inline-flex items-center cursor-pointer border border-blue-500 h-10 justify-center gap-2 rounded-lg bg-white text-blue-500 hover:bg-blue-500 hover:text-white transition duration-300 ease-in-out"
+            }
+        >
+            <div
+                className={`text-base font-semibold ${absolute
+                        ? "text-[#156fee]"
+                        : "text-blue-500 group-hover:text-white"
+                    }`}
+            >
+                Add to cart
             </div>
-            <div className="w-5 h-5 relative overflow-hidden">
-                <div className=" h-full w-full absolute">
-                    <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6.33398 14.1667L14.6673 5.83337M14.6673 5.83337H6.33398M14.6673 5.83337V14.1667" stroke="#155EEF"
-                            strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                </div>
+
+            <div
+                className={`w-5 h-5 ${absolute
+                        ? "text-[#156fee]"
+                        : "text-blue-500 group-hover:text-white"
+                    }`}
+            >
+                <svg width="21" height="20" viewBox="0 0 21 20" fill="none">
+                    <path
+                        d="M6.33398 14.1667L14.6673 5.83337M14.6673 5.83337H6.33398M14.6673 5.83337V14.1667"
+                        stroke="currentColor"
+                        strokeWidth="1.66667"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
             </div>
         </div>
     )

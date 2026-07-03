@@ -85,11 +85,11 @@ const EnrollNowCart = ({ course, quantity, type }: { course: any, quantity: numb
     }
 
     return (
-        <div className="self-stretch pt-3 flex-col justify-start items-start flex">
+        <div className="self-stretch pt-3 flex-col justify-start items-start flex w-[90%]">
             <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex" style={{ width: "100%", margin: "auto" }}>
                 <div
                     onClick={() => enrollNow2(course)}
-                    className="grow cursor-pointer shrink basis-0 h-[40px]  px-[18px] py-3 bg-[#2970fe] rounded-[28px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
+                    className="grow cursor-pointer shrink basis-0 h-[40px]  px-[18px] py-3 bg-[#2970fe] rounded-[10px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                     <div className="px-0.5 justify-center items-center flex">
                         <div className="text-white  font-bold font-['Inter'] leading-7" style={{ fontSize: "18px" }}>
                             {course?.category?.data?.attributes?.title == 'eBook' ? 'GET ACCESS' : 'Enroll now'}

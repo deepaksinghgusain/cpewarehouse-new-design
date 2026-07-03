@@ -114,7 +114,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                     <div
                         className="w-[90%] mx-auto self-stretch border-b border-[#dee1e9] flex flex-col justify-start items-start gap-2">
                         <Tabs defaultValue="Course Outline" className="w-full bg-transparent border-b border-[#dee1e9]">
-                            <TabsList variant="line" className='w-full bg-transparent  border-b border-[#dee1e9]'>
+                            <TabsList variant="line" className='w-full bg-transparent border-b border-[#dee1e9]'>
                                 <TabsTrigger value="Course Outline" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Course Outline</TabsTrigger>
                                 <TabsTrigger value="CPE Info" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">CPE Info</TabsTrigger>
                                 <TabsTrigger value="FAQ" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">FAQ</TabsTrigger>

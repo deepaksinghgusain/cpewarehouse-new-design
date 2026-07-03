@@ -1,8 +1,9 @@
 "use client";
 
+import AddToCart from '@/components/courses/add-to-cart';
 import EnrollNowCart from '@/components/courses/enroll-now';
 import { imageUrl } from '@/lib/constants';
-import { checkAlreadyCoursePurchased, getCart } from '@/services/cart';
+import { getCart } from '@/services/cart';
 import { ChevronRight } from 'lucide-react';
 import moment from 'moment-timezone'
 import Link from 'next/link';
@@ -10,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
 const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
-    console.log(courseData);
     
     const timezone = moment.tz.guess();
     const timezoneAbbrv = moment().tz(timezone).format('z');
@@ -222,7 +222,12 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                                 </div>
                             }
 
-                            <EnrollNowCart course={courseData} quantity={seats} />
+                            <div className="flex justify-between items-center w-full">
+                                <EnrollNowCart course={courseData} quantity={seats} />
+                                <AddToCart course={courseData} quantity={seats} absolute={false} />
+                            </div>
+
+
                             <div
                                 className="w-full px-[22px] py-4 rounded-[10px]  justify-center items-center gap-2.5 inline-flex overflow-hidden">
                                 <div className="px-0.5 justify-start items-center flex">
