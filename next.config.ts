@@ -4,15 +4,13 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "srv1246425.hstgr.cloud",
-        port: "3000",
+        protocol: "https",
+        hostname: "admin.cpewarehouse.us",
         pathname: "/upload/**",
       },
       {
-        protocol: "http",
-        hostname: "srv1246425.hstgr.cloud",
-        port: "3000",
+        protocol: "https",
+        hostname: "admin.cpewarehouse.us",
         pathname: "/**",
       },
     ],
