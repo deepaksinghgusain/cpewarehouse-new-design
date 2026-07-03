@@ -45,6 +45,57 @@ export async function getcoursesBySlug(slug: any) {
   return data?.courses;
 }
 
+export async function getAllCourseForSearch(search: any) {
+  const { data }: { data: any } = await client.query({
+    query: getCourseSearchGql(search, true, true),
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data?.courses;
+}
+
+function getCourseSearchGql(keyword: any, isActive: boolean, forTaxLaw: true) {
+  return gql`query {
+      courses( 
+        pagination: { limit: -1 }, 
+        filters : {
+          title: { contains : "${keyword}" },
+          isActive: { eq: ${isActive}}, 
+          forTaxLaw: { eq: ${forTaxLaw} },
+            or:  [{
+                      and: [{
+                              endDate:   { gte:  "${currentDate}"}
+                              ,
+                              category: {
+                                  title: {eq: "Live"}
+                              }
+                          }]
+                    },
+                    {
+                        category: {
+                            title: {ne: "Live"}
+                        }
+                    }],
+  
+         }
+      )
+    {
+          data {
+            id
+            attributes {
+              title
+              forTaxLaw
+              
+              slug
+            startDate
+              
+            }
+          }
+        }
+      }`;
+}
 
 export async function getAllCoursesForLive() {
   const { data }: { data: any } = await client.query({
@@ -137,7 +188,7 @@ export async function getUpcomingCourse(IDarray: any) {
   return data?.courses;
 }
 
-export async function getOrderBySessinId(sessionId:string) {
+export async function getOrderBySessinId(sessionId: string) {
   const { data }: { data: any } = await client.query({
     query: getOrdersBySeesionIdGql(sessionId),
     fetchPolicy: "network-only",
@@ -148,8 +199,8 @@ export async function getOrderBySessinId(sessionId:string) {
   return data;
 }
 
-function getOrdersBySeesionIdGql(sessionId:string){
-    return gql`query{
+function getOrdersBySeesionIdGql(sessionId: string) {
+  return gql`query{
       orders(filters:{stripeSessionId:{eq:"${sessionId}"}}){
        data{
          id,
@@ -175,7 +226,7 @@ function getOrdersBySeesionIdGql(sessionId:string){
        }
      }
        }`
-  }
+}
 
 
 export function getCourses(IDarray: any) {
