@@ -12,9 +12,6 @@ const SuccessPage = async ({ searchParams }: {
   let itemsArray: any = []
 
   const { session_id } = await searchParams;
-  console.log("Session ID from search params:", session_id);
-
-  await delay(2000)
 
   return (
       <SuccessMessage session_id={session_id} />

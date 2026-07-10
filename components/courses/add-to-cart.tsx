@@ -1,11 +1,95 @@
 "use client";
 
-import { checkAlreadyCoursePurchased } from '@/services/cart';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { addToCartRequest } from '@/store/actions/cart-actions';
 import { toast } from 'react-toastify';
+import { ApolloClient, ApolloLink, gql, HttpLink, InMemoryCache } from '@apollo/client';
+
+const httpLink = new HttpLink({
+  uri: process.env.NEXT_PUBLIC_API_BASE_URL + "/graphql",
+});
+
+const authLink = new ApolloLink((operation, forward) => {
+  const token = localStorage.getItem("token");
+
+  console.log(token);
+
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  }));
+
+  return forward(operation);
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
+
+export async function checkAlreadyCoursePurchased(id: number, email: string) {
+    const { data }: { data: any } = await client.query({
+        query: getAlreadyCoursePurchasedGQL(id, email),
+        fetchPolicy: "network-only",
+    });
+
+    if (!data) return {};
+
+    return data;
+}
+
+function getAlreadyCoursePurchasedGQL(id: number, email: string) {
+    return gql`query{
+      userCourses( sort: ["purchasedOn:desc"],
+       pagination:{limit:-1},
+       filters:
+       {
+         user:{email :{ eq: "${email}" }}
+         course:{id :{ eq: ${id}}}
+       }){
+        data{
+         id
+           attributes{
+             status
+             completedOn
+             joinUrl
+             course{
+               data{
+                 id
+                   attributes{
+                     title
+                     startDate
+                     slug
+                     webinarId
+                     videoUrl
+                     
+                       category{
+                         data{
+                           attributes{
+                             title
+                           }
+                         }
+                       }
+                   }
+               }
+             }
+             user{
+               data{
+                 id
+                 attributes{
+                   username
+                 }
+               }
+             }
+            }
+           }  
+         }
+       }`;
+}
 
 const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, quantity: number, type?: string, absolute?: boolean }) => {
 
@@ -14,6 +98,8 @@ const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, q
     const router = useRouter()
 
     async function enrollNow2(selectedCourse: any) {
+
+        console.log(selectedCourse)
 
         // if cart does not exist then create a cart
         const courseid = selectedCourse["id"] || 0;

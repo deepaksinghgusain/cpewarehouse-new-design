@@ -1,9 +1,11 @@
 import EnrollNowCart from '@/components/courses/enroll-now';
+import LiveCourseCard from '@/components/courses/LiveCourseCard';
 import PackageTabs from '@/components/packages/package-tab';
 import { imageUrl } from '@/lib/constants';
 import { getAllCourses } from '@/services/course';
 import { getPackageDetailbByGql, packageDetailPage } from '@/services/package';
 import { ArrowBigRight, ChevronRight, MoveRight } from 'lucide-react';
+import moment from "moment-timezone";
 import Link from 'next/link';
 
 const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) => {
@@ -28,7 +30,14 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
     let hasExpiredCourses: boolean = false;
     let isEmptyPackage: boolean = false;
 
+    const timezone = moment.tz.guess();
+    const timezoneAbbrv = moment().tz(timezone).format('z');
+    const firstLetter = timezoneAbbrv.charAt(0);
+    const lastLetter = timezoneAbbrv.charAt(timezoneAbbrv.length - 1);
+    const twoLettertimezone = firstLetter + lastLetter;
+
     let res = await packageDetailPage()
+
 
     function getInstructorName(instructors: any) {
         const name: string[] = []
@@ -63,7 +72,6 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
     }
 
     function packageExpirationCheck() {
-
         const filteredArray = packageData?.courses?.data.filter((element: any) => {
             const endDate = new Date(element.attributes.endDate).getTime()
             const currDate = Date.now()
@@ -74,13 +82,14 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
         if (filteredArray.length > 0) {
             hasExpiredCourses = true;
         }
-
     }
 
     async function getAllRelatedCourses(keywords: string[]) {
         relatedCourses = []
 
         let res = await getAllCourses();
+
+        console.log(res)
 
         const coursesArray = res.data.courses.data;
 
@@ -119,9 +128,6 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
         }
     }
 
-    console.log(res);
-
-
     if (res) {
         heroImageSection = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.hero-image-with-button')[0];
         accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
@@ -144,16 +150,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
         let name = ''
         packageData?.courses?.data.forEach((element: any) => {
             const facultyname = getInstructorName(element?.attributes?.instructors)
-            PackageCourses.push({
-                'title': element?.attributes.title,
-                'id': element?.id,
-                'price': element?.attributes.price,
-                'startDate': element?.attributes.startDate,
-                'image': element?.attributes.image,
-                'slug': element?.attributes.slug,
-                'instructor': facultyname,
-                'category': element.attributes.category.data.attributes.title,
-            });
+            PackageCourses.push(element);
         });
         packageOutline = packageData?.outline
         faq = packageData?.faqs?.faq[0]?.answer
@@ -559,25 +556,106 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
             </section>
 
 
-
-            {relatedBlock &&
+            {PackageCourses.length > 0 &&
                 <section className="bg-[#f9fafb] py-10">
-                    <div className="container mx-auto">
+                    <div className="container w-[90%] mx-auto">
 
                         <div className="flex-col justify-start items-center gap-8 flex">
                             <div className="flex-col justify-start items-center gap-5 flex">
                                 <div className="h-11 flex-col justify-start items-start gap-3 flex">
                                     <div className="text-left text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">
-                                        {relatedBlock.title}</div>
+                                        Course Included</div>
                                 </div>
-                                <div className="text-left text-[#475467] text-xl font-normal font-['Inter'] leading-[30px]">
-                                    {relatedBlock.sub_title}</div>
+
                             </div>
                         </div>
 
                         <div className="w-full my-8">
                             <div className="grid grid-cols-4 gap-6">
+                                {
+                                    PackageCourses.map((course: any, index: number) => (
+                                        <div
+                                            key={index}
+                                            className="course-container flex flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-sky-500">
+                                            <div
+                                                className="w-full min-h-[128px] relative bg-gradient-to-t from-cyan-300 to-indigo-600 rounded-[10px] overflow-hidden">
+                                                <div className="h-6 w-full  flex-col justify-center items-center inline-flex bg-[#8078d4]">
+                                                    <div
+                                                        className="w-full h-14 p-4 bg-white/30 border-t border-white/30 backdrop-blur-xl flex-col justify-start items-start gap-6 flex">
+                                                        <div className="w-full justify-start items-start gap-6 inline-flex">
+                                                            <div className="flex-col justify-start items-center inline-flex mt-2">
+                                                                <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">Credits:
+                                                                    {course.attributes?.credit} |
+                                                                    {course.attributes?.sub_title}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="ml-4 mt-4 pb-2">
+                                                    <div className="flex">
 
+                                                        {
+                                                            course.attributes?.instructors.data.length > 0 && course.attributes?.instructors.data.map((instructor: any, index: number) => (
+                                                                <img key={index} className="w-12 h-12 mr-2 rounded-[684px] ml[-10px]" src={imageUrl + instructor?.attributes?.image?.data?.attributes?.url} />
+                                                            ))
+                                                        }
+
+
+                                                    </div>
+                                                    <div className="w-[280px] mt-2 justify-start">
+                                                        <div className="flex-col justify-start items-start">
+                                                            <div className="text-white text-sm font-semibold font-['Inter'] leading-tight">
+                                                                {
+                                                                    course.attributes?.instructors.data.length > 0 && course.attributes?.instructors.data.map((instructor: any, index: number) => (
+                                                                        <span key={index}>{instructor?.attributes?.firstName} {instructor?.attributes?.lastName}</span>
+                                                                    ))
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div className="px-5 h-56 pb-6 mt-4 flex-col justify-start items-start gap-[18px] inline-flex">
+                                                <div className="self-stretch justify-start items-start gap-2 inline-flex">
+
+                                                    {
+                                                        course.attributes?.category?.data?.attributes?.title === "Live" && <div
+                                                            className="pl-2 pr-2.5 py-0.5 bg-[#ecfcf2] rounded-full border border-[#aaefc6] justify-start items-center gap-1.5 flex">
+                                                            <div className="w-2 h-2 relative">
+                                                                <div className="w-1.5 h-1.5 left-[1px] top-[1px] absolute bg-[#17b169] rounded-full"></div>
+                                                            </div>
+                                                            <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">Live webinar</div>
+                                                        </div>
+                                                    }
+
+                                                    <div
+                                                        className="px-2.5 py-0.5 bg-pink-50 rounded-full  outline-1 outline-offset-[-1px] outline-pink-200 inline-flex justify-start items-center">
+                                                        <div
+                                                            className="text-center justify-start text-pink-700 text-sm font-medium font-['Inter'] leading-tight">
+                                                            {course?.attributes?.fieldOfStudy}</div>
+                                                    </div>
+
+                                                </div>
+                                                <div className="self-stretch flex-col justify-start items-start gap-2 flex">
+                                                    <Link href={`/course/${course.attributes?.slug}`}>
+                                                        <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">{course.attributes?.title}</div>
+                                                    </Link>
+                                                    {
+                                                        course.attributes?.category?.data?.attributes?.title !== "Recorded" && <div
+                                                            className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-sm font-normal font-['Inter'] leading-normal">
+                                                            {moment(course.attributes?.startDate.replace("Z", "")).format("dddd MMM d YYYY")} |
+                                                            {moment(course.attributes?.startDate.replace("Z", "")).format("h:mm a").toUpperCase()} -
+                                                            {moment(course.attributes?.endDate).format("h:mm a").toUpperCase()} {twoLettertimezone || ''}
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
                         </div>
                     </div>

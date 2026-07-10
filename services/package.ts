@@ -3,23 +3,23 @@ import { apiFetch } from "./http";
 import { gql } from "@apollo/client";
 
 export async function packageDetailPage() {
-    const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/pages?populate=deep&filters[slug][$eq]=package-detail`;
-    return await apiFetch(url)
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/pages?populate=deep&filters[slug][$eq]=package-detail`;
+  return await apiFetch(url)
 }
 
 export async function getPackageDetailbByGql(slug: string) {
-    const { data }: { data: any } = await client.query({
-        query: getPackageDetailGql(slug),
-        fetchPolicy: "network-only",
-    });
+  const { data }: { data: any } = await client.query({
+    query: getPackageDetailGql(slug),
+    fetchPolicy: "network-only",
+  });
 
-    if (!data) return {};
+  if (!data) return {};
 
-    return data;
+  return data;
 }
 
 function getPackageDetailGql(slug: string) {
-    return gql`query {
+  return gql`query {
     packages(filters:{slug:{eq:"${slug}"}}){
   data{
     id
@@ -83,14 +83,19 @@ function getPackageDetailGql(slug: string) {
         data{
           id
           attributes{
-            shortDesc
-            title
-            startDate
-            endDate
-            isActive
-            slug
-            price
-            discount
+          title
+          slug
+          credit 
+          shortDesc
+          startDate
+          endDate
+          programNumber
+          medium
+          fieldOfStudy
+          price
+          discount
+          videoUrl
+          webinarId
             category{
               data{
                 attributes{
@@ -112,6 +117,13 @@ function getPackageDetailGql(slug: string) {
                 attributes{
                   firstName
                   lastName
+
+                   image{
+                  data{
+                  attributes{
+                    url
+                  }
+}}
                 }
               }
             }

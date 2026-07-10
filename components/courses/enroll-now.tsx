@@ -1,104 +1,227 @@
 "use client";
 
-import { checkAlreadyCoursePurchased } from '@/services/cart';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
-import { addToCartRequest } from '@/store/actions/cart-actions';
-import { toast } from 'react-toastify';
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addToCartRequest } from "@/store/actions/cart-actions";
+import { toast } from "react-toastify";
+import {
+  ApolloClient,
+  ApolloLink,
+  gql,
+  HttpLink,
+  InMemoryCache,
+} from "@apollo/client";
 
-const EnrollNowCart = ({ course, quantity, type }: { course: any, quantity: number, type?: string }) => {
-    console.log("EnrollNowCart rendered with course:", course, "and quantity:", quantity)
+const httpLink = new HttpLink({
+  uri: process.env.NEXT_PUBLIC_API_BASE_URL + "/graphql",
+});
 
-    const [isPurchased, setIsPurchased] = useState(false)
-    const dispatch = useDispatch()
-    const router = useRouter()
+const authLink = new ApolloLink((operation, forward) => {
+  const token = localStorage.getItem("token");
 
-    async function enrollNow2(selectedCourse: any) {
+  console.log(token);
 
-        // if cart does not exist then create a cart
-        const courseid = selectedCourse["id"] || 0;
-        const price = selectedCourse['attributes']['price']
-        const category = selectedCourse?.attributes['category']?.data?.attributes['title'] || '';
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  }));
 
-        if (new Date(selectedCourse.attributes['endDate']) < new Date() && category == 'Live') {
+  return forward(operation);
+});
 
-            toast.error("Course expired")
-            return;
-        }
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
 
-        if (localStorage.getItem('token')) {
+export async function checkAlreadyCoursePurchased(id: number, email: string) {
+  const { data }: { data: any } = await client.query({
+    query: getAlreadyCoursePurchasedGQL(id, email),
+    fetchPolicy: "network-only",
+  });
 
-            const email = localStorage.getItem('email') || ''
+  if (!data) return {};
 
-            let res = await checkAlreadyCoursePurchased(courseid, email)
-
-            const dts = res?.data?.userCourses?.data || []
-
-            if (dts.length == 0) {
-                setIsPurchased(false);  // no course found for the user
-            }
-            if (dts.length > 0 && dts[0].attributes?.course?.data.id == courseid) {
-                setIsPurchased(true); // course already purchased
-            }
-            if (isPurchased) {
-                toast.error("You have allready purchased our course")
-                return;
-            };
-
-            let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
-                ? selectedCourse.attributes.discount
-                : selectedCourse.attributes.price;
-
-            const totalprice = realPrice * quantity;
-
-            const payload = {
-                courseId: type === "package" ? 0 : Number(courseid),
-                qty: quantity,
-                course: selectedCourse.attributes,
-                total: totalprice,
-                packageId: Number(type === "package" ? selectedCourse.id : 0),
-            }
-
-            toast.success(`Item ${selectedCourse['title']} is add to cart successfully`)
-
-            dispatch(addToCartRequest(payload))
-        } else {
-            // not logged in: save a local cart and redirect to login
-            let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
-                ? selectedCourse.attributes.discount
-                : selectedCourse.attributes.price;
-
-            const payload = {
-                courseId: type === "package" ? 0 : Number(courseid),
-                qty: quantity,
-                course: selectedCourse.attributes,
-                total: realPrice * quantity,
-                packageId: Number(type === "package" ? selectedCourse.id : 0),
-            }
-
-            toast.error(`Please Login first`)
-
-            localStorage.setItem('cartData', JSON.stringify(payload))
-            router.push('/login')
-        }
-    }
-
-    return (
-        <div className="self-stretch pt-3 flex-col justify-start items-start flex w-[90%]">
-            <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex" style={{ width: "100%", margin: "auto" }}>
-                <div
-                    onClick={() => enrollNow2(course)}
-                    className="grow cursor-pointer shrink basis-0 h-[40px]  px-[18px] py-3 bg-[#2970fe] rounded-[10px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
-                    <div className="px-0.5 justify-center items-center flex">
-                        <div className="text-white  font-bold font-['Inter'] leading-7" style={{ fontSize: "18px" }}>
-                            {course?.category?.data?.attributes?.title == 'eBook' ? 'GET ACCESS' : 'Enroll now'}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
+  return data;
 }
 
-export default EnrollNowCart
+function getAlreadyCoursePurchasedGQL(id: number, email: string) {
+  return gql`query{
+      userCourses( sort: ["purchasedOn:desc"],
+       pagination:{limit:-1},
+       filters:
+       {
+         user:{email :{ eq: "${email}" }}
+         course:{id :{ eq: ${id}}}
+       }){
+        data{
+         id
+           attributes{
+             status
+             completedOn
+             joinUrl
+             course{
+               data{
+                 id
+                   attributes{
+                     title
+                     startDate
+                     slug
+                     webinarId
+                     videoUrl
+                     
+                       category{
+                         data{
+                           attributes{
+                             title
+                           }
+                         }
+                       }
+                   }
+               }
+             }
+             user{
+               data{
+                 id
+                 attributes{
+                   username
+                 }
+               }
+             }
+            }
+           }  
+         }
+       }`;
+}
+
+const EnrollNowCart = ({
+  course,
+  quantity,
+  type,
+}: {
+  course: any;
+  quantity: number;
+  type?: string;
+}) => {
+  console.log(
+    "EnrollNowCart rendered with course:",
+    course,
+    "and quantity:",
+    quantity,
+  );
+
+  const [isPurchased, setIsPurchased] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  async function enrollNow2(selectedCourse: any) {
+    // if cart does not exist then create a cart
+    const courseid = selectedCourse["id"] || 0;
+    const price = selectedCourse["attributes"]["price"];
+    const category =
+      selectedCourse?.attributes["category"]?.data?.attributes["title"] || "";
+
+    if (
+      new Date(selectedCourse.attributes["endDate"]) < new Date() &&
+      category == "Live"
+    ) {
+      toast.error("Course expired");
+      return;
+    }
+
+    if (localStorage.getItem("token")) {
+      const email = localStorage.getItem("email") || "";
+
+      let res = await checkAlreadyCoursePurchased(courseid, email);
+
+      const dts = res?.data?.userCourses?.data || [];
+
+      if (dts.length == 0) {
+        setIsPurchased(false); // no course found for the user
+      }
+      if (dts.length > 0 && dts[0].attributes?.course?.data.id == courseid) {
+        setIsPurchased(true); // course already purchased
+      }
+      if (isPurchased) {
+        toast.error("You have allready purchased our course");
+        return;
+      }
+
+      let realPrice: any =
+        selectedCourse.attributes.discount != null &&
+        selectedCourse.attributes.discount != 0
+          ? selectedCourse.attributes.discount
+          : selectedCourse.attributes.price;
+
+      const totalprice = realPrice * quantity;
+
+      const payload = {
+        courseId: type === "package" ? 0 : Number(courseid),
+        qty: quantity,
+        course: selectedCourse.attributes,
+        total: totalprice,
+        packageId: Number(type === "package" ? selectedCourse.id : 0),
+      };
+
+      toast.success(
+        `Item ${selectedCourse["title"]} is add to cart successfully`,
+      );
+
+      dispatch(addToCartRequest(payload));
+
+      setTimeout(() => {
+        router.push("/checkout");
+      }, 1000)
+    } else {
+      // not logged in: save a local cart and redirect to login
+      let realPrice: any =
+        selectedCourse.attributes.discount != null &&
+        selectedCourse.attributes.discount != 0
+          ? selectedCourse.attributes.discount
+          : selectedCourse.attributes.price;
+
+      const payload = {
+        courseId: type === "package" ? 0 : Number(courseid),
+        qty: quantity,
+        course: selectedCourse.attributes,
+        total: realPrice * quantity,
+        packageId: Number(type === "package" ? selectedCourse.id : 0),
+      };
+
+      toast.error(`Please Login first`);
+
+      localStorage.setItem("cartData", JSON.stringify(payload));
+      router.push("/login");
+    }
+  }
+
+  return (
+    <div className="self-stretch pt-3 flex-col justify-start items-start flex w-[90%]">
+      <div
+        className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex"
+        style={{ width: "100%", margin: "auto" }}
+      >
+        <div
+          onClick={() => enrollNow2(course)}
+          className="grow cursor-pointer shrink basis-0 h-[40px]  px-[18px] py-3 bg-[#2970fe] rounded-[10px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden"
+        >
+          <div className="px-0.5 justify-center items-center flex">
+            <div
+              className="text-white  font-bold font-['Inter'] leading-7"
+              style={{ fontSize: "18px" }}
+            >
+              {course?.category?.data?.attributes?.title == "eBook"
+                ? "GET ACCESS"
+                : "Enroll now"}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EnrollNowCart;
