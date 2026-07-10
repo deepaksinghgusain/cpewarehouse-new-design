@@ -199,7 +199,13 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                     </div>
                                 </div>
                             </div>
-                            <div className="mt-4 flex-col justify-start items-start gap-3 flex">
+                             <EnrollNowCart
+                              course={{ ...packageData, id: packageId }}
+                              quantity={1}
+                              type="package"
+                            />
+
+                            {/* <div className="mt-4 flex-col justify-start items-start gap-3 flex">
                                 <div className="justify-start items-center gap-6 inline-flex">
                                     <div className="justify-start items-start gap-3 flex">
                                         <div
@@ -212,7 +218,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="self-stretch mt-10 flex-col justify-start items-start gap-5 flex">
                                 <div className="self-stretch  flex-col justify-start items-start gap-8 flex">
                                     <div className="self-stretch justify-start items-center gap-5 inline-flex">

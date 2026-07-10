@@ -106,93 +106,89 @@ const EnrollNowCart = ({
   quantity: number;
   type?: string;
 }) => {
-  console.log(
-    "EnrollNowCart rendered with course:",
-    course,
-    "and quantity:",
-    quantity,
-  );
-
   const [isPurchased, setIsPurchased] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
 
-  async function enrollNow2(selectedCourse: any) {
-    // if cart does not exist then create a cart
-    const courseid = selectedCourse["id"] || 0;
-    const price = selectedCourse["attributes"]["price"];
-    const category =
-      selectedCourse?.attributes["category"]?.data?.attributes["title"] || "";
+  const normalizeCourse = (selectedCourse: any) => {
+    const attributes = selectedCourse?.attributes ?? selectedCourse ?? {};
+    return {
+      id: selectedCourse?.id ?? attributes?.id ?? 0,
+      title: selectedCourse?.title ?? attributes?.title ?? "",
+      price: attributes?.price ?? selectedCourse?.price ?? 0,
+      discount: attributes?.discount ?? selectedCourse?.discount ?? 0,
+      discountedPrice:
+        attributes?.discountedPrice ?? selectedCourse?.discountedPrice ?? 0,
+      categoryTitle:
+        attributes?.category?.data?.attributes?.title ||
+        selectedCourse?.category?.data?.attributes?.title ||
+        "",
+      endDate: attributes?.endDate ?? selectedCourse?.endDate,
+      attributes,
+    };
+  };
 
-    if (
-      new Date(selectedCourse.attributes["endDate"]) < new Date() &&
-      category == "Live"
-    ) {
-      toast.error("Course expired");
-      return;
+  async function enrollNow2(selectedCourse: any) {
+    const normalized = normalizeCourse(selectedCourse);
+    const courseid = normalized.id;
+    const category = normalized.categoryTitle;
+    const isPackage = type === "package";
+
+    if (category === "Live" && normalized.endDate) {
+      const endDate = new Date(normalized.endDate);
+      if (endDate < new Date()) {
+        toast.error("Course expired");
+        return;
+      }
     }
+
+    const price = isPackage
+      ? normalized.discountedPrice || normalized.price
+      : normalized.discount || normalized.price;
 
     if (localStorage.getItem("token")) {
       const email = localStorage.getItem("email") || "";
+      let alreadyPurchased = false;
 
-      let res = await checkAlreadyCoursePurchased(courseid, email);
-
-      const dts = res?.data?.userCourses?.data || [];
-
-      if (dts.length == 0) {
-        setIsPurchased(false); // no course found for the user
+      if (!isPackage && courseid > 0) {
+        const res = await checkAlreadyCoursePurchased(courseid, email);
+        const dts = res?.data?.userCourses?.data || [];
+        alreadyPurchased =
+          dts.length > 0 && dts[0].attributes?.course?.data?.id == courseid;
+        setIsPurchased(alreadyPurchased);
       }
-      if (dts.length > 0 && dts[0].attributes?.course?.data.id == courseid) {
-        setIsPurchased(true); // course already purchased
-      }
-      if (isPurchased) {
-        toast.error("You have allready purchased our course");
+
+      if (alreadyPurchased) {
+        toast.error("You have already purchased our course");
         return;
       }
 
-      let realPrice: any =
-        selectedCourse.attributes.discount != null &&
-        selectedCourse.attributes.discount != 0
-          ? selectedCourse.attributes.discount
-          : selectedCourse.attributes.price;
-
-      const totalprice = realPrice * quantity;
-
+      const totalprice = price * quantity;
       const payload = {
-        courseId: type === "package" ? 0 : Number(courseid),
+        courseId: isPackage ? 0 : Number(courseid),
         qty: quantity,
-        course: selectedCourse.attributes,
+        course: normalized.attributes,
         total: totalprice,
-        packageId: Number(type === "package" ? selectedCourse.id : 0),
+        packageId: Number(isPackage ? courseid : 0),
       };
 
-      toast.success(
-        `Item ${selectedCourse["title"]} is add to cart successfully`,
-      );
-
+      toast.success(`Item ${normalized.title} is add to cart successfully`);
       dispatch(addToCartRequest(payload));
 
       setTimeout(() => {
         router.push("/checkout");
-      }, 1000)
+      }, 5000);
     } else {
-      // not logged in: save a local cart and redirect to login
-      let realPrice: any =
-        selectedCourse.attributes.discount != null &&
-        selectedCourse.attributes.discount != 0
-          ? selectedCourse.attributes.discount
-          : selectedCourse.attributes.price;
-
+      const totalprice = price * quantity;
       const payload = {
-        courseId: type === "package" ? 0 : Number(courseid),
+        courseId: isPackage ? 0 : Number(courseid),
         qty: quantity,
-        course: selectedCourse.attributes,
-        total: realPrice * quantity,
-        packageId: Number(type === "package" ? selectedCourse.id : 0),
+        course: normalized.attributes,
+        total: totalprice,
+        packageId: Number(isPackage ? courseid : 0),
       };
 
       toast.error(`Please Login first`);
-
       localStorage.setItem("cartData", JSON.stringify(payload));
       router.push("/login");
     }

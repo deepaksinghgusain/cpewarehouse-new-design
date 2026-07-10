@@ -28,9 +28,10 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
     }
   };
 
-  let selectedCourse : any = {};
-
-  selectedCourse.attributes= courseData;
+  const selectedCourse: any = {
+    id: courseData?.id,
+    attributes: courseData,
+  };
 
   const updateTotal = () => {
     let total = 0;

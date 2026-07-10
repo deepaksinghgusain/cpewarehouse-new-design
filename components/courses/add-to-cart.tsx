@@ -102,34 +102,28 @@ const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, q
         console.log(selectedCourse)
 
         // if cart does not exist then create a cart
-        const courseid = selectedCourse["id"] || 0;
-        const price = selectedCourse['attributes']['price']
-        const category = selectedCourse?.attributes['category']?.data?.attributes['title'] || '';
+        const courseid = selectedCourse?.id || selectedCourse?.attributes?.id || 0;
+        const price = selectedCourse?.attributes?.price || selectedCourse?.price;
+        const category = selectedCourse?.attributes?.category?.data?.attributes?.title || '';
 
-        if (new Date(selectedCourse.attributes['endDate']) < new Date() && category == 'Live') {
-
+        if (new Date(selectedCourse?.attributes?.endDate) < new Date() && category == 'Live') {
             toast.error("Course expired")
             return;
         }
 
         if (localStorage.getItem('token')) {
-
             const email = localStorage.getItem('email') || ''
 
             let res = await checkAlreadyCoursePurchased(courseid, email)
 
             const dts = res?.data?.userCourses?.data || []
+            const alreadyPurchased = dts.length > 0 && dts[0].attributes?.course?.data?.id == courseid;
 
-            if (dts.length == 0) {
-                setIsPurchased(false);  // no course found for the user
-            }
-            if (dts.length > 0 && dts[0].attributes?.course?.data.id == courseid) {
-                setIsPurchased(true); // course already purchased
-            }
-            if (isPurchased) {
-                toast.error("You have allready purchased our course")
+            setIsPurchased(alreadyPurchased);
+            if (alreadyPurchased) {
+                toast.error("You have already purchased our course")
                 return;
-            };
+            }
 
             let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
                 ? selectedCourse.attributes.discount
