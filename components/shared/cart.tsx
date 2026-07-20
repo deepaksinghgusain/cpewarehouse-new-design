@@ -77,7 +77,7 @@ export function CartComponent() {
                     <SheetTrigger asChild>
                         <Button variant="default" className="relative rounded-2xl px-6">
                             <Image src="/assets/images/cart.gif" height={30} width={30} className="h-[30px] w-[30px]" alt="" />
-                            {cartItems.length > 0 && (
+                            {isAuthenticated && cartItems.length > 0 && (
                                 <Badge className="bg-blue-600 text-white absolute -top-1 right-[6px]">
                                     {cartItems.length}
                                 </Badge>

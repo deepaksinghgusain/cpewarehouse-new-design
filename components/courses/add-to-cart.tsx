@@ -99,8 +99,6 @@ const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, q
 
     async function enrollNow2(selectedCourse: any) {
 
-        console.log(selectedCourse)
-
         // if cart does not exist then create a cart
         const courseid = selectedCourse?.id || selectedCourse?.attributes?.id || 0;
         const price = selectedCourse?.attributes?.price || selectedCourse?.price;
@@ -139,7 +137,7 @@ const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, q
                 packageId: Number(type === "package" ? selectedCourse.id : 0),
             }
 
-            toast.success(`Item ${selectedCourse['title']} is add to cart successfully`)
+            toast.success(`Item ${selectedCourse['attributes']['title']} is add to cart successfully`)
 
             dispatch(addToCartRequest(payload))
         } else {

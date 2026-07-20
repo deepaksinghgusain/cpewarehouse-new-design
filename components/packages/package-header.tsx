@@ -7,7 +7,7 @@ import { imageUrl } from "@/lib/constants";
 import { Button } from '../ui/button';
 import { Minus, Plus } from 'lucide-react';
 
-const PackageHeader = ({ packageData }: any) => {
+const PackageHeader = ({ packageData, selectedCourse }: any) => {
     const [seats, setSeats] = useState(1);
 
     return (
@@ -81,7 +81,7 @@ const PackageHeader = ({ packageData }: any) => {
                                 </div>
                             </div>
 
-                            <EnrollNowCart course={packageData} quantity={seats} className="bg-emerald-600 hover:bg-emerald-700 text-white flex item-center rounded-xl px-5 h-10 tracking-wide"
+                            <EnrollNowCart course={selectedCourse} type="package" quantity={seats} className="bg-emerald-600 hover:bg-emerald-700 text-white flex item-center rounded-xl px-5 h-10 tracking-wide"
                             />
 
                         </div>

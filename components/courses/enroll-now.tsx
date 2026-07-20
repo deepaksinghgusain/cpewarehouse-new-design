@@ -132,6 +132,7 @@ const EnrollNowCart = ({
 
   async function enrollNow2(selectedCourse: any) {
     const normalized = normalizeCourse(selectedCourse);
+
     const courseid = normalized.id;
     const category = normalized.categoryTitle;
     const isPackage = type === "package";
@@ -152,7 +153,7 @@ const EnrollNowCart = ({
       const email = localStorage.getItem("email") || "";
       let alreadyPurchased = false;
 
-      if (!isPackage && courseid > 0) {
+      if (isPackage && courseid > 0) {
         const res = await checkAlreadyCoursePurchased(courseid, email);
         const dts = res?.data?.userCourses?.data || [];
         alreadyPurchased =
@@ -173,6 +174,8 @@ const EnrollNowCart = ({
         total: totalprice,
         packageId: Number(isPackage ? courseid : 0),
       };
+
+      console.log("payload", payload);
 
       toast.success(`Item ${normalized.title} is add to cart successfully`);
       dispatch(addToCartRequest(payload));

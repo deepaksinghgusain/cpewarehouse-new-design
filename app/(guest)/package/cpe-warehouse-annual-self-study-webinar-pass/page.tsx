@@ -17,6 +17,13 @@ const page = async () => {
 
     const packageData = res?.packages?.data[0]?.attributes;
 
+    
+    const selectedCourse: any = {
+        id: res?.packages?.data[0]?.id,
+        attributes: packageData,
+    };
+
+
     function getInstructorName(instructors: any) {
         const name: string[] = []
         instructors.data.forEach((element: any, index: number) => {
@@ -85,7 +92,7 @@ const page = async () => {
 
     return (<>
         <section className="mx-auto">
-            <PackageHeader packageData={packageData} />
+             <PackageHeader packageData={packageData} selectedCourse={selectedCourse} />
         </section>
 
         <section className="w-[90%] mx-auto mt-10">
