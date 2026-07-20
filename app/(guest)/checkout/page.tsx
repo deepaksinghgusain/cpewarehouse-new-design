@@ -844,9 +844,6 @@ const CheckoutPage = () => {
                                                                     <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">{title}</div>
                                                                     <div className="self-stretch text-[#475467] text-sm font-normal font-['Inter'] leading-normal">{date}</div>
                                                                 </div>
-                                                                <div className="justify-center items-center gap-2 inline-flex overflow-hidden">
-                                                                    <div className="text-[#156fee] text-base font-semibold font-['Inter'] leading-normal">Add to my Calendar</div>
-                                                                </div>
                                                             </div>
                                                         </td>
                                                         <td>

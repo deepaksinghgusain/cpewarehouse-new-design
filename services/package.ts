@@ -19,121 +19,203 @@ export async function getPackageDetailbByGql(slug: string) {
 }
 
 function getPackageDetailGql(slug: string) {
-  return gql`query {
-    packages(filters:{slug:{eq:"${slug}"}}){
-  data{
-    id
-    attributes{
-      title
-      desc
-      price
-      slug
-      discountedPrice
-      outline
-      createdAt
-      image{
-        data{
-          attributes{
-            url
-          }
-        }
+  return gql`
+     query {
+  packages(
+    filters: {
+      slug: {
+        eq: "${slug}"
       }
-      faqs{
-        title
-        sub_title
-        faq{
-          answer
-          question
-        }
-      }
-      key_features {
-        value
-      }
-
-      keywords
-
-      cpe_info
-
-      inclusion {
-        heading
-        title
-        sub_title
-        image{
-        data{
-            attributes{
-              url
-            }
-          }
-        }
-        list {
-          icon {
-            data{
-              attributes{
-                url
-              }
-            }
-          }
+    }
+  ) {
+    data {
+      id
+      attributes {
+        packege_outlines {
+          id
           title
-          item {
+          list {
             value
           }
         }
-      }
-      courses(filters:{isActive:{eq:true},forTaxLaw:{eq:true}},pagination: { limit: -1 }){
-        data{
-          id
-          attributes{
+
+        package_includes {
           title
-          slug
-          credit 
-          shortDesc
-          startDate
-          endDate
-          programNumber
-          medium
-          fieldOfStudy
-          price
-          discount
-          videoUrl
-          webinarId
-            category{
-              data{
-                attributes{
-                  title
-                }
-              }
-            }
-            image{
-              data{
-                attributes{
+          list {
+            image {
+              data {
+                attributes {
                   url
                 }
               }
             }
-            
-            instructors(	
-              pagination: { limit: -1 }){
-              data{
-                attributes{
-                  firstName
-                  lastName
+            title
+          }
+        }
+        package_attend {
+          title
+          list {
+            value
+          }
+        }
 
-                   image{
-                  data{
-                  attributes{
+        accredited_partners {
+          id
+          title
+          description
+          bg_image {
+            data {
+              attributes {
+                url
+              }
+            }
+          }
+          list {
+            image {
+              data {
+                attributes {
+                  url
+                }
+              }
+            }
+          }
+        }
+
+        package_sponser {
+          id
+          title
+          description
+          list {
+            value
+          }
+
+          features {
+            value
+          }
+        }
+        title
+        desc
+        price
+        slug
+        discountedPrice
+        outline
+        createdAt
+        image {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        faqs {
+          title
+          sub_title
+          faq {
+            answer
+            question
+          }
+        }
+        key_features {
+          value
+        }
+
+        keywords
+
+        cpe_info
+
+        inclusion {
+          heading
+          title
+          sub_title
+          image {
+            data {
+              attributes {
+                url
+              }
+            }
+          }
+          list {
+            icon {
+              data {
+                attributes {
+                  url
+                }
+              }
+            }
+            title
+            item {
+              value
+            }
+          }
+        }
+
+        packege_outlines {
+          id
+          title
+          list {
+            value
+          }
+        }
+
+        courses(
+          filters: { isActive: { eq: true }, forTaxLaw: { eq: true } }
+          pagination: { limit: -1 }
+        ) {
+          data {
+            id
+            attributes {
+              title
+              slug
+              credit
+              shortDesc
+              startDate
+              endDate
+              programNumber
+              medium
+              fieldOfStudy
+              price
+              discount
+              videoUrl
+              webinarId
+              category {
+                data {
+                  attributes {
+                    title
+                  }
+                }
+              }
+              image {
+                data {
+                  attributes {
                     url
                   }
-}}
+                }
+              }
+
+              instructors(pagination: { limit: -1 }) {
+                data {
+                  attributes {
+                    firstName
+                    lastName
+
+                    image {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           }
         }
       }
-      
-      
-    }
     }
   }
-}`;
+}
+
+
+`;
 }
