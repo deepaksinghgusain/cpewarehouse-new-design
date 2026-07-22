@@ -153,9 +153,9 @@ const EnrollNowCart = ({
       const email = localStorage.getItem("email") || "";
       let alreadyPurchased = false;
 
-      if (isPackage && courseid > 0) {
+      if (!isPackage && courseid > 0) {
         const res = await checkAlreadyCoursePurchased(courseid, email);
-        const dts = res?.data?.userCourses?.data || [];
+        const dts = res?.userCourses?.data || [];
         alreadyPurchased =
           dts.length > 0 && dts[0].attributes?.course?.data?.id == courseid;
         setIsPurchased(alreadyPurchased);

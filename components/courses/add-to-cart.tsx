@@ -114,9 +114,9 @@ const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, q
 
             let res = await checkAlreadyCoursePurchased(courseid, email)
 
-            const dts = res?.data?.userCourses?.data || []
+            const dts = res?.userCourses?.data || []
             const alreadyPurchased = dts.length > 0 && dts[0].attributes?.course?.data?.id == courseid;
-
+            
             setIsPurchased(alreadyPurchased);
             if (alreadyPurchased) {
                 toast.error("You have already purchased our course")

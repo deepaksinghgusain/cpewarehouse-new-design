@@ -154,10 +154,10 @@ const SuccessMessage = ({ session_id }: { session_id: any }) => {
                 {/* Buttons */}
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                     <Link
-                        href="/"
+                        href="/learner/dashboard"
                         className="flex-1 rounded-lg border border-gray-300 px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-100"
                     >
-                        Continue Shopping
+                        Goto to Dashboard
                     </Link>
                 </div>
 
