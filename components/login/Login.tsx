@@ -14,7 +14,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Button } from '../ui/button';
 import { ArrowRight, Loader } from 'lucide-react';
 import { login } from '@/services/auth';
-import { redirect } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
 import { useDispatch } from 'react-redux';
 import { userLoginRequest } from '@/store/actions/user-actions';
@@ -32,6 +32,8 @@ const loginSchema = z.object({
 
 const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => {
     const dispatch = useDispatch();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [open, setOpen] = useState(false)
     const [error, setError] = useState("")
     const [mounted, setMounted] = useState(false)
@@ -111,7 +113,10 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                     localStorage.removeItem('rem_pass');
                 }
 
-                redirect("/learner/dashboard")
+                const callbackUrl = searchParams.get('callbackUrl');
+                const destination = callbackUrl ? decodeURIComponent(callbackUrl) : '/learner/dashboard';
+
+                router.push(destination)
             } else {
                 setOpen(true)
                 setError(res.error.message)

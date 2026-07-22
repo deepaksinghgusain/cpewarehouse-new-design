@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addToCartRequest } from "@/store/actions/cart-actions";
@@ -103,14 +103,17 @@ const EnrollNowCart = ({
   type,
   className
 }: {
-    course: any;
-    quantity: number;
-    type?: string;
-    className?: string;
-  }) => {
+  course: any;
+  quantity: number;
+  type?: string;
+  className?: string;
+}) => {
   const [isPurchased, setIsPurchased] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const callbackUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
   const normalizeCourse = (selectedCourse: any) => {
     const attributes = selectedCourse?.attributes ?? selectedCourse ?? {};
@@ -195,7 +198,8 @@ const EnrollNowCart = ({
 
       toast.error(`Please Login first`);
       localStorage.setItem("cartData", JSON.stringify(payload));
-      router.push("/login");
+      router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+
     }
   }
 
