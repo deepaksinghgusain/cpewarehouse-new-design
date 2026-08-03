@@ -74,7 +74,15 @@ const cartSlice = createSlice({
 		},
 		addItem(state, action: PayloadAction<any>) {
 			const item = action.payload;
-			const existing = state.items.find((i: any) => i.courseId === item.courseId || i.id === item.id);
+			const existing = state.items.find((i: any) => {
+				if (item.packageId && i.packageId) {
+					return i.packageId === item.packageId;
+				}
+				if (item.courseId && i.courseId) {
+					return i.courseId === item.courseId;
+				}
+				return i.courseId === item.courseId || i.id === item.id;
+			});
 			if (existing) {
 				existing.qty = item.qty;
 			} else {
@@ -87,7 +95,7 @@ const cartSlice = createSlice({
 			}, 0);
 		},
 		removeItem(state, action: PayloadAction<number>) {
-			state.items = state.items.filter((i: any) => i.courseId !== action.payload && i.id !== action.payload);
+			state.items = state.items.filter((i: any) => i.courseId !== action.payload && i.id !== action.payload && i.packageId !== action.payload);
 			state.total = state.items.reduce((acc: number, item: any) => {
 				const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
 				const qty = item.qty || item.quantity || 1;

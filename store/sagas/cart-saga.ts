@@ -73,24 +73,46 @@ function* handleAddToCart(action: any): Generator<any, any, any> {
   }
 }
 
+function getCartItemIdentity(item: any) {
+  return {
+    courseId: Number(item?.courseId ?? item?.id ?? 0) || 0,
+    packageId: Number(item?.packageId ?? 0) || 0,
+  };
+}
+
+function isSameCartItem(item: any, target: any) {
+  const left = getCartItemIdentity(item);
+  const right = getCartItemIdentity(target);
+
+  if (left.packageId && right.packageId) {
+    return left.packageId === right.packageId;
+  }
+
+  if (left.courseId && right.courseId) {
+    return left.courseId === right.courseId;
+  }
+
+  return left.courseId === right.courseId && left.packageId === right.packageId;
+}
+
 function buildFullCartBody(cartState: any, payload: any) {
-  const courseId = payload.item?.courseId || payload.item?.id || 0;
+  const courseId = payload.item?.courseId || 0;
+  const packageId = payload.item?.packageId || 0;
   const qty = payload.qty ?? payload.item?.qty ?? payload.item?.quantity ?? 0;
   const remove = payload.remove === true;
   let found = false;
 
   const items = cartState.items
     .map((item: any) => {
-      const key = item.courseId || item.id;
-      if (remove && key === (payload.item?.courseId || payload.item?.id)) {
+      if (remove && isSameCartItem(item, payload.item)) {
         found = true;
         return null;
       }
 
-      if (key === (payload.item?.courseId || payload.item?.id)) {
+      if (isSameCartItem(item, payload.item)) {
         found = true;
         return {
-          courseId: item.courseId || item.id,
+          courseId: item.courseId,
           qty,
           packageId: item.packageId || 0,
           Enrollment: item.Enrollment || [
@@ -107,12 +129,12 @@ function buildFullCartBody(cartState: any, payload: any) {
       }
 
       return {
-        courseId: item.courseId || item.id,
+        courseId: item.courseId,
         qty: item.qty || item.quantity || 1,
         packageId: item.packageId || 0,
         Enrollment: item.Enrollment || [
           {
-            courseId: item.courseId || item.id,
+            courseId: item.courseId,
             email: typeof window !== "undefined" ? localStorage.getItem("email") || "" : "",
             name: item.name || item.course?.data?.attributes?.name || "",
             lastname: item.lastname || "",
@@ -128,7 +150,7 @@ function buildFullCartBody(cartState: any, payload: any) {
     items.push({
       courseId,
       qty,
-      packageId: payload.item?.packageId || 0,
+      packageId,
       Enrollment: payload.item?.Enrollment || [
         {
           courseId,
@@ -136,7 +158,7 @@ function buildFullCartBody(cartState: any, payload: any) {
           name: payload.item?.name || payload.item?.course?.data?.attributes?.name || "",
           lastname: payload.item?.lastname || "",
           ptin: payload.item?.ptin || "",
-          packageId: payload.item?.packageId || 0,
+          packageId,
         },
       ],
     });
@@ -166,6 +188,7 @@ function* handleUpdateCart(action: any): Generator<any, any, any> {
     const cartState = yield select((state: any) => state.cart);
     const cartId = payload.cartId || cartState.cartId;
     if (!cartId) return;
+
 
     const body = buildFullCartBody(cartState, payload);
     const resp = yield call(updateCartAPI, cartId, body);
