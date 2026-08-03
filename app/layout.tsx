@@ -26,9 +26,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ApolloWrapper>{children}</ApolloWrapper>
-
-        <CookieConsent />
+        <ApolloWrapper>
+          <>
+            {children}
+            <CookieConsent />
+          </>
+        </ApolloWrapper>
 
         <ToastContainer 
           position="top-center" 

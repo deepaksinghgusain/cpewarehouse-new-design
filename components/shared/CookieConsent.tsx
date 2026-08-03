@@ -20,11 +20,13 @@ export default function CookieConsent() {
 
 
         if (value === "accepted") {
-            dispatch(userLogoutRequest());
 
             const userData = await userInfo()
 
             if (!("id" in userData)) {
+
+                dispatch(userLogoutRequest());
+                
                 localStorage.removeItem('remember');
                 localStorage.removeItem('token');
                 localStorage.removeItem('username');
