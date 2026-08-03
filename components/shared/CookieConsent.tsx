@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { userInfo } from "@/services/auth";
+import { userLogoutRequest } from "@/store/actions/user-actions";
+import { useDispatch } from "react-redux";
 
 export default function CookieConsent() {
     const [open, setOpen] = useState(false);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const timer = window.setTimeout(() => setOpen(true), 300);
@@ -17,6 +20,7 @@ export default function CookieConsent() {
 
 
         if (value === "accepted") {
+            dispatch(userLogoutRequest());
 
             const userData = await userInfo()
 
