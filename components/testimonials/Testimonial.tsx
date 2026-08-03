@@ -99,8 +99,10 @@ const Testimonial = () => {
                             onSwiper={(swiper) => (swiperRef.current = swiper)}
                             spaceBetween={30}
                             slidesPerView={1}
+                            slidesPerGroup={1}
                             autoplay={{ delay: 3000 }}
-                            loop={true}
+                            loop={testimonials.length > 1}
+                            allowTouchMove={testimonials.length > 1}
                         >
                             {testimonials.map((item: any) => (
                                 <SwiperSlide key={item.id}>

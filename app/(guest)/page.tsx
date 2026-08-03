@@ -64,7 +64,7 @@ export default async function page() {
                     <div className="self-stretch justify-start items-start gap-3 inline-flex" key={index}>
                       <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
                         <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
-                          <Image src="/assets/images/check-icon.png" fill className="h-6 mr-2" alt="" />
+                          <Image src="/assets/images/check-icon.png" fill sizes="28px" className="h-6 mr-2" alt="" />
                         </div>
                       </div>
                       <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
@@ -87,7 +87,7 @@ export default async function page() {
             </div>
           </div>
           <div className="w-full h-full">
-            <Image alt='' src={imageUrl + frontPageBanner?.image?.data?.attributes?.url} height={800} width={800} />
+            <Image alt='' src={imageUrl + frontPageBanner?.image?.data?.attributes?.url} height={800} width={800} loading="eager" />
           </div>
         </div>
       </section>
@@ -122,7 +122,7 @@ export default async function page() {
       </div>
 
       <div className="relative w-[90%] mx-auto h-[600px] mt-16 ">
-        <Image src={imageUrl + highlightsimple?.image?.data?.attributes?.url} alt="" fill className="object-cover" />
+        <Image src={imageUrl + highlightsimple?.image?.data?.attributes?.url} alt="" fill sizes="(max-width: 768px) 100vw, 90vw" className="object-cover" />
       </div>
 
       <section className="bg-[#eef4ff] mt-10">
@@ -146,7 +146,7 @@ export default async function page() {
                   </div>
                 </div>
                 <div className="w-[480px] h-[400px] relative">
-                  <Image fill alt='' src={imageUrl + liveWebinarPass.image.data.attributes.url} />
+                  <Image fill alt='' sizes="(max-width: 768px) 100vw, 480px" src={imageUrl + liveWebinarPass.image.data.attributes.url} />
                 </div>
               </div>
             </div>
@@ -173,7 +173,7 @@ export default async function page() {
                   <div key={index} className="flex-1 h-[560px] min-w-80 rounded-[10px] solid border border-[#dadee3]  inline-flex flex-col justify-start items-start gap-5">
                     <div className="self-stretch h-48 relative bg-gradient-to-b from-Colors-Cyan-25 to-gray-300 rounded-tr-[10px] rounded-br-[10px]">
                       <div className="w-44 h-36 pt-2 left-[97px] top-[29px] absolute inline-flex justify-center items-start">
-                        <Image alt='' className="w-full h-full object-contain" fill src={imageUrl + list.image.data.attributes.url} />
+                        <Image alt='' className="w-full h-full object-contain" fill sizes="(max-width: 768px) 100vw, 33vw" src={imageUrl + list.image.data.attributes.url} />
                       </div>
                     </div>
                     <div className="self-stretch p-4 flex flex-col justify-start items-start gap-6">
