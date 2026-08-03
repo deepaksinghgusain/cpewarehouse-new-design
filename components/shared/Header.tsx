@@ -54,7 +54,7 @@ export const Header = () => {
                                 <div className="flex items-center w-[300px]">
                                     <Link href="/">
                                         {
-                                            logo && <Image src={logo} alt="LOGO" height={200} width={200} style={{ width: "auto", height: "auto" }} />
+                                            logo && <Image src={logo} alt="LOGO" height={300} width={300} />
                                         }
                                     </Link>
                                 </div>
