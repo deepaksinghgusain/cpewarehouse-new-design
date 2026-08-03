@@ -15,13 +15,10 @@ export default function CookieConsent() {
     const handleConsent = async (value: "accepted" | "declined") => {
         document.cookie = `cookieConsent=${value}; path=/; max-age=31536000; SameSite=Lax`;
 
-        console.log(`Cookie consent ${value} and cookie set:`);
 
         if (value === "accepted") {
-            console.log("User accepted cookies. You can add your analytics or tracking code here.");
 
             const userData = await userInfo()
-            console.log("User data:", userData);
 
             if (!("id" in userData)) {
                 localStorage.removeItem('remember');

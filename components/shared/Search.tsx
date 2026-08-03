@@ -19,7 +19,6 @@ export default function SearchComponent() {
     const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)
         const results = await getAllCourseForSearch(e.target.value)
-        // console.log("results", results.data)
         setFiltered(results.data)
     }
 

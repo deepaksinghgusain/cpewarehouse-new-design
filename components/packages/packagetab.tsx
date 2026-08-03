@@ -6,8 +6,6 @@ import { Button } from '../ui/button'
 
 const PackageTab = ({ packageData }: any) => {
 
-    console.log(packageData, "packageData")
-
     return (
         <Tabs defaultValue="outline" className="w-full bg-transparent mb-10 ">
             <TabsList variant="line" className="w-[400px] bg-transparent ">

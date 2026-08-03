@@ -114,7 +114,6 @@ export function CartComponent() {
                                         </div>
                                     ) : (
                                         cartItems.map((item: any) => {
-                                            console.log("Cart item:", item);
                                             const rawTitle =
                                                 item.course?.data?.attributes?.title ||
                                                 item.course?.title ||
@@ -139,7 +138,6 @@ export function CartComponent() {
                                                 imageUrlConstant + item.course?.url ||
                                                 "/assets/images/cart.gif"
 
-                                            console.log({item}, item.course?.url)
 
                                             return (
                                                 <div

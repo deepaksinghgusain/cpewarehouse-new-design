@@ -119,7 +119,6 @@ const ProfileForm = () => {
             });
 
             let res = await response.json();
-            console.log(res);
 
             if (res.status === 200) {
                 setSuccess(true);

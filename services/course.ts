@@ -38,8 +38,6 @@ export async function getcoursesBySlug(slug: any) {
     fetchPolicy: "network-only",
   });
 
-  console.log(data);
-
   if (!data) return {};
 
   return data?.courses;

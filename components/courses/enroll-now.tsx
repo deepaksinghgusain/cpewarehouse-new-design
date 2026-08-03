@@ -20,8 +20,6 @@ const httpLink = new HttpLink({
 const authLink = new ApolloLink((operation, forward) => {
   const token = localStorage.getItem("token");
 
-  console.log(token);
-
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
@@ -177,8 +175,6 @@ const EnrollNowCart = ({
         total: totalprice,
         packageId: Number(isPackage ? courseid : 0),
       };
-
-      console.log("payload", payload);
 
       toast.success(`Item ${normalized.title} is add to cart successfully`);
       dispatch(addToCartRequest(payload));

@@ -14,7 +14,6 @@ const PackageTabs = ({
   twoLettertimezone,
 }: any) => {
 
-    console.log("packageData", packageData);
   return (
     <Tabs defaultValue="outline" className="w-full bg-transparent ">
       <TabsList variant="line" className="w-full bg-transparent ">

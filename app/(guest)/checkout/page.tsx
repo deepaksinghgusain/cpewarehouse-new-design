@@ -31,7 +31,6 @@ const CheckoutPage = () => {
         }
         return '';
     }
-    console.log("Cart data in checkout page:", cart);
     const items = cart?.items || [];
     const enrollments = items.reduce((acc: number, it: any) => acc + (it.qty || it.quantity || 1), 0);
     const subtotal = items.reduce((acc: number, it: any) => acc + ((it.course?.price || 0) * (it.qty || 1)), 0);
@@ -221,7 +220,6 @@ const CheckoutPage = () => {
         const filteredEnrolls: any[] = [];
         participantDetailsByItem.forEach((it) => it.enrolls.forEach((e) => { if (e.name || e.email) filteredEnrolls.push(e); }));
 
-        console.log('enrolls ', filteredEnrolls);
 
         addOrder();
     }
@@ -578,7 +576,6 @@ const CheckoutPage = () => {
                 },
             };
 
-            console.log('ORDER DATA', orderData);
 
             // PAID EVENTS
             if (lengthOfCartItems !== freeEvents) {
@@ -628,10 +625,6 @@ const CheckoutPage = () => {
 
                 let od: any = await addOrderApi(orderData);
 
-                console.log(
-                    'FREE ORDER RESPONSE',
-                    JSON.stringify(od, null, 2)
-                );
 
                 if (
                     od &&
@@ -803,7 +796,6 @@ const CheckoutPage = () => {
                                             items.map((item: any, idx: number) => {
                                                 const qty = item.qty || item.quantity || 1;
                                                 const rawTitle = item.course?.data?.attributes?.title || item.course?.data?.attributes?.name || item.course?.attributes?.title || item.title || item.name || item.course?.title;
-                                                console.log('rawTitle', rawTitle, 'item', item);
                                                 const title = resolveText(rawTitle) || 'Untitled Course';
                                                 const date = item.course?.data?.attributes?.date || item.date || '';
                                                 const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;

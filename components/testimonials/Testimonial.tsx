@@ -80,7 +80,6 @@ const Testimonial = () => {
     useEffect(() => {
         getTestimonial().then((data) => {
             setTestimonial(data.data);
-            console.log(data);
         });
 
         getHomePageSection().then((res) => {

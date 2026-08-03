@@ -133,7 +133,6 @@ function InvoiceCard({ invoice, invoicesTem }: any) {
 
           doc.save(`invoice_${InvoiceNo}.pdf`);
 
-          console.log("invoice downloaded successfully");
         },
       });
 

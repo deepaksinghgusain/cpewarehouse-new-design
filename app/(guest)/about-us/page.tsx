@@ -3,10 +3,7 @@ import { getAboutus } from '@/services/common';
 import React from 'react'
 
 const AboutPage = async () => {
-  const res = await getAboutus()
-
-  console.log(res?.data[0]?.attributes?.blocks);
-  
+  const res = await getAboutus()  
 
   let aboutFirst: any;
   let commitment: any;

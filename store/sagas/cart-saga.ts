@@ -46,15 +46,12 @@ function* handleAddToCart(action: any): Generator<any, any, any> {
     const cartId = typeof window !== "undefined" ? localStorage.getItem("cartId") : null;
     const body = buildCartRequestBody(payload);
 
-    console.log("Cart request body:", body);
-
     if (!cartId || cartId === "0") {
       // create new cart
       const resp = yield call(createCart, body);      
       if (resp && resp.data) {
         localStorage.setItem("cartId", String(resp.data.id));
         const full = yield call(getCart, resp.data.id);
-        console.log({full})
         yield put(setCart(full));
       }
     } else {
@@ -62,9 +59,7 @@ function* handleAddToCart(action: any): Generator<any, any, any> {
       const updateBody = buildFullCartBody(cartState, { item: payload, qty: payload.qty });
       const resp = yield call(updateCartAPI, cartId, updateBody);
       if (resp && resp.data) {
-        console.log("Cart updated:", resp.data);
         const full = yield call(getCart, cartId);
-        console.log({full});
         yield put(setCart(full));
       }
     }

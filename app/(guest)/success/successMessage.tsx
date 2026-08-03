@@ -14,8 +14,6 @@ const authLink = new ApolloLink((operation, forward) => {
 
     const token = localStorage.getItem("token")
 
-    console.log(token)
-
     operation.setContext(({ headers = {} }) => ({
         headers: {
             ...headers,
@@ -79,8 +77,6 @@ const SuccessMessage = ({ session_id }: { session_id: any }) => {
 
     const getOrderDetail = async () => {
         const res = await getOrderBySessinId(session_id as string);
-        console.log(res)
-        console.log('res==>', res, res.orders.data[0], res.orders.data.length);
         let orderId = res.orders.data[0].id
         let title = `CPE Warehouse-success#${orderId}`;
 
@@ -102,9 +98,6 @@ const SuccessMessage = ({ session_id }: { session_id: any }) => {
                 })
             }
         }
-
-        console.log("Items Array for GTM:", itemsArray);
-        console.log("Order Title for GTM:", title);
 
         dispatch(clearCartRequest())
         localStorage.removeItem("cartId")

@@ -37,7 +37,6 @@ function StoreHydrator() {
             if (!storedCartId) return;
             try {
                 const freshCart = await getCart(storedCartId);
-                console.log("Fetched fresh cart from server:", freshCart);
                 if (freshCart) {
                     store.dispatch(setCart(freshCart));
                 }

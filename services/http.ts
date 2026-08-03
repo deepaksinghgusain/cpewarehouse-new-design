@@ -20,7 +20,6 @@ export async function apiFetch(
     revalidate,
   } = options;
 
-  console.log(url);
   
   // Get token from localStorage if available (client-side)
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;

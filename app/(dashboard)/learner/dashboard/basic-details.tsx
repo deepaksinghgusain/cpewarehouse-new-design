@@ -294,9 +294,6 @@ function RegisteredEventCard({ event, onLaunch }: any) {
                 downloadCount++;
             }
 
-            console.log(downloadCount);
-
-
             if (downloadCount === 0) {
                 setErr("No valid handouts could be downloaded.");
             } else {
@@ -552,8 +549,6 @@ const BasicDetails = () => {
         })
 
         let data = await response.json();
-        console.log(data);
-
     }
 
     async function getEventlist() {

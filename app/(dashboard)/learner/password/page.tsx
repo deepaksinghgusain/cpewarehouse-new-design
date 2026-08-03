@@ -59,7 +59,6 @@ const Password = () => {
             });
 
             let res = await response.json();
-            console.log(res);
 
             if (res?.data) {
                 setSuccess(true);
