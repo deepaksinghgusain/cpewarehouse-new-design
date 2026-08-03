@@ -3,6 +3,7 @@ import "./globals.css";
 import ApolloWrapper from "@/components/providers/apollo-wrapper";
 
 import { ToastContainer } from 'react-toastify';
+import CookieConsent from '@/components/shared/CookieConsent';
 
 import { Inter } from 'next/font/google';
 
@@ -26,6 +27,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ApolloWrapper>{children}</ApolloWrapper>
+
+        <CookieConsent />
 
         <ToastContainer 
           position="top-center" 
