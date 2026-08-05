@@ -1,18 +1,14 @@
 "use client";
 
 import { imageUrl } from '@/lib/constants'
-import moment from "moment-timezone";
+import { toUserTZ } from '@/lib/dates';
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import PaginationComponent from './PaginationComponent';
 import AddToCart from './add-to-cart';
 
 const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
-    const timezone = moment.tz.guess();
-    const timezoneAbbrv = moment().tz(timezone).format('z');
-    const firstLetter = timezoneAbbrv.charAt(0);
-    const lastLetter = timezoneAbbrv.charAt(timezoneAbbrv.length - 1);
-    const twoLettertimezone = firstLetter + lastLetter;
+    // use toUserTZ for timezone-aware formatting
 
     const [filterCourse, setFilterCourse] = useState<any>([]);
 
@@ -121,7 +117,7 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
 
                                 </div>
 
-                                <div className="px-5 h-56 pb-6 mt-4 flex-col justify-start items-start gap-[18px] inline-flex">
+                                <div className="px-5 pb-6 my-4 flex-col justify-start items-start gap-[18px] inline-flex">
                                     <div className="self-stretch justify-start items-start gap-2 inline-flex">
 
                                         {
@@ -149,9 +145,18 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                         {
                                             course.attributes?.category?.data?.attributes?.title !== "Recorded" && <div
                                                 className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-sm font-normal font-['Inter'] leading-normal">
-                                                {moment(course.attributes?.startDate.replace("Z", "")).format("dddd MMM d YYYY")} |
-                                                {moment(course.attributes?.startDate.replace("Z", "")).format("h:mm a").toUpperCase()} -
-                                                {moment(course.attributes?.endDate).format("h:mm a").toUpperCase()} {twoLettertimezone || ''}
+                                                {(() => {
+                                                    const s = toUserTZ(course.attributes?.startDate);
+                                                    const e = toUserTZ(course.attributes?.endDate);
+                                                    return (
+                                                        <>
+                                                            {s ? s.format('dddd MMM D YYYY') : ''} |
+                                                            {s ? ` ${s.format('h:mm a').toUpperCase()}` : ''} -
+                                                            {e ? ` ${e.format('h:mm a').toUpperCase()}` : ''}
+                                                            {s ? ` ${s.format('z')}` : ''}
+                                                        </>
+                                                    )
+                                                })()}
                                             </div>
                                         }
                                     </div>

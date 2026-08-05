@@ -2,17 +2,13 @@
 
 import { imageUrl } from '@/lib/constants'
 import { getAllCoursesForLive } from '@/services/course';
-import moment from "moment-timezone";
+import { toUserTZ } from '@/lib/dates';
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 const CourseCard = ({ course }: { course: any }) => {
 
-    const timezone = moment.tz.guess();
-    const timezoneAbbrv = moment().tz(timezone).format('z');
-    const firstLetter = timezoneAbbrv.charAt(0);
-    const lastLetter = timezoneAbbrv.charAt(timezoneAbbrv.length - 1);
-    const twoLettertimezone = firstLetter + lastLetter;
+    // use toUserTZ when rendering dates
 
     return (
 
@@ -93,9 +89,18 @@ const CourseCard = ({ course }: { course: any }) => {
                                 {
                                     course.attributes?.category?.data?.attributes?.title !== "Recorded" && <div
                                         className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-sm font-normal font-['Inter'] leading-normal">
-                                        {moment(course.attributes?.startDate.replace("Z", "")).format("dddd MMM d YYYY")} |
-                                        {moment(course.attributes?.startDate.replace("Z", "")).format("h:mm a").toUpperCase()} -
-                                        {moment(course.attributes?.endDate).format("h:mm a").toUpperCase()} {twoLettertimezone || ''}
+                                        {(() => {
+                                            const s = toUserTZ(course.attributes?.startDate);
+                                            const e = toUserTZ(course.attributes?.endDate);
+                                            return (
+                                                <>
+                                                    {s ? s.format('dddd MMM D YYYY') : ''} |
+                                                    {s ? ` ${s.format('h:mm a').toUpperCase()}` : ''} -
+                                                    {e ? ` ${e.format('h:mm a').toUpperCase()}` : ''}
+                                                    {s ? ` ${s.format('z')}` : ''}
+                                                </>
+                                            )
+                                        })()}
                                     </div>
                                 }
                             </div>

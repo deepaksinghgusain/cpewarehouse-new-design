@@ -50,12 +50,13 @@ export default function PaginationComponent({
     const pages = generatePagination(currentPage, totalPages)
 
     return (
-        <Pagination>
+        <Pagination className="mb-4">
             <PaginationContent>
 
                 {/* Previous */}
                 <PaginationItem>
                     <PaginationPrevious
+                        className="cursor-pointer"
                         onClick={() =>
                             currentPage > 1 && onPageChange(currentPage - 1)
                         }
@@ -67,7 +68,7 @@ export default function PaginationComponent({
                     if (page === "...") {
                         return (
                             <PaginationItem key={index}>
-                                <span className="px-3">...</span>
+                                <span className="px-3 cursor-pointer">...</span>
                             </PaginationItem>
                         )
                     }
@@ -77,7 +78,7 @@ export default function PaginationComponent({
                             <PaginationLink
                                 isActive={currentPage === page}
                                 onClick={() => onPageChange(Number(page))}
-                                className="border-gray-200"
+                                className="border-gray-200 cursor-pointer"
                             >
                                 {page}
                             </PaginationLink>

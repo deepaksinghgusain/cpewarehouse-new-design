@@ -5,7 +5,7 @@ import { getUpcomingCourse, GetUserSubscribedCourses } from '@/services/course';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { imageUrl } from '@/lib/constants';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import moment from 'moment';
+import { toUserTZ } from '@/lib/dates';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -333,12 +333,12 @@ function RegisteredEventCard({ event, onLaunch }: any) {
 
                         <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4" />
-                            {moment(event.startDate).format("ddd, MMM DD YYYY")}
+                            {toUserTZ(event.startDate)?.format("ddd, MMM DD YYYY")}
                         </div>
 
                         <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4" />
-                            {moment(event.startDate).format("h:mm A")} - {moment(event.endDate).format("h:mm A")}  ET
+                            {toUserTZ(event.startDate)?.format("h:mm A")} - {toUserTZ(event.endDate)?.format("h:mm A")} {toUserTZ(event.startDate)?.format('z')}
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -439,12 +439,12 @@ function RecommendedEventCard({ event }: any) {
 
                     <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        {moment(event.attributes.startDate).format("ddd, MMM DD YYYY")}
+                        {toUserTZ(event.attributes.startDate)?.format("ddd, MMM DD YYYY")}
                     </div>
 
                     <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
-                        {moment(event.attributes.startDate).format("h:mm A")} - {moment(event.attributes.endDate).format("h:mm A")}  ET
+                        {toUserTZ(event.attributes.startDate)?.format("h:mm A")} - {toUserTZ(event.attributes.endDate)?.format("h:mm A")} {toUserTZ(event.attributes.startDate)?.format('z')}
                     </div>
 
                     <div className="flex items-center gap-2">

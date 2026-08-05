@@ -5,17 +5,13 @@ import EnrollNowCart from "@/components/courses/enroll-now";
 import { imageUrl } from "@/lib/constants";
 import { getCart } from "@/services/cart";
 import { ChevronRight } from "lucide-react";
-import moment from "moment-timezone";
+import { toUserTZ } from '@/lib/dates';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
-  const timezone = moment.tz.guess();
-  const timezoneAbbrv = moment().tz(timezone).format("z");
-  const firstLetter = timezoneAbbrv.charAt(0);
-  const lastLetter = timezoneAbbrv.charAt(timezoneAbbrv.length - 1);
-  const twoLettertimezone = firstLetter + lastLetter;
+  // convert UTC dates to user's timezone when rendering
 
   const router = useRouter();
 
@@ -180,16 +176,18 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                             <div className="justify-start items-center gap-3 flex">
                               <div className="flex-col justify-start items-start inline-flex">
                                 <div className="text-[#475467] text-base font-normal font-['Inter'] leading-normal w-full">
-                                  {moment(
-                                    courseData?.startDate.replace("Z", ""),
-                                  ).format("dddd MMM d YYYY")}{" "}
-                                  |
-                                  {moment(
-                                    courseData?.startDate.replace("Z", ""),
-                                  ).format("h:mm a")}{" "}
-                                  -
-                                  {moment(courseData?.endDate).format("h:mm a")}{" "}
-                                  {twoLettertimezone || ""}
+                                  {(() => {
+                                    const s = toUserTZ(courseData?.startDate);
+                                    const e = toUserTZ(courseData?.endDate);
+                                    return (
+                                      <>
+                                        {s ? s.format('dddd MMM D YYYY') : ''} |
+                                        {s ? ` ${s.format('h:mm a').toUpperCase()}` : ''} -
+                                        {e ? ` ${e.format('h:mm a').toUpperCase()}` : ''}
+                                        {s ? ` ${s.format('z')}` : ''}
+                                      </>
+                                    );
+                                  })()}
                                 </div>
                               </div>
                             </div>

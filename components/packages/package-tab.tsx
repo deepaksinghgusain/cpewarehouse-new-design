@@ -6,6 +6,7 @@ import { Accordion } from "../ui/accordion";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { PlusCircle, MinusCircle } from "lucide-react";
 import moment from "moment";
+import { toUserTZ } from '@/lib/dates';
 
 const PackageTabs = ({
   packageData,
@@ -301,20 +302,20 @@ const PackageTabs = ({
                           {course.attributes?.category?.data?.attributes
                             ?.title !== "Recorded" && (
                             <div className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-sm font-normal font-['Inter'] leading-normal">
-                              {moment(
-                                course.attributes?.startDate.replace("Z", ""),
-                              ).format("dddd MMM d YYYY")}{" "}
-                              |
-                              {moment(
-                                course.attributes?.startDate.replace("Z", ""),
-                              )
-                                .format("h:mm a")
-                                .toUpperCase()}{" "}
-                              -
-                              {moment(course.attributes?.endDate)
-                                .format("h:mm a")
-                                .toUpperCase()}{" "}
-                              {twoLettertimezone || ""}
+                              {(() => {
+                                const s = toUserTZ(course.attributes?.startDate);
+                                const e = toUserTZ(course.attributes?.endDate);
+                                return (
+                                  <>
+                                    {s ? s.format('dddd MMM D YYYY') : ''} {' '}
+                                    |
+                                    {s ? ` ${s.format('h:mm a').toUpperCase()}` : ''} {' '}
+                                    -
+                                    {e ? ` ${e.format('h:mm a').toUpperCase()}` : ''} {' '}
+                                    {s ? ` ${s.format('z')}` : ''}
+                                  </>
+                                )
+                              })()}
                             </div>
                           )}
                         </div>
