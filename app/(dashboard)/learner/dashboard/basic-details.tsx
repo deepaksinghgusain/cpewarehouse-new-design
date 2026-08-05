@@ -557,7 +557,11 @@ const BasicDetails = () => {
         let availableYears = [];
         let regEvent = []
         const coursesPurchased: any = []
-        const localTime = moment().format('YYYY-MM-DD') + 'T00:00:00.000Z'; // store localTime
+        const todayLocal = new Date();
+        const yyyy = todayLocal.getFullYear();
+        const mm = String(todayLocal.getMonth() + 1).padStart(2, '0');
+        const dd = String(todayLocal.getDate()).padStart(2, '0');
+        const localTime = `${yyyy}-${mm}-${dd}T00:00:00.000Z`; // store localTime (based on local date)
 
         let res = await GetUserSubscribedCourses(email);
 

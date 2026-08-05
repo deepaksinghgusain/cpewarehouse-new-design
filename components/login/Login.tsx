@@ -34,6 +34,8 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
     const dispatch = useDispatch();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl');
+    const registerHref = callbackUrl ? `/register?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/register';
     const [open, setOpen] = useState(false)
     const [error, setError] = useState("")
     const [mounted, setMounted] = useState(false)
@@ -273,8 +275,8 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
 
                                 <div className="self-stretch justify-center items-baseline gap-1 inline-flex">
                                     <div className="text-[#475467] text-lg font-normal font-['Inter'] leading-7">New to CPE warehouse?</div>
-                                    <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                        <Link href="/register" className="text-[#2970fe] text-lg font-semibold font-['Inter'] leading-7">Sign
+                                        <div className="justify-center items-center gap-1.5 flex overflow-hidden">
+                                        <Link href={registerHref} className="text-[#2970fe] text-lg font-semibold font-['Inter'] leading-7">Sign
                                             up</Link>
                                     </div>
                                 </div>

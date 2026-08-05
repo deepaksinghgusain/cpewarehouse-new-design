@@ -10,7 +10,7 @@ import ReactCountryFlag from "react-country-flag";
 import z from 'zod'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { redirect } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Form } from '@/components/ui/form'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { registerUser } from '@/services/auth'
@@ -56,7 +56,7 @@ const RegisterForm = () => {
             CFPcode: "",
             companyname: "",
             address1: "",
-            country: "",
+            country: "US",
             state: "",
             city: "",
             pinCode: "",
@@ -65,6 +65,8 @@ const RegisterForm = () => {
     })
 
     const [isPending, startTransition] = useTransition()
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     const onSubmit: SubmitHandler<z.infer<typeof registSchema>> = async (values: any) => {
         startTransition(async () => {
@@ -82,7 +84,9 @@ const RegisterForm = () => {
             }
 
             if (res?.user) {
-                redirect("/login");
+                const callback = searchParams.get('callbackUrl');
+                const dest = callback ? `/login?callbackUrl=${encodeURIComponent(callback)}` : '/login';
+                router.push(dest);
             }
         });
     };
@@ -476,12 +480,11 @@ const RegisterForm = () => {
                                                         htmlFor="country"
                                                         className="text-slate-700 text-sm font-semibold leading-tight"
                                                     >
-                                                        Country
                                                     </FieldLabel>
                                                 </div>
 
                                                 <div className="relative w-full">
-                                                    <Select value={field.value} onValueChange={field.onChange}>
+                                                    <Select value={field.value} onValueChange={field.onChange} defaultValue={field.value} aria-invalid={fieldState.invalid}>
                                                         <SelectTrigger className="w-full border-gray-200 focus:border-blue-500 focus:ring-blue-500 focus:border-2" id="country">
                                                             <SelectValue placeholder="Select Country" />
                                                         </SelectTrigger>
