@@ -9,37 +9,52 @@ import { useDispatch } from "react-redux";
 export default function CookieConsent() {
     const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
+    const COOKIE_CONSENT_MAX_AGE = 1296000; // 15 days in seconds
+
+    const clearAuthState = () => {
+        dispatch(userLogoutRequest());
+
+        localStorage.removeItem('remember');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('lastname');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('email');
+        localStorage.removeItem('PTIN');
+        localStorage.removeItem('rem_email');
+        localStorage.removeItem('rem_pass');
+        document.cookie = 'token=; path=/; max-age=0; SameSite=Lax';
+    };
+
+    const getCookieValue = (name: string) => {
+        return document.cookie
+            .split('; ')
+            .find((cookie) => cookie.startsWith(`${name}=`))
+            ?.split('=')[1];
+    };
 
     useEffect(() => {
-        const timer = window.setTimeout(() => setOpen(true), 300);
-        return () => window.clearTimeout(timer);
+        const consent = getCookieValue('cookieConsent');
+
+        if (!consent) {
+            clearAuthState();
+            const timer = window.setTimeout(() => setOpen(true), 300);
+            return () => window.clearTimeout(timer);
+        }
+
+        return undefined;
     }, []);
 
     const handleConsent = async (value: "accepted" | "declined") => {
-        document.cookie = `cookieConsent=${value}; path=/; max-age=31536000; SameSite=Lax`;
-
+        document.cookie = `cookieConsent=${value}; path=/; max-age=${COOKIE_CONSENT_MAX_AGE}; SameSite=Lax`;
 
         if (value === "accepted") {
+            const userData = await userInfo();
 
-            const userData = await userInfo()
-
-            if (!("id" in userData)) {
-
-                dispatch(userLogoutRequest());
-                
-                localStorage.removeItem('remember');
-                localStorage.removeItem('token');
-                localStorage.removeItem('username');
-                localStorage.removeItem('lastname');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userData');
-                localStorage.removeItem('email');
-                localStorage.removeItem('PTIN');
-                localStorage.removeItem('rem_email');
-                localStorage.removeItem('rem_pass');
-                document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
+            if (!('id' in userData)) {
+                clearAuthState();
             }
-
         }
 
         setOpen(false);
