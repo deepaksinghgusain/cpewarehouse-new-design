@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowRight, Building, Eye, EyeOff, Loader, Mail, MapPin } from 'lucide-react'
+import { ArrowRight, Building, Eye, EyeOff, Loader, Mail, MapPin, Phone } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import countries from "i18n-iso-countries";
 import ReactCountryFlag from "react-country-flag";
@@ -18,12 +18,12 @@ import Link from 'next/link'
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
-
 const registSchema = z.object({
     customerType: z.string().min(1, "Customer type is required"),
     firstName: z.string().min(1, "First Name is required"),
     lastName: z.string().min(1, "Last Name is required"),
     email: z.string().min(1, "Email is required"),
+    phone: z.string().min(1, "Phone is required"),
     password: z.string().min(1, "Password is required"),
     Pcode: z.string().optional(),
     CFPcode: z.string().optional(),
@@ -199,8 +199,50 @@ const RegisterForm = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="self-stretch flex-col justify-start items-start gap-1.5 flex">
 
+                             <div className="self-stretch flex-col justify-start items-start gap-1.5 flex">
+                                <FieldGroup>
+                                    <Controller
+                                        name="phone"
+                                        control={form.control}
+                                        render={({ field, fieldState }) => (
+                                            <Field data-invalid={fieldState.invalid}>
+
+
+                                                <div className="justify-start items-start gap-0.5 inline-flex">
+                                                    <FieldLabel
+                                                        htmlFor="phone"
+                                                        className="text-[#344054] text-lg font-medium leading-7"
+                                                    >
+                                                        Phone Number
+                                                    </FieldLabel>
+                                                    <span className="text-[#7e56d8] text-sm font-medium leading-tight">
+                                                        *
+                                                    </span>
+                                                </div>
+
+                                                <div className="relative w-full">
+                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+
+                                                    <Input
+                                                        {...field}
+                                                        id="phone"
+                                                        className='border-gray-200 pl-10 focus:border-blue-500 focus:ring-blue-500 focus:border-2'
+                                                        placeholder="Enter your phone number"
+                                                        aria-invalid={fieldState.invalid}
+                                                    />
+                                                </div>
+
+                                                {fieldState.invalid && (
+                                                    <FieldError errors={[fieldState.error]} />
+                                                )}
+                                            </Field>
+                                        )}
+                                    />
+                                </FieldGroup>
+                            </div>
+
+                            <div className="self-stretch flex-col justify-start items-start gap-1.5 flex">
                                 <FieldGroup>
                                     <Controller
                                         name="email"
