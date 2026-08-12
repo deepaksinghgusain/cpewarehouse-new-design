@@ -126,10 +126,20 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
         })
     }
 
+    const handleGoogleSignIn = () => {
+        try {
+            const callback = callbackUrl ? decodeURIComponent(callbackUrl) : (typeof window !== 'undefined' ? window.location.origin + '/learner/dashboard' : '/learner/dashboard')
+            const providerUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/connect/google?callbackUrl=${encodeURIComponent(callback)}`
+            // redirect to Strapi provider endpoint to initiate OAuth
+            window.location.href = providerUrl
+        } catch (err) {
+            console.error('Google sign-in error', err)
+        }
+    }
+
     if (mounted) {
         return (
             <>
-
                 <section className="w-[90%] mx-auto py-16">
                     <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-4">
                         <div className="flex-col  justify-center ">
@@ -243,8 +253,10 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                                 </Form>
 
                                 <div className="self-stretch h-11 flex-col justify-center items-center gap-3 flex mb-4">
-                                    <div
-                                        className="self-stretch px-4 py-2.5 bg-white rounded-lg  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#d0d5dd] justify-center items-center gap-3 inline-flex overflow-hidden">
+                                    <button
+                                        type="button"
+                                        onClick={handleGoogleSignIn}
+                                        className="w-full flex items-center justify-center cursor-pointer px-4 py-2.5 bg-white rounded-lg  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#d0d5dd] gap-3 overflow-hidden">
                                         <div className="w-6 h-6 relative  overflow-hidden">
                                             <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <g clipPath="url(#clip0_2618_5578)">
@@ -268,9 +280,8 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
                                                 </defs>
                                             </svg>
                                         </div>
-                                        <div className="text-[#344054] text-base font-semibold font-['Inter'] leading-normal">Sign in with
-                                            Google</div>
-                                    </div>
+                                        <div className="text-[#344054] text-base font-semibold font-['Inter'] leading-normal">Sign in with Google</div>
+                                    </button>
                                 </div>
 
                                 <div className="self-stretch justify-center items-baseline gap-1 inline-flex">
