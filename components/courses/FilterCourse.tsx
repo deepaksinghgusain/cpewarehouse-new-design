@@ -15,17 +15,34 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
         if (res) {
             const filters = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.filters')[0];
 
-            for (let l of filters.list) {
+            // initialize showChildren for accordion and initial filter values
+            const mappedList = (filters.list || []).map((l: any, i: number) => ({ ...l, showChildren: i === 0 }));
 
-                filterValue[l.name] = null;
+            const initialValues: any = {};
+            for (let l of mappedList) {
+                initialValues[l.name] = null;
             }
 
-            setFilterValue({...filterValue})
+            setFilterValue(initialValues)
+            setFilterValues(initialValues)
 
-            setFilterValues(filterValue)
-
-            setFilters(filters)
+            setFilters({ ...filters, list: mappedList })
         }
+    }
+
+    function toggleSection(index: number) {
+        const updated = { ...filters };
+        if (!updated.list) return;
+        updated.list = updated.list.map((f: any, i: number) => i === index ? { ...f, showChildren: !f.showChildren } : f);
+        setFilters(updated);
+    }
+
+    function resetFilters() {
+        const initial: any = {};
+        (filters.list || []).forEach((f: any) => initial[f.name] = null);
+        setFilterValue(initial);
+        setFilterValues(initial);
+        getFilterValues(initial);
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,12 +72,15 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
                         <div className="self-stretch text-[#101828] text-xl font-semibold font-['Inter'] leading-[30px]">Filters</div>
                     </div>
                 </div>
+                <div className="flex items-center gap-2">
+                    <button type="button" onClick={resetFilters} className="text-sm text-blue-600 hover:underline">Reset</button>
+                </div>
             </div>
 
             {
                 filters.list && filters.list.length > 0 && filters.list.map((filter: any, index: number) => (
                     <div className=" bg-white flex-col justify-start items-start flex border-b border-[#e4e7ec] py-2 w-full" key={index}>
-                        <div className="self-stretch px-3 justify-start items-center gap-4 inline-flex overflow-hidden">
+                        <div className="self-stretch px-3 justify-start items-center gap-4 inline-flex overflow-hidden cursor-pointer" onClick={() => toggleSection(index)}>
                             <div className="w-5 h-5 relative bg-white  overflow-hidden">
                                 {
                                     !filter.showChildren ? <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,12 +107,18 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
                         <form >
                             <div className="w-full py-1 flex-col justify-start items-start flex overflow-hidden">
                                 {
-                                    filter?.children?.length > 0 && filter?.children.map((children: any, index: number) => (
-                                        <div className="self-stretch px-1.5 py-px justify-start items-center inline-flex" key={index}>
+                                    filter?.children?.length > 0 && filter.showChildren && filter?.children.map((children: any, cindex: number) => (
+                                        <div className="self-stretch px-1.5 py-px justify-start items-center inline-flex" key={cindex}>
                                             <div className="grow shrink basis-0 h-9 px-2.5 py-[9px] rounded-md justify-start items-center gap-3 flex overflow-hidden">
                                                 <div className="grow shrink basis-0 h-[18px] justify-start items-center gap-2 flex">
                                                     <div className="justify-center items-center flex">
-                                                        <input type="radio" name={filter.label.toLowerCase().replace(/\s+/g, "_")} value={children.value} onChange={handleChange} />
+                                                        <input
+                                                            type="radio"
+                                                            name={filter.name}
+                                                            value={children.value}
+                                                            onChange={handleChange}
+                                                            checked={filterValue[filter.name] === children.value}
+                                                        />
                                                     </div>
                                                     <div className="grow shrink basis-0 text-[#344054] text-xs font-normal font-['Inter'] leading-[18px]">
                                                         {children.label}

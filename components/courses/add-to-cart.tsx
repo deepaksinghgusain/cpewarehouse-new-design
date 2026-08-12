@@ -89,8 +89,9 @@ function getAlreadyCoursePurchasedGQL(id: number, email: string) {
        }`;
 }
 
-const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, quantity: number, type?: string, absolute?: boolean }) => {
+const AddToCart = ({ course, quantity, type, absolute = true, className }: { course: any, quantity: number, type?: string, absolute?: boolean, className?: string }) => {
 
+  console.log(className)
 
   const [isPurchased, setIsPurchased] = useState(false)
   const dispatch = useDispatch()
@@ -143,7 +144,6 @@ const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, q
 
       dispatch(addToCartRequest(payload))
     } else {
-      // not logged in: save a local cart and redirect to login
       let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
         ? selectedCourse.attributes.discount
         : selectedCourse.attributes.price;
@@ -163,12 +163,14 @@ const AddToCart = ({ course, quantity, type, absolute = true }: { course: any, q
     }
   }
 
+  let baseClassName = className ? className : "absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden cursor-pointer";
+
   return (
     <div
       onClick={() => enrollNow2(course)}
       className={
         absolute
-          ? "absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden cursor-pointer"
+          ? baseClassName
           : "group add-to-card w-[200px] inline-flex items-center cursor-pointer border border-blue-500 h-10 justify-center gap-2 rounded-lg bg-white text-blue-500 hover:bg-blue-500 hover:text-white transition duration-300 ease-in-out"
       }
     >

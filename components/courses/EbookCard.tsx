@@ -7,59 +7,88 @@ import PaginationComponent from './PaginationComponent';
 import AddToCart from './add-to-cart';
 
 const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
+
     const [filterCourse, setFilterCourse] = useState<any>([]);
 
     const itemsPerPage = 9;
+
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
 
     async function getDataByFilterValueChanges() {
+        const list = courses || [];
 
-        const filterCourse = courses.filter((course: any) => {
+        const deriveKeyMap = (sampleCourse: any, filters: any) => {
+            const attrKeys = sampleCourse?.attributes ? Object.keys(sampleCourse.attributes) : [];
+            const map: any = {};
+            if (!filters) return map;
+            Object.keys(filters).forEach((k) => {
+                const camel = k.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+                const pascal = camel.charAt(0).toUpperCase() + camel.slice(1);
+                const candidates = [camel, pascal, k];
+                const found = candidates.find(c => attrKeys.includes(c));
+                map[k] = found ?? camel;
+            });
+            return map;
+        }
 
-            if (filterValue?.cpe_credit !== null && filterValue?.field_of_study !== null) {
+        const keyMap: any = deriveKeyMap(list[0] ?? {}, filterValue);
 
-                let credit: string = "" + filterValue?.cpe_credit;
+        function matches(course: any, filters: any) {
+            if (!filters || Object.keys(filters).length === 0) return true;
 
-                let startCreditPoint = parseInt(credit.split("-")[0]);
-                let endCreditPoint = parseInt(credit.split("-")[1]);
+            return Object.entries(filters).every(([key, value]) => {
+                if (value === null || value === undefined || value === '') return true;
 
-                if (
-                    parseInt(course.attributes.credit) >= startCreditPoint &&
-                    parseInt(course.attributes.credit) < endCreditPoint &&
-                    filterValue?.field_of_study.toLowerCase() === course.attributes.fieldOfStudy?.toLowerCase()) {
-                    return course
+                const attrKey = keyMap[key] ?? key.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+                let attrVal = course.attributes?.[attrKey];
+
+                // fallback: try original key if camelCase mapping failed
+                if (attrVal === undefined) attrVal = course.attributes?.[key];
+
+                // Special handling for credit ranges
+                if (key === 'cpe_credit') {
+                    const credit = '' + value;
+                    const parts = credit.split('-').map((p: string) => parseInt(p));
+                    const start = parts[0] ?? 0;
+                    const end = parts[1] ?? start + 1;
+                    const courseCredit = parseInt(course.attributes?.credit || 0);
+                    return courseCredit >= start && courseCredit < end;
                 }
-            } else if (filterValue?.cpe_credit !== null) {
 
-                let credit: string = "" + filterValue?.cpe_credit;
-
-                let startCreditPoint = parseInt(credit.split("-")[0]);
-                let endCreditPoint = parseInt(credit.split("-")[1]);
-
-                if (
-                    parseInt(course.attributes.credit) >= startCreditPoint &&
-                    parseInt(course.attributes.credit) < endCreditPoint) {
-                    return course
+                // If filter is an array, check inclusion
+                if (Array.isArray(value)) {
+                    return value.map((v: any) => ('' + v).toLowerCase()).includes(('' + attrVal).toLowerCase());
                 }
-            } else if (filterValue.field_of_study !== null) {
 
-                if (filterValue.field_of_study && filterValue?.field_of_study?.toString().toLowerCase() === course.attributes?.fieldOfStudy?.toLowerCase()) {
-                    return course
+                // If filter is a numeric range like "1-3"
+                if (typeof value === 'string' && value.includes('-') && !isNaN(Number(value.split('-')[0]))) {
+                    const parts = value.split('-').map((p: string) => parseInt(p));
+                    const start = parts[0];
+                    const end = parts[1];
+                    const num = parseInt(attrVal || 0);
+                    return num >= start && num < end;
                 }
-            } else {
-                return course
-            }
-        })
 
-        setFilterCourse(filterCourse)
+                // Booleans or numbers
+                if (typeof value === 'boolean' || typeof value === 'number') {
+                    return String(attrVal) === String(value);
+                }
 
-        setTotalPages(Math.ceil(filterCourse.length / itemsPerPage));
+                // Default: case-insensitive string match
+                return ('' + attrVal).toLowerCase() === ('' + value).toLowerCase();
+            })
+        }
+
+        const filtered = list.filter((course: any) => matches(course, filterValue));
+
+        setFilterCourse(filtered)
+        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     }
 
     useEffect(() => {
         getDataByFilterValueChanges();
-    }, [courses.length, filterCourse.length, filterValue.field_of_study, filterValue.cpe_credit])
+    }, [courses.length, JSON.stringify(filterValue)])
 
     return (
         <div className="flex gap-5 ml-1 mt-6">
@@ -122,7 +151,7 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
                                     </div>
                                 </div>
                                 <div className="absolute bottom-5 ml-2 add-to-card flex flex-col justify-start items-center gap-2 overflow-hidden">
-                                     <AddToCart course={course} quantity={1} />
+                                    <AddToCart course={course} quantity={1} />
                                     <div>
                                         <img src="/assets/images/bar-code-image.png" alt="" />
                                     </div>
