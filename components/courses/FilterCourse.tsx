@@ -4,19 +4,26 @@ import React, { useEffect, useState } from 'react'
 import { imageUrl } from '@/lib/constants'
 import { getPageContent } from '@/services/common';
 
-const FilterCourse = ({ getFilterValues }: { getFilterValues: any }) => {
+const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: any , setFilterValues: any }) => {
     const [filters, setFilters] = useState<any>([]);
 
-    const [filterValue, setFilterValue] = useState<any>({
-        cpe_credit: null,
-        field_of_study: null
-    })
+    const [filterValue, setFilterValue] = useState<any>({})
 
     async function getFilters() {
         const res = await getPageContent('course-listing');
 
         if (res) {
             const filters = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.filters')[0];
+
+            for (let l of filters.list) {
+
+                filterValue[l.name] = null;
+            }
+
+            setFilterValue({...filterValue})
+
+            setFilterValues(filterValue)
+
             setFilters(filters)
         }
     }

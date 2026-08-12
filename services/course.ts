@@ -770,13 +770,20 @@ function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
             filters: {
             isActive: { eq: ${isActive} }
             forTaxLaw: { eq: ${fortaxLaw} }
-            and: [
-                {
-                category: {
-                    title: { eq: "Live" }
-                }
-                }
-            ]
+            or:  [{
+                      and: [{
+                              endDate:   { gte:  "${currentDate}"}
+                              ,
+                              category: {
+                                  title: {eq: "Live"}
+                              }
+                          }]
+                    },
+                    {
+                        category: {
+                            title: {ne: "Live"}
+                        }
+                    }],
             }
         ) {
             data {

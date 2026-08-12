@@ -23,13 +23,16 @@ const CourseCatalog = () => {
     )
 
 
-    let [filterValue, setFilterValue] = useState<any>({
-        cpe_credit: null,
-        field_of_study: null
-    })
+    const [filterValue, setFilterValue] = useState<any>({})
+
+    function setFilterValues(values: any) {
+        setFilterValue(values)
+    }
 
     function getFilterValues(values: any) {
         setFilterValue(values)
+
+        console.log("filterValue", values)
     }
 
     async function getCourse() {
@@ -86,7 +89,7 @@ const CourseCatalog = () => {
         <section className="container mx-auto my-10 flex">
 
             <div className="w-1/5">
-                <FilterCourse getFilterValues={getFilterValues} />
+                <FilterCourse getFilterValues={getFilterValues} setFilterValues={setFilterValues} />
             </div>
 
             <div className="w-4/5">
