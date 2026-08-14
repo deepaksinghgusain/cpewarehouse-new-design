@@ -52,12 +52,12 @@ export default function LearnerSidebar() {
                 <Link href="/">
                     {
                         logo && <Image
-                        height={42}
-                        width={100}
-                        src={logo}
-                        alt="logo"
-                        className="w-full h-[42px] object-contain"
-                    />
+                            height={42}
+                            width={100}
+                            src={logo}
+                            alt="logo"
+                            className="w-full h-[42px] object-contain"
+                        />
                     }
                 </Link>
 

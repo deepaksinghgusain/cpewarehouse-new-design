@@ -12,6 +12,7 @@ import { RootState } from '@/store/store';
 import { Card } from '@/components/ui/card';
 import { jsPDF } from 'jspdf';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { redirect } from 'next/navigation';
 
 function PastEventCard({ event }: any) {
     const [err, setErr] = useState("");
@@ -342,10 +343,9 @@ function RegisteredEventCard({ event, onLaunch }: any) {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <img src={imageUrl + event.instrutors.image.data.attributes.url} height="20" width="20" className='rounded-xl' />
-                            {event.instrutors.firstName} {event.instrutors.lastName}
+                            <img src={imageUrl + event?.attributes?.instructors?.data[0].attributes?.image?.data?.attributes?.url} height="20" width="20" className='rounded-xl' />
+                            {event?.attributes?.instructors?.data[0].attributes?.firstName} {event?.attributes?.instructors?.data[0].attributes?.lastName}
                         </div>
-
                     </div>
 
                     <div className="mt-3 flex items-center gap-4">
@@ -448,8 +448,8 @@ function RecommendedEventCard({ event }: any) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <img src={imageUrl + event.attributes.instructors.data[0].attributes.image.data.attributes.url} height="20" width="20" className='rounded-xl' />
-                        {event.attributes.instructors.data[0].attributes.firstName} {event.attributes.instructors.data[0].attributes.lastName}
+                        <img src={imageUrl + event?.attributes?.instructors?.data[0].attributes?.image?.data?.attributes?.url} height="20" width="20" className='rounded-xl' />
+                        {event?.attributes.instructors.data[0].attributes.firstName} {event?.attributes.instructors.data[0].attributes.lastName}
                     </div>
 
                 </div>
@@ -508,31 +508,31 @@ const BasicDetails = () => {
         if (!videoUrl) return;
 
         const baseOrigin = window.location.origin;
-        const cleanedVideoPath = videoUrl
-            .trim()
-            .replace(/^https?:\/\/[^/]+\/learner\/view-webinar\/?/i, "")
-            .replace(/^\/+|\/+$/g, "");
-
-        let targetUrl = `${baseOrigin}/learner/view-webinar/${cleanedVideoPath}`;
-
-        if (slug && !targetUrl.toLowerCase().includes(`/${slug.toLowerCase()}`)) {
-            targetUrl = `${targetUrl.replace(/\/$/, "")}/${slug}`;
+        const params = new URLSearchParams();
+        
+        // Pass video URL as query parameter to preserve all query params and special characters
+        params.append('videoUrl', videoUrl.trim());
+        
+        // Add slug if provided
+        if (slug) {
+            params.append('slug', slug);
         }
-
-        if (eventImage && !targetUrl.includes("image=")) {
-            const separator = targetUrl.includes("?") ? "&" : "?";
+        
+        // Add image if provided
+        if (eventImage) {
             const absoluteImageUrl = eventImage.startsWith("http") ? eventImage : `${imageUrl}${eventImage}`;
-            const encodedImageUrl = encodeURIComponent(absoluteImageUrl).replace(/%3A/g, ":");
-            targetUrl = `${targetUrl}${separator}image=${encodedImageUrl}`;
+            params.append('image', absoluteImageUrl);
         }
 
-        window.open(targetUrl, "_self");
+        const targetUrl = `${baseOrigin}/learner/view-webinar?${params.toString()}`;
+        redirect(targetUrl);
     };
 
     const launchEvent = (event: any) => {
         if (event.courseType === 'Live Webinar') {
             gotowebinar(event?.course?.webinarId, event?.joinUrl);
         } else if (event.courseType === 'Self-Study') {
+            console.log(event?.course);
             navigateToVideo(event?.course?.videoUrl, event?.course?.slug, event?.image);
         }
     };
@@ -597,6 +597,7 @@ const BasicDetails = () => {
                     })
                 }
 
+
                 let creditValue = parseFloat(course?.credit) || 0;
                 let fieldOfStudy = course?.fieldOfStudy || 'Unknown';
                 let completedOn = usercourse?.completedOn;
@@ -619,11 +620,7 @@ const BasicDetails = () => {
         let upcomingEvents = response.data;
         setUpcommingEvent(upcomingEvents)
 
-        regEvent = coursesPurchased.filter((element: any) =>
-        ((element.category.toLowerCase() === "live" && new Date(element?.course?.endDate) >= new Date(localTime))
-            || (element.category.toLowerCase() === "recorded")
-            && new Date(element?.course?.endDate) <= new Date(localTime)
-        ));
+        regEvent = coursesPurchased;
 
         regEvent.sort((a: any, b: any) => {
             if (a.courseType === 'Live Webinar' && b.courseType !== 'Live Webinar') {
