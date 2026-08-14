@@ -61,7 +61,7 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
 
     return (
         <div className=" w-full self-start sticky top-[100px]  bg-white rounded-lgshadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex overflow-hidden">
-            <div className=" px-3 justify-start items-start inline-flex border-b border-[#e4e7ec] pb-2 w-full">
+            <div className=" px-3 justify-start items-center inline-flex border-b border-[#e4e7ec] pb-2 w-full">
                 <div className="grow shrink basis-0 h-12 pt-2 justify-start items-start gap-4 flex">
                     <div className="w-10 h-10 p-2.5 bg-white rounded-lg  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#e4e7ec] justify-center items-center flex overflow-hidden">
                         <div className="w-5 h-5 relative flex-col justify-start items-start flex overflow-hidden">
