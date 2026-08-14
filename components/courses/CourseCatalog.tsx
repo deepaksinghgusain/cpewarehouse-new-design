@@ -31,8 +31,6 @@ const CourseCatalog = () => {
 
     function getFilterValues(values: any) {
         setFilterValue(values)
-
-        console.log("filterValue", values)
     }
 
     async function getCourse() {

@@ -17,9 +17,7 @@ export default function FacultySection({ res }: any) {
 
     const handleOpen = (faculty: any) => {
         setSelectedFaculty(faculty);
-        setOpen(true);
-        console.log(faculty);
-        
+        setOpen(true);        
     };
 
     return (

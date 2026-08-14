@@ -2,6 +2,7 @@
 
 import AddToCart from "@/components/courses/add-to-cart";
 import EnrollNowCart from "@/components/courses/enroll-now";
+import ShareWithColleague from "@/components/share/ShareWithColleague";
 import { imageUrl } from "@/lib/constants";
 import { getCart } from "@/services/cart";
 import { ChevronRight } from "lucide-react";
@@ -17,6 +18,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
 
   const [seats, setSeats] = useState(1);
   const [addItems, setAddItems] = useState(1);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const getcardCount = async (cartId: number) => {
     if (cartId > 0) {
@@ -339,12 +341,26 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                     </g>
                   </svg>
                 </div>
-                <p>Share with Colleague</p>
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="cursor-pointer text-[#18212f] text-xl font-['Inter'] leading-[30px] hover:text-[#db6803] transition duration-200"
+                >
+                  Share with Colleague
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Share with Colleague Modal Popup */}
+      <ShareWithColleague
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        courseId={courseData?.id}
+        courseTitle={courseData?.title}
+        onSuccess={() => setShowShareModal(false)}
+      />
     </div>
   );
 };

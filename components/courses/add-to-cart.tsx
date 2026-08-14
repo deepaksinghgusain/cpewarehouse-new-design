@@ -91,8 +91,6 @@ function getAlreadyCoursePurchasedGQL(id: number, email: string) {
 
 const AddToCart = ({ course, quantity, type, absolute = true, className }: { course: any, quantity: number, type?: string, absolute?: boolean, className?: string }) => {
 
-  console.log(className)
-
   const [isPurchased, setIsPurchased] = useState(false)
   const dispatch = useDispatch()
   const router = useRouter()
