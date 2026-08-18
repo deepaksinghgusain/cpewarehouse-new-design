@@ -53,6 +53,7 @@ const ViewWebinar = () => {
     const [totalPercentage, setTotalPercentage] = useState("0");
     const [passPercentage, setPassPercentage] = useState(70);
     const [isShow, setIsShow] = useState(false);
+    const [isCaptionOn, setIsCaptionOn] = useState(false);
 
     const videoRef = useRef<any>(null);
     const prTimeRef = useRef(0);
@@ -131,11 +132,11 @@ const ViewWebinar = () => {
     const sendVidViewToUsercourse = () => {
         if (!userCourseId) return;
 
-        console.log(videoWatchTime, "videoWatchTime");
+        const storedVideoWatchTime = localStorage.getItem("videoWatchTime");
 
         const jsonData = {
             data: {
-                lastVideoView: Number(videoWatchTime || 0),
+                lastVideoView: Number(storedVideoWatchTime || 0),
             }
         };
 
@@ -186,6 +187,36 @@ const ViewWebinar = () => {
 
     const webinarImage = searchParams.get("image") || "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80";
     const currentUserName = searchParams.get("user") || "";
+    const captionUrl = process.env.NEXT_PUBLIC_SUBTITLE_URL || "";
+    const captionTracks = useMemo(() => {
+        if (!captionUrl) return [];
+
+        return [{
+            src: captionUrl,
+            kind: "captions",
+            srclang: "en",
+            label: "English (CC)",
+            default: false,
+        }];
+    }, [captionUrl]);
+
+    const toggleCaptions = () => {
+        const player = videoRef.current;
+        const mediaElement = player?.querySelector?.('video') || player;
+        const tracks = mediaElement?.textTracks ? Array.from(mediaElement.textTracks) : [];
+
+        if (!tracks.length) {
+            setIsCaptionOn(false);
+            return;
+        }
+
+        const nextState = !isCaptionOn;
+        tracks.forEach((track: any) => {
+            track.mode = nextState ? 'showing' : 'hidden';
+        });
+
+        setIsCaptionOn(nextState);
+    };
 
     const getFinalquestionListing = async (id: string) => {
         try {
@@ -519,15 +550,19 @@ const ViewWebinar = () => {
 
     const handleVideoPlaying = () => {
         if (!isPausedRef.current && videoRef.current) {
+            let time = Math.floor(videoRef.current.currentTime).toFixed(0);
+            localStorage.setItem("videoWatchTime", time);
+            setVideoWatchTime(time);
             sendVidViewToUsercourse();
-            localStorage.setItem("videoWatchTime", Math.floor(videoRef.current.currentTime).toFixed(0));
         }
 
         if (!sendViewIntervalRef.current) {
             sendViewIntervalRef.current = setInterval(() => {
                 if (!isPausedRef.current && videoRef.current) {
+                    let time = Math.floor(videoRef.current.currentTime).toFixed(0);
+                    localStorage.setItem("videoWatchTime", time);
+                    setVideoWatchTime(time);
                     sendVidViewToUsercourse();
-                    localStorage.setItem("videoWatchTime", Math.floor(videoRef.current.currentTime).toFixed(0));
                 }
             }, 5000);
         }
@@ -789,6 +824,7 @@ const ViewWebinar = () => {
                                                         ref={videoRef}
                                                         playbackId={playbackSource.src.split('/').pop()?.split('.')[0] || ''}
                                                         streamType="on-demand"
+                                                        defaultHiddenCaptions={!isCaptionOn}
                                                         onTimeUpdate={handleVideoProgress}
                                                         onLoadedMetadata={handleVideoLoadedMetadata}
                                                         onPlay={handleVideoPlay}
@@ -801,11 +837,14 @@ const ViewWebinar = () => {
                                                             height: '100%',
                                                             borderRadius: '0.75rem',
                                                         }}
-                                                    />
+                                                    >
+                                                    </MuxPlayer>
                                                 )}
-                                                <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
+
+                                                 <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
                                                     Watched: {videoWatchTime}s ({vidViewPercent}%)
                                                 </div>
+                                               
                                             </div>
                                         </div>
                                     </div>
