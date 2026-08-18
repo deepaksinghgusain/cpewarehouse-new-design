@@ -8,16 +8,16 @@ import { Check, X } from 'lucide-react'
 
 // Zod validation schema
 const contactFormSchema = z.object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    email: z.string().email("Please enter a valid email address"),
-    countryCode: z.string().min(1, "Country code is required"),
-    phoneNumber: z.string().optional().refine(
+    firstName: z.string().trim().min(1, "First name is required"),
+    lastName: z.string().trim().min(1, "Last name is required"),
+    email: z.string().trim().min(1, "Email is required").email("Please enter a valid email address"),
+    countryCode: z.string().trim().min(1, "Country code is required"),
+    phoneNumber: z.string().trim().min(1, "Phone number is required").refine(
         (val) => !val || /^[\d\s\-\+\(\)]+$/.test(val),
         "Please enter a valid phone number"
     ),
-    qType: z.string().min(1, "Please select a category"),
-    message: z.string().min(1, "Message is required").min(10, "Message must be at least 10 characters"),
+    qType: z.string().trim().min(1, "Please select a category"),
+    message: z.string().trim().min(1, "Message is required").min(10, "Message must be at least 10 characters"),
     agreeToPrivacy: z.boolean().refine((val) => val === true, "You must agree to the Privacy Policy"),
 })
 
@@ -144,8 +144,19 @@ const ContactForm = () => {
         setIsSubmitting(true)
 
         try {
+            const normalizedData = {
+                firstName: formData.firstName ?? "",
+                lastName: formData.lastName ?? "",
+                email: formData.email ?? "",
+                countryCode: formData.countryCode ?? "",
+                phoneNumber: formData.phoneNumber ?? "",
+                qType: formData.qType ?? "",
+                message: formData.message ?? "",
+                agreeToPrivacy: Boolean(formData.agreeToPrivacy),
+            }
+
             // Validate form data against schema
-            const validatedData = contactFormSchema.parse(formData)
+            const validatedData = contactFormSchema.parse(normalizedData)
             
             // If validation passes, submit the form
             const res = await contactUs(validatedData)
@@ -261,7 +272,7 @@ const ContactForm = () => {
                         <div className="grid gap-4 mt-4 space-y-2">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">
-                                    Phone Number
+                                    Phone Number *
                                 </label>
                                 <div className={`flex items-center gap-3 rounded-2xl border bg-white px-3 py-2 ${
                                     errors.phoneNumber ? "border-red-500" : "border-slate-300"
@@ -346,7 +357,7 @@ const ContactForm = () => {
                             )}
                         </div>
 
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-4 items-center justify-start">
                             <label className="flex items-center gap-3 text-sm text-slate-700">
                                 <input
                                     type="checkbox"
@@ -364,6 +375,7 @@ const ContactForm = () => {
                                     </a>
                                 </span>
                             </label>
+                            <br />
                             {errors.agreeToPrivacy && (
                                 <p className="text-sm text-red-600">{errors.agreeToPrivacy}</p>
                             )}
