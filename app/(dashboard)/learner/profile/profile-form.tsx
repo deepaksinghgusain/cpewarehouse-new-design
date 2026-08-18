@@ -4,7 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Building, Eye, EyeOff, Mail, Phone, UploadCloud } from 'lucide-react'
+import { Building, Check, Eye, EyeOff, Mail, Phone, UploadCloud, X } from 'lucide-react'
 import ReactCountryFlag from 'react-country-flag'
 import z from "zod";
 import { Form, FormField, FormItem } from '@/components/ui/form'
@@ -14,8 +14,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { imageUrl } from "@/lib/constants";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { setUser } from "@/store/reducers/user-reducer";
 
 export const profileSchema = z.object({
     firstName: z.string().min(1, "First Name is required"),
@@ -37,8 +40,12 @@ export const profileSchema = z.object({
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
+const MAX_PROFILE_IMAGE_SIZE = 1 * 1024 * 1024;
+
 const ProfileForm = () => {
     const [mounted, setMounted] = useState(false)
+    const dispatch = useDispatch();
+    const currentUser = useSelector((state: RootState) => state.user.user);
 
     const [errorMessage, setErrorMessage] = useState('')
     const [error, setError] = useState(false)
@@ -60,7 +67,15 @@ const ProfileForm = () => {
 
         if (!token) return;
 
-        let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/users/me", {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+        if (!apiBaseUrl) {
+            setError(true);
+            setErrorMessage("API configuration is missing. Please contact support.");
+            return;
+        }
+
+        let response = await fetch(apiBaseUrl + "/api/users/me", {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
@@ -98,34 +113,91 @@ const ProfileForm = () => {
     const onSubmit: SubmitHandler<z.infer<typeof profileSchema>> = async (values: any) => {
 
         startTransition(async () => {
-            const token = localStorage.getItem("token")
+            try {
+                const token = localStorage.getItem("token")
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-            let formData = new FormData()
+                console.log("apiBaseUrl", apiBaseUrl);
+                
+                if (!apiBaseUrl) {
+                    setError(true);
+                    setErrorMessage("API configuration is missing. Please contact support.");
+                    return;
+                }
 
-            if (typeof uploadImage === "object") {
-                formData.append("profileImage", uploadImage)
-            }
+                if (!token) {
+                    setError(true);
+                    setErrorMessage("Your session has expired. Please log in again.");
+                    return;
+                }
 
-            for (const field in values) {
-                formData.append(field, values[field])
-            }
+                let formData = new FormData()
 
-            let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/profile", {
-                method: "PUT",
-                body: formData,
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-            });
+                if (typeof uploadImage === "object") {
+                    if (uploadImage.size > MAX_PROFILE_IMAGE_SIZE) {
+                        setError(true);
+                        setErrorMessage("Image is too large. Please choose a file smaller than 1MB.");
+                        return;
+                    }
+                    formData.append("profileImage", uploadImage)
+                }
 
-            let res = await response.json();
+                for (const field in values) {
+                    const value = values[field];
+                    if (value !== undefined && value !== null) {
+                        formData.append(field, String(value));
+                    }
+                }
 
-            if (res.status === 200) {
+                let response = await fetch(apiBaseUrl + "/api/profile", {
+                    method: "PUT",
+                    body: formData,
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
+                });
+
+                let res = await response.json();
+
+                if (!response.ok || res?.status !== 200) {
+                    throw new Error(res?.error?.message || res?.message || "Profile update failed.");
+                }
+
+                const updatedUser = {
+                    ...(currentUser || {}),
+                    firstName: values.firstName,
+                    lastName: values.lastName,
+                    username: values.username,
+                    email: values.email,
+                    phone: values.phone,
+                    PTIN: values.PTIN,
+                    CFPcode: values.CFPcode,
+                    companyName: values.companyName,
+                    address1: values.address1,
+                    country: values.country,
+                    city: values.city,
+                    state: values.state,
+                    pinCode: values.pinCode,
+                    newsletter1: values.newsletter1,
+                    profileImage: res?.data.profileImage || null,
+                };
+
+                dispatch(setUser(updatedUser));
+                localStorage.setItem('userData', JSON.stringify(updatedUser));
+
                 setSuccess(true);
-                setSuccessMessage(res.msg)
-            } else {
+                setSuccessMessage(res.msg || "Profile updated successfully.");
+            } catch (err: any) {
+                const message = String(err?.message || "");
+
+                if (message.toLowerCase().includes("failed to fetch") || message.toLowerCase().includes("cors")) {
+                    setError(true);
+                    setErrorMessage("The server blocked this request due to CORS. Please enable Access-Control-Allow-Origin for http://localhost:3000 on the backend or call through a server proxy.");
+                    return;
+                }
+
                 setError(true);
-                setErrorMessage(res.error.message)
+                setErrorMessage(message || "Failed to fetch. Please check your connection and try again.");
             }
         })
     }
@@ -195,6 +267,13 @@ const ProfileForm = () => {
                                                                 const file = e.target.files?.[0];
 
                                                                 if (!file) return;
+
+                                                                if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+                                                                    setError(true);
+                                                                    setErrorMessage("Image is too large. Please choose a file smaller than 1MB.");
+                                                                    e.target.value = "";
+                                                                    return;
+                                                                }
 
                                                                 setUploadImage(file)
 
@@ -823,24 +902,80 @@ const ProfileForm = () => {
                         </div >
                     </div >
                     <Dialog open={success} onOpenChange={setSuccess}>
-                        <DialogContent  className='bg-white z-100'>
-                            <DialogHeader>
-                                <DialogTitle>Success</DialogTitle>
-                                <DialogDescription>
-                                    {successMessage}
-                                </DialogDescription>
-                            </DialogHeader>
+                        <DialogContent
+                            showCloseButton={false}
+                            className="z-100 max-w-[1200px] rounded-none border-0 bg-[#f5f5f5] p-0 shadow-none"
+                        >
+                            <div className="relative w-full  bg-[#f5f5f5]">
+                                <DialogClose asChild>
+                                    <button
+                                        type="button"
+                                        className="absolute right-8 top-8 flex h-10 w-10 items-center justify-center rounded-full bg-transparent text-4xl font-light text-[#111827] hover:text-[#000]"
+                                        aria-label="Close"
+                                    >
+                                        <X className="h-12 w-12" />
+                                    </button>
+                                </DialogClose>
+
+                                <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
+                                    <div className="mb-8 flex h-28 w-28 items-center justify-center rounded-full bg-[#63c98a] shadow-[0_10px_30px_rgba(34,197,94,0.25)]">
+                                        <Check className="h-16 w-16 text-white" strokeWidth={3} />
+                                    </div>
+
+                                    <div className="mb-10 text-center text-[24px] font-semibold uppercase tracking-tight text-[#111827]">
+                                        {successMessage}
+                                    </div>
+
+                                    <DialogClose asChild>
+                                        <button
+                                            type="button"
+                                            className="flex h-10 w-[280px] items-center cursor-pointer justify-center rounded-xl bg-[#0b2d5c] text-xl font-bold uppercase tracking-wide text-white shadow-[0_8px_20px_rgba(11,45,92,0.25)] transition hover:bg-[#0d3a75]"
+                                        >
+                                            CLOSE
+                                        </button>
+                                    </DialogClose>
+                                </div>
+                            </div>
                         </DialogContent>
                     </Dialog>
 
                     <Dialog open={error} onOpenChange={setError}>
-                        <DialogContent  className='bg-white z-100'>
-                            <DialogHeader>
-                                <DialogTitle>Error</DialogTitle>
-                                <DialogDescription>
+                        <DialogContent
+                            showCloseButton={false}
+                            className="z-100 max-w-[560px] rounded-[28px] border-0 bg-white p-0 shadow-[0_24px_80px_rgba(17,24,39,0.2)]"
+                        >
+                            <div className="relative w-full p-8 text-center">
+                                <DialogClose asChild>
+                                    <button
+                                        type="button"
+                                        className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full bg-transparent text-[#111827] hover:text-[#000]"
+                                        aria-label="Close"
+                                    >
+                                        <X className="h-7 w-7" />
+                                    </button>
+                                </DialogClose>
+
+                                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#ef4444] mx-auto">
+                                    <X className="h-10 w-10 text-white" strokeWidth={3} />
+                                </div>
+
+                                <DialogHeader className="mb-2 text-center">
+                                    <DialogTitle className="text-3xl font-bold uppercase text-[#111827]">Error</DialogTitle>
+                                </DialogHeader>
+
+                                <DialogDescription className="text-base text-[#374151]">
                                     {errorMessage}
                                 </DialogDescription>
-                            </DialogHeader>
+
+                                <DialogClose asChild>
+                                    <button
+                                        type="button"
+                                        className="mt-8 flex h-12 w-full items-center justify-center rounded-xl bg-[#0b2d5c] text-base font-bold uppercase text-white hover:bg-[#0d3a75]"
+                                    >
+                                        CLOSE
+                                    </button>
+                                </DialogClose>
+                            </div>
                         </DialogContent>
                     </Dialog>
                 </form>

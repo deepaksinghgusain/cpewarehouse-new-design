@@ -18,15 +18,19 @@ export default async function GuestLayout({
     }
 
     return (
-        <div className='flex flex-col h-screen'>
-            <main className='flex flex-1 wrapper'>
-                <LearnerSidebar />
-                <div className='w-full'>
-                    <LearnerNavBar />
-                    {children}
+        <div className='flex min-h-screen flex-col bg-gray-50'>
+            <main className='flex flex-1 items-stretch'>
+                <div className='sticky top-0 h-screen w-[260px] shrink-0 border-r border-gray-200 bg-white'>
+                    <LearnerSidebar />
                 </div>
-            </main >
+
+                <div className='flex min-w-0 flex-1 flex-col'>
+                    <LearnerNavBar />
+                    <div className='flex-1'>{children}</div>
+                </div>
+            </main>
+
             <Footer />
-        </div >
+        </div>
     );
 }

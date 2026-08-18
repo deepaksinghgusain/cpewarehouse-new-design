@@ -30,8 +30,6 @@ function PastEventCard({ event }: any) {
         category = "Self Study"
     }
 
-
-
     const getUserCourse = async (courseSlug: string) => {
         const userEmail = localStorage.getItem("email") || "";
         if (!userEmail || !courseSlug) return null;
@@ -532,7 +530,6 @@ const BasicDetails = () => {
         if (event.courseType === 'Live Webinar') {
             gotowebinar(event?.course?.webinarId, event?.joinUrl);
         } else if (event.courseType === 'Self-Study') {
-            console.log(event?.course);
             navigateToVideo(event?.course?.videoUrl, event?.course?.slug, event?.image);
         }
     };

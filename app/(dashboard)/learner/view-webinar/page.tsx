@@ -506,7 +506,6 @@ const ViewWebinar = () => {
             };
             const token = localStorage.getItem("token") || "";
 
-            // ✅ Submit exam
             let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/user-exams", {
                 method: "POST",
                 body: JSON.stringify(record),
