@@ -11,6 +11,8 @@ export async function getCourseDetailPage() {
 }
 
 export async function updateUserCourseApi(id: any, data: any) {
+  if (!id) return null;
+
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/user-courses/${id}`;
 
   return await apiFetch(url, {
@@ -18,7 +20,7 @@ export async function updateUserCourseApi(id: any, data: any) {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(data)
+    body: data
   })
 }
 

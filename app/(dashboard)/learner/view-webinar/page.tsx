@@ -59,7 +59,9 @@ const ViewWebinar = () => {
     const showReviewQTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const sendViewIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const muxVideoEnv = process.env.NEXT_PUBLIC_MUX_ENV_KEY || "";
+    const isPausedRef = useRef(false);
+    const isAnswerTrueRef = useRef(false);
+    const showFirstReviewQuestionRef = useRef(false);
 
     useEffect(() => {
         // Get video URL from query parameters (preserves full URL with query params)
@@ -90,27 +92,54 @@ const ViewWebinar = () => {
 
     const isReviewExamExist = finalquestionList.length > 0;
 
+    useEffect(() => {
+        isPausedRef.current = isPaused;
+    }, [isPaused]);
+
+    useEffect(() => {
+        isAnswerTrueRef.current = isAnswerTrue;
+    }, [isAnswerTrue]);
+
+    useEffect(() => {
+        showFirstReviewQuestionRef.current = showFirstReviewQuestion;
+    }, [showFirstReviewQuestion]);
+
     const openReviewQuestionPrompt = () => {
-        console.log("Open review question prompt");
+        setShowFirstReviewQuestion(true);
+        setShowQuestionOnTime(false);
     };
 
     const showReviewQuestions = () => {
         setShowFirstReviewQuestion(true);
+        setErr("");
     };
 
     const CheckAnswer = () => {
-        console.log("Check answer hook");
+        setIsAnswerTrue(true);
+        setShowQuestionOnTime(false);
+        setShowFirstReviewQuestion(false);
     };
 
     const resumeCountdown = () => {
-        console.log("Resume countdown hook");
+        if (timeoutIdRef.current) {
+            clearTimeout(timeoutIdRef.current);
+            timeoutIdRef.current = null;
+        }
+        setIsTimeoutCleared(false);
     };
 
     const sendVidViewToUsercourse = () => {
-        const jsonData = { "data": { "lastVideoView": (videoWatchTime) } }
-        if (jsonData) {
-            updateUserCourse(jsonData)
-        }
+        if (!userCourseId) return;
+
+        console.log(videoWatchTime, "videoWatchTime");
+
+        const jsonData = {
+            data: {
+                lastVideoView: Number(videoWatchTime || 0),
+            }
+        };
+
+        updateUserCourse(jsonData);
     };
 
     const webinarTitle = useMemo(() => {
@@ -154,8 +183,6 @@ const ViewWebinar = () => {
         };
 
     }, [muxPlaybackId]);
-
-    console.log("playbackSource", playbackSource);
 
     const webinarImage = searchParams.get("image") || "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80";
     const currentUserName = searchParams.get("user") || "";
@@ -215,6 +242,11 @@ const ViewWebinar = () => {
 
                 setIsReviewExamPassed(!!selectedCourse?.attributes?.isReviewExamPassed);
                 setLastVideoViewed(viewedTime);
+                setVideoWatchTime(String(viewedTime));
+                setVidViewPercent((viewedTime > 0 && selectedCourse?.attributes?.duration
+                    ? ((viewedTime * 100) / Number(selectedCourse.attributes.duration || 1)).toFixed(2)
+                    : "0.00"));
+                localStorage.setItem("videoWatchTime", String(viewedTime));
                 setUserCourseId(Number(selectedCourse?.id) || null);
                 setCourseCompletedOn(selectedCourse?.attributes?.completedOn || null);
                 setPrTime(viewedTime);
@@ -370,97 +402,156 @@ const ViewWebinar = () => {
         await updateUserCourseApi(userCourseId, data);
     }
 
-    useEffect(() => {
-        // MuxPlayer event listener for tracking playback
-        const muxPlayer = videoRef.current;
-        if (!muxPlayer || !playbackSource.src) return;
+    const syncVideoProgress = (currentTime: number, duration: number) => {
+        try {
+            const watched = Math.floor(currentTime).toFixed(0);
+            setVideoWatchTime(watched);
+            localStorage.setItem("videoWatchTime", watched);
 
-        const handleTimeUpdate = () => {
-            try {
-                const currentTime = muxPlayer.currentTime || 0;
-                const duration = muxPlayer.duration || 0;
-
-                const watched = Math.floor(currentTime).toFixed(0);
-                setVideoWatchTime(watched);
-                localStorage.setItem("videoWatchTime", watched);
-
-                if (duration > 0) {
-                    const percent = ((Number(watched) * 100) / duration).toFixed(2);
-                    setVidViewPercent(percent);
-                }
-
-                setPrTime(currentTime);
-                prTimeRef.current = currentTime;
-            } catch (error) {
-                console.error("Error updating video time:", error);
+            if (duration > 0) {
+                const percent = ((Number(watched) * 100) / duration).toFixed(2);
+                setVidViewPercent(percent);
             }
-        };
 
-        const handlePlay = () => {
-            setPlayBtnCount((prevPlayCount) => {
-                const nextCount = prevPlayCount + 1;
-                setIsPlay(true);
-                if ((nextCount === 1 || showFirstReviewQuestion) && isReviewExamExist && !isReviewExamPassed) {
-                    showReviewQuestions();
-                }
-                return nextCount;
-            });
-            setIsPaused(false);
-        };
+            setPrTime(currentTime);
+            prTimeRef.current = currentTime;
+        } catch (error) {
+            console.error("Error updating video time:", error);
+        }
+    };
 
-        const handlePause = () => {
-            setPauseBtnCount((prev) => prev + 1);
-            setIsPlay(false);
-            setIsPaused(true);
+    const handleVideoProgress = (event: any) => {
+        const target = event?.target || videoRef.current;
+        const currentTime = Number(target?.currentTime ?? 0);
+        const duration = Number(target?.duration ?? 0);
 
-            if (sendViewIntervalRef.current) {
-                clearInterval(sendViewIntervalRef.current);
-                sendViewIntervalRef.current = null;
+        syncVideoProgress(currentTime, duration);
+
+        if (showQuestionOnTime && !isAnswerTrueRef.current && !target?.seeking) {
+            target?.pause?.();
+            openReviewQuestionPrompt();
+        }
+    };
+
+    const handleVideoLoadedMetadata = (event: any) => {
+        const target = event?.target || videoRef.current;
+        if (!target) return;
+
+        const savedViewedTime = Number(lastVideoViewed || videoWatchTime || 0);
+        if (savedViewedTime > 0 && Number(target.currentTime || 0) === 0) {
+            target.currentTime = savedViewedTime;
+            syncVideoProgress(savedViewedTime, Number(target.duration || 0));
+            localStorage.setItem("videoWatchTime", String(savedViewedTime));
+        }
+    };
+
+    const handleVideoPlay = () => {
+        setPlayBtnCount((prevPlayCount) => {
+            const nextCount = prevPlayCount + 1;
+            setIsPlay(true);
+
+            if ((nextCount === 1 || showFirstReviewQuestionRef.current) && isReviewExamExist && !isReviewExamPassed) {
+                showReviewQuestions();
             }
-        };
 
-        const handlePlaying = () => {
-            if (!isPaused) {
-                if (videoRef.current) {
+            if (nextCount > 1 && !isAnswerTrueRef.current && showQuestionOnTime) {
+                if (isReviewExamExist) {
+                    setIsPaused(true);
+                }
+            }
+
+            if (nextCount > 1 && isAnswerTrueRef.current && currentQuestionIndex < finalquestionList.length - 1) {
+                resumeCountdown();
+            }
+
+            return nextCount;
+        });
+
+        setIsPaused(false);
+        const bigPlayButton = document.querySelector('.vjs-big-play-button') as HTMLElement | null;
+        if (bigPlayButton) {
+            bigPlayButton.style.display = 'none';
+        }
+    };
+
+    const handleVideoPause = () => {
+        const currentTarget = videoRef.current;
+        const currentTime = Number(currentTarget?.currentTime ?? 0);
+
+        setPauseBtnCount((prev) => prev + 1);
+        setIsPlay(false);
+        setIsPaused(true);
+
+        const bigPlayButton = document.querySelector('.vjs-big-play-button') as HTMLElement | null;
+        if (bigPlayButton) {
+            bigPlayButton.style.display = 'block';
+        }
+
+        if (showFirstReviewQuestionRef.current) {
+            if (showReviewQTimeoutIdRef.current) {
+                clearTimeout(showReviewQTimeoutIdRef.current);
+                showReviewQTimeoutIdRef.current = null;
+            }
+        } else {
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+                timeoutIdRef.current = null;
+            }
+            setIsTimeoutCleared(true);
+
+            if (isReviewExamExist && currentQuestionIndex < finalquestionList.length - 1) {
+                const nextQuestion = finalquestionList[currentQuestionIndex + 1];
+                const nextQuestionTime = Number((nextQuestion as any)?.timeStampInSeconds ?? 0);
+
+                if (Number.isFinite(nextQuestionTime) && nextQuestionTime > 0) {
+                    setNextQuesRemainingTime(Math.max(0, Math.floor(nextQuestionTime - currentTime)));
+                } else {
+                    setNextQuesRemainingTime(0);
+                }
+            }
+        }
+
+        if (sendViewIntervalRef.current) {
+            clearInterval(sendViewIntervalRef.current);
+            sendViewIntervalRef.current = null;
+        }
+    };
+
+    const handleVideoPlaying = () => {
+        if (!isPausedRef.current && videoRef.current) {
+            sendVidViewToUsercourse();
+            localStorage.setItem("videoWatchTime", Math.floor(videoRef.current.currentTime).toFixed(0));
+        }
+
+        if (!sendViewIntervalRef.current) {
+            sendViewIntervalRef.current = setInterval(() => {
+                if (!isPausedRef.current && videoRef.current) {
+                    sendVidViewToUsercourse();
                     localStorage.setItem("videoWatchTime", Math.floor(videoRef.current.currentTime).toFixed(0));
                 }
-            }
+            }, 5000);
+        }
+    };
 
-            if (!sendViewIntervalRef.current) {
-                sendViewIntervalRef.current = setInterval(() => {
-                    if (!isPaused && videoRef.current) {
-                        localStorage.setItem("videoWatchTime", Math.floor(videoRef.current.currentTime).toFixed(0));
-                    }
-                }, 5000);
-            }
-        };
+    const handleVideoEnded = () => {
+        if (sendViewIntervalRef.current) {
+            clearInterval(sendViewIntervalRef.current);
+            sendViewIntervalRef.current = null;
+        }
+        setVidViewPercent("100.00");
+        setPrTime(0);
+        prTimeRef.current = 0;
+    };
 
-        const handleEnded = () => {
-            setVidViewPercent("100.00");
-            setPrTime(0);
-            prTimeRef.current = 0;
-        };
+    const handleVideoSeeking = () => {
+        const currentTarget = videoRef.current;
+        if (!currentTarget) return;
 
-        // Add event listeners
-        muxPlayer.addEventListener("timeupdate", handleTimeUpdate);
-        muxPlayer.addEventListener("play", handlePlay);
-        muxPlayer.addEventListener("pause", handlePause);
-        muxPlayer.addEventListener("playing", handlePlaying);
-        muxPlayer.addEventListener("ended", handleEnded);
-
-        return () => {
-            muxPlayer.removeEventListener("timeupdate", handleTimeUpdate);
-            muxPlayer.removeEventListener("play", handlePlay);
-            muxPlayer.removeEventListener("pause", handlePause);
-            muxPlayer.removeEventListener("playing", handlePlaying);
-            muxPlayer.removeEventListener("ended", handleEnded);
-
-            if (sendViewIntervalRef.current) {
-                clearInterval(sendViewIntervalRef.current);
-                sendViewIntervalRef.current = null;
-            }
-        };
-    }, [playbackSource.src, showFirstReviewQuestion, isReviewExamExist, isReviewExamPassed, isPaused]);
+        const delta = currentTarget.currentTime - prTimeRef.current;
+        if (Math.abs(delta) > 1) {
+            currentTarget.currentTime = prTimeRef.current;
+        }
+    };
 
     const handleFinalAnswerChange = (questionIndex: number, optionValue: string) => {
         setFinalquestionList((prevList) =>
@@ -698,6 +789,13 @@ const ViewWebinar = () => {
                                                         ref={videoRef}
                                                         playbackId={playbackSource.src.split('/').pop()?.split('.')[0] || ''}
                                                         streamType="on-demand"
+                                                        onTimeUpdate={handleVideoProgress}
+                                                        onLoadedMetadata={handleVideoLoadedMetadata}
+                                                        onPlay={handleVideoPlay}
+                                                        onPause={handleVideoPause}
+                                                        onPlaying={handleVideoPlaying}
+                                                        onEnded={handleVideoEnded}
+                                                        onSeeking={handleVideoSeeking}
                                                         style={{
                                                             width: '100%',
                                                             height: '100%',
