@@ -4,9 +4,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button';
 import { imageUrl } from '@/lib/constants';
-import { GetUserSubscribedCourses, updateUserCourseApi } from '@/services/course';
+import { getReviewExamQuestion, GetUserSubscribedCourses, updateUserCourseApi } from '@/services/course';
 import { getAllFinalExamQuestion } from '@/services/exam';
-import { ArrowLeft, Award, BadgeCheck, Bell, Check, Download, FileText, Loader, Mail, Monitor, Phone, Play, Settings, Star, ThumbsUp } from 'lucide-react'
+import { ArrowLeft, Award, BadgeCheck, Bell, Check, CheckCircle2, Download, FileText, Loader, Mail, Monitor, Phone, Play, Settings, Star, ThumbsUp, XCircle } from 'lucide-react'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from 'react-icons/fa6'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link';
@@ -14,14 +14,13 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { jsPDF } from 'jspdf';
 import { getHeader } from '@/services/common';
 import MuxPlayer from '@mux/mux-player-react';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const ViewWebinar = () => {
     const params = useParams<{ videoPath?: string[] }>();
     const searchParams = useSearchParams();
     const [slug, setSlug] = useState("");
     const [muxPlaybackId, setMuxPlaybackId] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
     const [isReviewExamPassed, setIsReviewExamPassed] = useState(false);
     const [lastVideoViewed, setLastVideoViewed] = useState(0);
     const [userCourseId, setUserCourseId] = useState<number | null>(null);
@@ -53,7 +52,9 @@ const ViewWebinar = () => {
     const [totalPercentage, setTotalPercentage] = useState("0");
     const [passPercentage, setPassPercentage] = useState(70);
     const [isShow, setIsShow] = useState(false);
+    const [examResultType, setExamResultType] = useState<"pass" | "fail" | "">("");
     const [isCaptionOn, setIsCaptionOn] = useState(false);
+    const [finalAnswerJson, setFinalAnswerJson] = useState<any[]>([]);
 
     const videoRef = useRef<any>(null);
     const prTimeRef = useRef(0);
@@ -185,41 +186,11 @@ const ViewWebinar = () => {
 
     }, [muxPlaybackId]);
 
-    const webinarImage = searchParams.get("image") || "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80";
-    const currentUserName = searchParams.get("user") || "";
-    const captionUrl = process.env.NEXT_PUBLIC_SUBTITLE_URL || "";
-    const captionTracks = useMemo(() => {
-        if (!captionUrl) return [];
-
-        return [{
-            src: captionUrl,
-            kind: "captions",
-            srclang: "en",
-            label: "English (CC)",
-            default: false,
-        }];
-    }, [captionUrl]);
-
-    const toggleCaptions = () => {
-        const player = videoRef.current;
-        const mediaElement = player?.querySelector?.('video') || player;
-        const tracks = mediaElement?.textTracks ? Array.from(mediaElement.textTracks) : [];
-
-        if (!tracks.length) {
-            setIsCaptionOn(false);
-            return;
-        }
-
-        const nextState = !isCaptionOn;
-        tracks.forEach((track: any) => {
-            track.mode = nextState ? 'showing' : 'hidden';
-        });
-
-        setIsCaptionOn(nextState);
-    };
+    const webinarImage = searchParams.get("image") || "";
 
     const getFinalquestionListing = async (id: string) => {
         try {
+
             const res: any = await getAllFinalExamQuestion(id);
 
             if (res?.exams?.data?.length > 0) {
@@ -298,6 +269,56 @@ const ViewWebinar = () => {
         return null;
     };
 
+    const getReviewQuestionListing = async (id: any) => {
+        try {
+            const res = await getReviewExamQuestion(id);
+            const reviewExams = res?.data?.reviewExams?.data || [];
+
+            if (reviewExams.length > 0) {
+                const reviewExam = reviewExams[0];
+                const questionData = reviewExam?.attributes?.questions || [];
+                const mappedQuestions = questionData.map((element: any) => {
+                    const questionOptions = (element?.options || []).map((item: any) => ({
+                        id: item.id,
+                        option: item.option,
+                        isAnswer: item.isAnswer,
+                        hint: item.hint,
+                    }));
+
+                    const duration = String(element?.durationInminute || "00:00");
+                    const [hours = "0", minutes = "0"] = duration.split(":");
+                    const timeStampInSeconds = (Number(hours) * 60 * 60) + (Number(minutes) * 60);
+
+                    return {
+                        id: element.id,
+                        isMCQ: true,
+                        selectedAnswer: "",
+                        title: element.title,
+                        options: questionOptions,
+                        timeStampInSeconds,
+                    };
+                });
+
+                setFinalExamId(reviewExam?.id || "");
+                setFinalquestionList(mappedQuestions);
+                setFinalQuestionCount(mappedQuestions.length);
+                setCurrentQuestionIndex(0);
+
+                if (!isReviewExamPassed) {
+                    setShowQuestionOnTime(true);
+                }
+            } else {
+                setFinalExamId("");
+                setFinalquestionList([]);
+                setFinalQuestionCount(0);
+                setCurrentQuestionIndex(0);
+                setShowQuestionOnTime(false);
+            }
+        } catch (error) {
+            console.log('error in fetching review question listing', error);
+        }
+    };
+
     const formatCompletedDate = (completedOn: string | null) => {
         if (!completedOn) return "";
         const date = new Date(completedOn);
@@ -334,7 +355,6 @@ const ViewWebinar = () => {
             const fieldStudy = course?.fieldOfStudy || "";
             const program = course?.programNumber || "";
             const usernameFromStorage = localStorage.getItem("username") || "";
-            const fullName = `${firstName} ${lastName}`.trim() || usernameFromStorage;
             const datecompleted = formatCompletedDate(completedOn);
             const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
             const templateUrl = `${baseUrl}${templatePath}`;
@@ -343,7 +363,7 @@ const ViewWebinar = () => {
             const templateHtml = await response.text();
 
             let html = templateHtml
-                .replace(/{{username}}/g, fullName)
+                .replace(/{{username}}/g, usernameFromStorage)
                 .replace(/{{course}}/g, title)
                 .replace(/{{credit}}/g, credit)
                 .replace(/{{medium}}/g, medium)
@@ -427,6 +447,7 @@ const ViewWebinar = () => {
         if (!slug) return;
         getUserCourse(slug);
         getFinalquestionListing(slug);
+        getReviewQuestionListing(slug);
     }, [slug]);
 
     async function updateUserCourse(data: any) {
@@ -588,6 +609,30 @@ const ViewWebinar = () => {
         }
     };
 
+    const selectAnswer = (option: any, selectedIndex: number) => {
+        const selectedAnswer = String(option ?? "").trim();
+
+        setFinalquestionList((prevList) => {
+            const selectedQuestion = prevList[selectedIndex];
+            const questionTitle = selectedQuestion?.title?.trim() || "";
+
+            setFinalAnswerJson((prevAnswers) => {
+                const nextList = [...prevAnswers];
+                nextList[selectedIndex] = {
+                    question: questionTitle,
+                    answer: selectedAnswer,
+                };
+                return nextList;
+            });
+
+            return prevList.map((question, index) =>
+                index === selectedIndex
+                    ? { ...question, selectedAnswer: option }
+                    : question
+            );
+        });
+    };
+
     const handleFinalAnswerChange = (questionIndex: number, optionValue: string) => {
         setFinalquestionList((prevList) =>
             prevList.map((question, index) =>
@@ -596,16 +641,45 @@ const ViewWebinar = () => {
                     : question
             )
         );
+
+        selectAnswer(optionValue, questionIndex);
+    };
+
+    const reviewExamsAnswer = (selectedOption: string, questionIndex: number) => {
+        if (questionIndex < 0 || questionIndex >= finalquestionList.length) return;
+
+        const currentQuestion = finalquestionList[questionIndex];
+        const safeOption = String(selectedOption ?? "").trim();
+
+        setFinalquestionList((prevList) =>
+            prevList.map((question, index) =>
+                index === questionIndex
+                    ? { ...question, selectedAnswer: safeOption }
+                    : question
+            )
+        );
+
+        setFinalAnswerJson((prevList) => {
+            const nextList = [...prevList];
+            nextList[questionIndex] = {
+                question: currentQuestion?.title?.trim() || "",
+                answer: safeOption,
+            };
+            return nextList;
+        });
+
+        setCurrentQuestionIndex(questionIndex);
     };
 
     const checkFinalAnswers = () => {
-        const finalAnswerJson = finalquestionList.map((question: any) => question?.selectedAnswer);
+        const finalAnswerJson = finalquestionList.map((question: any) => ({
+            question: question?.title?.trim() || "",
+            answer: question?.selectedAnswer?.trim() || "",
+        }));
 
-        if (
-            finalAnswerJson.length !== finalQuestionCount ||
-            finalAnswerJson.includes(undefined) ||
-            finalAnswerJson.includes("")
-        ) {
+        const hasEmptyAnswer = finalAnswerJson.some((item) => !item.question || !item.answer);
+
+        if (finalAnswerJson.length !== finalQuestionCount || hasEmptyAnswer) {
             const message = 'Make sure you have answered each question';
             setErr(message);
             setShowSubmitConfirm(false);
@@ -622,9 +696,10 @@ const ViewWebinar = () => {
         try {
             const todayDate = new Date().toISOString().split("T")[0];
 
-            // ✅ Get pass percentage
+            // Get pass percentage
             const headerRes = await getHeader(); // replace with actual API
             const pass = headerRes?.data?.data?.attributes?.examPassPercentage || 70;
+
             setPassPercentage(pass);
 
             const record = {
@@ -635,6 +710,7 @@ const ViewWebinar = () => {
                     endedOn: todayDate,
                 },
             };
+
             const token = localStorage.getItem("token") || "";
 
             let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/user-exams", {
@@ -646,9 +722,7 @@ const ViewWebinar = () => {
                 },
             })
 
-
             let res = await response.json();
-
 
             if (
                 res.error?.status === 400 &&
@@ -659,10 +733,9 @@ const ViewWebinar = () => {
                 setErr("You have already submitted the exam. Multiple attempts are not allowed.");
             }
 
-
             if (res?.data) {
-                const score = res?.data.data.attributes.score;
-                const total = res?.data.data.attributes.totalScore;
+                const score = res?.data.attributes.score;
+                const total = res?.data.attributes.totalScore;
 
                 setScoreObtained(score);
                 setTotalScore(total);
@@ -670,12 +743,9 @@ const ViewWebinar = () => {
                 const percentage = ((score * 100) / total).toFixed(2);
                 setTotalPercentage(percentage);
 
-                if (parseFloat(percentage) >= pass) {
-                    // success modal
-                    setIsShow(true);
-                } else {
-                    setIsShow(false);
-                }
+                const passed = parseFloat(percentage) >= pass;
+                setExamResultType(passed ? "pass" : "fail");
+                setIsShow(true);
             }
         } catch (error: any) {
 
@@ -696,6 +766,7 @@ const ViewWebinar = () => {
         "Glossary of Terms",
         "Table Of Contents",
     ];
+
     const faqItems = [
         {
             question: "What is this service about?",
@@ -759,9 +830,6 @@ const ViewWebinar = () => {
                                     <h3 className="text-2xl font-bold leading-tight text-slate-900">
                                         {webinarTitle}
                                     </h3>
-                                    <p className="text-sm text-slate-600">
-                                        {firstName} {lastName}
-                                    </p>
                                     <p className="font-semibold leading-none text-amber-600">
                                         {vidViewPercent} % Complete...keep it going!
                                     </p>
@@ -841,10 +909,10 @@ const ViewWebinar = () => {
                                                     </MuxPlayer>
                                                 )}
 
-                                                 <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
+                                                <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
                                                     Watched: {videoWatchTime}s ({vidViewPercent}%)
                                                 </div>
-                                               
+
                                             </div>
                                         </div>
                                     </div>
@@ -901,6 +969,50 @@ const ViewWebinar = () => {
                                 </aside>
                             </div>
                         </section>
+
+                        {finalquestionList.length > 0 && !isReviewExamPassed && (
+                            <div id="reviewQuestionsSection" className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                                <h2 className="mb-4 text-xl font-semibold text-gray-800">Review Questions</h2>
+
+                                {finalquestionList[currentQuestionIndex] && (
+                                    <div className="space-y-4">
+                                        <h6 className="text-lg font-medium text-gray-700">
+                                            {finalquestionList[currentQuestionIndex]?.title}
+                                        </h6>
+
+                                        <div className="space-y-2">
+                                            {finalquestionList[currentQuestionIndex]?.options?.map((question: any, questionIndex: number) => (
+                                                <label
+                                                    key={question?.id || questionIndex}
+                                                    className="flex cursor-pointer items-center space-x-3 rounded-md border border-gray-200 p-3 transition hover:bg-gray-100"
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        id={`question_${questionIndex}`}
+                                                        name={`option_${currentQuestionIndex}`}
+                                                        value={question?.option}
+                                                        checked={finalquestionList[currentQuestionIndex]?.selectedAnswer == question?.option}
+                                                        onChange={() => reviewExamsAnswer(question?.option, currentQuestionIndex)}
+                                                        disabled={isAnswerTrue}
+                                                        className="h-4 w-4 text-blue-500 focus:ring focus:ring-blue-300"
+                                                    />
+                                                    <span className="text-gray-700">{question?.option}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+
+                                        <Button
+                                            type="button"
+                                            onClick={CheckAnswer}
+                                            disabled={isAnswerTrue}
+                                            className="mt-2 bg-blue-500 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            Check Answer
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         <section className="mt-8 mb-4 rounded-none bg-[#e9ecf6] px-6 py-10 md:px-12">
                             <div className="mx-auto max-w-7xl">
@@ -990,6 +1102,55 @@ const ViewWebinar = () => {
                                         Submit
                                     </Button>
                                 </div>
+
+                                <Dialog open={isShow} onOpenChange={setIsShow}>
+                                    <DialogContent
+                                        showCloseButton={false}
+                                        className="max-w-md rounded-[28px] border-0 bg-white p-0 shadow-[0_24px_80px_rgba(17,24,39,0.22)] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                                    >
+                                        <div className="relative w-full p-8 text-center">
+                                            <DialogClose asChild>
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-200"
+                                                    aria-label="Close"
+                                                >
+                                                    <span className="text-xl leading-none">×</span>
+                                                </button>
+                                            </DialogClose>
+
+                                            <div className="mb-5 flex justify-center">
+                                                {examResultType === "pass" ? (
+                                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 ring-8 ring-emerald-50">
+                                                        <CheckCircle2 className="h-12 w-12 text-emerald-600" strokeWidth={2.5} />
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-100 ring-8 ring-red-50">
+                                                        <XCircle className="h-12 w-12 text-red-600" strokeWidth={2.5} />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <DialogHeader className="mb-3 text-center">
+                                                <DialogTitle className="text-3xl text-center font-bold uppercase tracking-tight text-slate-900">
+                                                    {examResultType === "pass" ? "Congratulations!" : "Exam Result"}
+                                                </DialogTitle>
+                                            </DialogHeader>
+
+                                            <DialogDescription className="text-base leading-7 text-slate-700">
+                                                {examResultType === "pass"
+                                                    ? `You passed the exam with ${totalPercentage}% and met the ${passPercentage}% requirement.`
+                                                    : `You scored ${totalPercentage}% and need at least ${passPercentage}% to pass this exam.`}
+                                            </DialogDescription>
+
+                                            <DialogClose asChild>
+                                                <Button className="mt-6 w-full rounded-xl bg-[#0b2d5c] text-white hover:bg-[#0d3a75]">
+                                                    Close
+                                                </Button>
+                                            </DialogClose>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
 
                                 {err && (
                                     <p className="mt-3 text-center text-sm font-medium text-red-600">{err}</p>

@@ -68,6 +68,55 @@ export async function getAllCourseForSearch(search: any) {
   return data?.courses;
 }
 
+export async function getReviewExamQuestion(slug: any) {
+  const { data }: { data: any } = await client.query({
+    query: getQuestionGqlReviewExam(slug),
+    fetchPolicy: "network-only",
+  });
+
+  if (!data) return {};
+
+  return data?.courses;
+}
+
+function getQuestionGqlReviewExam(slug: any) {
+  return gql`query{
+        reviewExams (pagination: { limit: -1 }, filters:
+           { 
+            course:
+            { 
+              slug :{ eq: "${slug}"} 
+            }
+          }) {
+          data
+          {
+            id
+            attributes
+            {
+              title
+              desc
+               questions (pagination: { limit: -1 }) {
+                id
+                isMCQ
+                title
+                durationInminute
+                options{
+                  option
+                  id
+                  displayOrder
+                  isAnswer
+                  hint
+                }
+              }
+            }
+            
+          }
+        }
+    }
+  `;
+}
+
+
 function getCourseSearchGql(keyword: any, isActive: boolean, forTaxLaw: true) {
   return gql`query {
       courses( 
