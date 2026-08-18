@@ -10,6 +10,18 @@ export async function getCourseDetailPage() {
   return await apiFetch(url)
 }
 
+export async function updateUserCourseApi(id: any, data: any) {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/user-courses/${id}`;
+
+  return await apiFetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+}
+
 export async function getAllCourses(title?: any) {
   let search = title || '';
 

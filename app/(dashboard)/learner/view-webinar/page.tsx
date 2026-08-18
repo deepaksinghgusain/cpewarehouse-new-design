@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button';
 import { imageUrl } from '@/lib/constants';
-import { GetUserSubscribedCourses } from '@/services/course';
+import { GetUserSubscribedCourses, updateUserCourseApi } from '@/services/course';
 import { getAllFinalExamQuestion } from '@/services/exam';
 import { ArrowLeft, Award, BadgeCheck, Bell, Check, Download, FileText, Loader, Mail, Monitor, Phone, Play, Settings, Star, ThumbsUp } from 'lucide-react'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from 'react-icons/fa6'
@@ -65,7 +65,7 @@ const ViewWebinar = () => {
         // Get video URL from query parameters (preserves full URL with query params)
         const videoUrlParam = searchParams.get('videoUrl');
         const slugParam = searchParams.get('slug');
-        
+
         // If videoUrl is provided as query param, use it as muxPlaybackId
         if (videoUrlParam) {
             setMuxPlaybackId(videoUrlParam);
@@ -107,9 +107,10 @@ const ViewWebinar = () => {
     };
 
     const sendVidViewToUsercourse = () => {
-        if (!videoRef.current) return;
-        const watched = videoRef.current.currentTime.toFixed(0);
-        localStorage.setItem("videoWatchTime", watched);
+        const jsonData = { "data": { "lastVideoView": (videoWatchTime) } }
+        if (jsonData) {
+            updateUserCourse(jsonData)
+        }
     };
 
     const webinarTitle = useMemo(() => {
@@ -151,7 +152,7 @@ const ViewWebinar = () => {
             src,
             type: cleanId.toLowerCase().endsWith('.mp4') ? "video/mp4" : "application/x-mpegURL",
         };
-        
+
     }, [muxPlaybackId]);
 
     console.log("playbackSource", playbackSource);
@@ -364,6 +365,10 @@ const ViewWebinar = () => {
         getUserCourse(slug);
         getFinalquestionListing(slug);
     }, [slug]);
+
+    async function updateUserCourse(data: any) {
+        await updateUserCourseApi(userCourseId, data);
+    }
 
     useEffect(() => {
         // MuxPlayer event listener for tracking playback
