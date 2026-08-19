@@ -76,7 +76,7 @@ export async function getReviewExamQuestion(slug: any) {
 
   if (!data) return {};
 
-  return data?.courses;
+  return data;
 }
 
 function getQuestionGqlReviewExam(slug: any) {

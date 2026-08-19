@@ -55,6 +55,7 @@ const ViewWebinar = () => {
     const [examResultType, setExamResultType] = useState<"pass" | "fail" | "">("");
     const [isCaptionOn, setIsCaptionOn] = useState(false);
     const [finalAnswerJson, setFinalAnswerJson] = useState<any[]>([]);
+    const [reviewExamQuestions, setReviewExamQuestions] = useState<any[]>([]);
 
     const videoRef = useRef<any>(null);
     const prTimeRef = useRef(0);
@@ -272,7 +273,9 @@ const ViewWebinar = () => {
     const getReviewQuestionListing = async (id: any) => {
         try {
             const res = await getReviewExamQuestion(id);
-            const reviewExams = res?.data?.reviewExams?.data || [];
+            const reviewExams = res?.reviewExams?.data || [];
+
+            console.log('reviewExams', reviewExams);
 
             if (reviewExams.length > 0) {
                 const reviewExam = reviewExams[0];
@@ -299,20 +302,9 @@ const ViewWebinar = () => {
                     };
                 });
 
-                setFinalExamId(reviewExam?.id || "");
-                setFinalquestionList(mappedQuestions);
-                setFinalQuestionCount(mappedQuestions.length);
-                setCurrentQuestionIndex(0);
-
-                if (!isReviewExamPassed) {
-                    setShowQuestionOnTime(true);
-                }
+                setReviewExamQuestions(mappedQuestions);
             } else {
-                setFinalExamId("");
-                setFinalquestionList([]);
-                setFinalQuestionCount(0);
-                setCurrentQuestionIndex(0);
-                setShowQuestionOnTime(false);
+               
             }
         } catch (error) {
             console.log('error in fetching review question listing', error);
@@ -970,18 +962,18 @@ const ViewWebinar = () => {
                             </div>
                         </section>
 
-                        {finalquestionList.length > 0 && !isReviewExamPassed && (
+                        {reviewExamQuestions.length > 0 && !isReviewExamPassed && (
                             <div id="reviewQuestionsSection" className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                                 <h2 className="mb-4 text-xl font-semibold text-gray-800">Review Questions</h2>
 
-                                {finalquestionList[currentQuestionIndex] && (
+                                {reviewExamQuestions[currentQuestionIndex] && (
                                     <div className="space-y-4">
                                         <h6 className="text-lg font-medium text-gray-700">
-                                            {finalquestionList[currentQuestionIndex]?.title}
+                                            {reviewExamQuestions[currentQuestionIndex]?.title}
                                         </h6>
 
                                         <div className="space-y-2">
-                                            {finalquestionList[currentQuestionIndex]?.options?.map((question: any, questionIndex: number) => (
+                                            {reviewExamQuestions[currentQuestionIndex]?.options?.map((question: any, questionIndex: number) => (
                                                 <label
                                                     key={question?.id || questionIndex}
                                                     className="flex cursor-pointer items-center space-x-3 rounded-md border border-gray-200 p-3 transition hover:bg-gray-100"
@@ -991,7 +983,7 @@ const ViewWebinar = () => {
                                                         id={`question_${questionIndex}`}
                                                         name={`option_${currentQuestionIndex}`}
                                                         value={question?.option}
-                                                        checked={finalquestionList[currentQuestionIndex]?.selectedAnswer == question?.option}
+                                                        checked={reviewExamQuestions[currentQuestionIndex]?.selectedAnswer == question?.option}
                                                         onChange={() => reviewExamsAnswer(question?.option, currentQuestionIndex)}
                                                         disabled={isAnswerTrue}
                                                         className="h-4 w-4 text-blue-500 focus:ring focus:ring-blue-300"
