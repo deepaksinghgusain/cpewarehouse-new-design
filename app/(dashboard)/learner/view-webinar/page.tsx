@@ -16,6 +16,96 @@ import { getHeader } from '@/services/common';
 import MuxPlayer from '@mux/mux-player-react';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
+const parseDurationToSeconds = (duration?: string | number | null): number => {
+    if (duration === null || duration === undefined || duration === "") return 0;
+
+    const value = String(duration).trim();
+    if (!value) return 0;
+
+    const normalized = value.replace(",", ".");
+    const match = normalized.match(/^((\d+):)?(\d{1,2}):(\d{1,2})(?:\.(\d+))?$/);
+
+    if (!match) {
+        const numeric = Number(normalized);
+        return Number.isFinite(numeric) ? numeric : 0;
+    }
+
+    const hours = match[2] ? Number(match[2]) : 0;
+    const minutes = Number(match[3]);
+    const seconds = Number(match[4]);
+    const milliseconds = match[5] ? Number(`0.${match[5]}`) : 0;
+
+    return hours * 3600 + minutes * 60 + seconds + milliseconds;
+};
+
+const normalizeReviewOption = (option: any, index: number) => {
+    const optionValue = option?.value ?? option?.option ?? option?.label ?? option?.text ?? option?.answer ?? option?.correctAnswer ?? `Option ${index + 1}`;
+    const optionLabel = option?.label ?? option?.option ?? option?.text ?? option?.value ?? option?.answer ?? option?.correctAnswer ?? `Option ${index + 1}`;
+
+    const isCorrect =
+        option?.isCorrect === true ||
+        option?.correct === true ||
+        option?.isAnswer === true ||
+        option?.correctAnswer === true ||
+        option?.answer === true ||
+        option?.isCorrectAnswer === true;
+
+    return {
+        id: String(option?.id ?? option?.optionId ?? option?.value ?? index),
+        label: String(optionLabel),
+        value: String(optionValue),
+        isCorrect,
+        raw: option,
+    };
+};
+
+const normalizeReviewQuestion = (question: any, index: number) => {
+    const safeOptions = Array.isArray(question?.options) ? question.options : [];
+
+    return {
+        id: String(question?.id ?? `${index}`),
+        title: String(question?.title ?? `Question ${index + 1}`),
+        isMCQ: Boolean(question?.isMCQ),
+        supportsMultipleAnswers: Boolean(
+            question?.allowMultipleAnswers ||
+            question?.multipleAnswers ||
+            question?.supportsMultipleAnswers ||
+            question?.multipleCorrectAnswers ||
+            Number(question?.maxSelections ?? 0) > 1
+        ),
+        durationInminute: question?.durationInminute ?? "00:00",
+        timestampSeconds: parseDurationToSeconds(question?.durationInminute),
+        options: safeOptions.map((option: any, optionIndex: number) => normalizeReviewOption(option, optionIndex)),
+        raw: question,
+    };
+};
+
+const getMediaElement = (ref: React.RefObject<any>) => {
+    const node = ref?.current;
+    if (!node) return null;
+
+    if (typeof node.currentTime === 'number' && typeof node.pause === 'function' && typeof node.play === 'function') {
+        return node;
+    }
+
+    if (node?.media && typeof node.media.currentTime === 'number' && typeof node.media.pause === 'function' && typeof node.media.play === 'function') {
+        return node.media;
+    }
+
+    if (node instanceof HTMLMediaElement) return node;
+
+    if (typeof node.querySelector === 'function') {
+        const media = node.querySelector('video');
+        if (media instanceof HTMLMediaElement) return media;
+
+        if (media && typeof media.currentTime === 'number' && typeof media.pause === 'function' && typeof media.play === 'function') {
+            return media;
+        }
+    }
+
+    return null;
+};
+
 const ViewWebinar = () => {
     const params = useParams<{ videoPath?: string[] }>();
     const searchParams = useSearchParams();
@@ -56,6 +146,12 @@ const ViewWebinar = () => {
     const [isCaptionOn, setIsCaptionOn] = useState(false);
     const [finalAnswerJson, setFinalAnswerJson] = useState<any[]>([]);
     const [reviewExamQuestions, setReviewExamQuestions] = useState<any[]>([]);
+    const [currentReviewQuestion, setCurrentReviewQuestion] = useState<any | null>(null);
+    const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
+    const [showResultPopup, setShowResultPopup] = useState(false);
+    const [answerResult, setAnswerResult] = useState<{ isCorrect: boolean; correctAnswer: string; message: string } | null>(null);
+    const [completedQuestionIds, setCompletedQuestionIds] = useState<string[]>([]);
+    const [isReviewActive, setIsReviewActive] = useState(false);
 
     const videoRef = useRef<any>(null);
     const prTimeRef = useRef(0);
@@ -65,6 +161,33 @@ const ViewWebinar = () => {
     const isPausedRef = useRef(false);
     const isAnswerTrueRef = useRef(false);
     const showFirstReviewQuestionRef = useRef(false);
+    const completedReviewIdsRef = useRef<Set<string>>(new Set());
+    const triggeredReviewIdsRef = useRef<Set<string>>(new Set());
+
+    const getSavedReviewAnswers = (): Array<{ question: string; answer: string }> => {
+        try {
+            const savedAnswers = JSON.parse(localStorage.getItem('FinalAnswerList') || '[]');
+            return Array.isArray(savedAnswers)
+                ? savedAnswers.filter((item) => item?.question && item?.answer)
+                : [];
+        } catch {
+            return [];
+        }
+    };
+
+    const saveReviewAnswer = (question: any, answers: string[]) => {
+        const questionTitle = String(question?.title || '').trim();
+        const answer = answers.map((item) => String(item).trim()).filter(Boolean).join(', ');
+        if (!questionTitle || !answer) return;
+
+        const jsonData = {
+            question: questionTitle,
+            answer,
+        };
+        const savedAnswers = getSavedReviewAnswers().filter((item) => item.question !== questionTitle);
+
+        localStorage.setItem('FinalAnswerList', JSON.stringify([...savedAnswers, jsonData]));
+    };
 
     useEffect(() => {
         // Get video URL from query parameters (preserves full URL with query params)
@@ -273,38 +396,44 @@ const ViewWebinar = () => {
     const getReviewQuestionListing = async (id: any) => {
         try {
             const res = await getReviewExamQuestion(id);
-            const reviewExams = res?.reviewExams?.data || [];
+            const reviewExams = res?.reviewExams?.data || res?.data?.reviewExams?.data || [];
 
-            console.log('reviewExams', reviewExams);
+            console.log(res, "reviewExams", reviewExams);
 
             if (reviewExams.length > 0) {
                 const reviewExam = reviewExams[0];
                 const questionData = reviewExam?.attributes?.questions || [];
-                const mappedQuestions = questionData.map((element: any) => {
-                    const questionOptions = (element?.options || []).map((item: any) => ({
-                        id: item.id,
-                        option: item.option,
-                        isAnswer: item.isAnswer,
-                        hint: item.hint,
-                    }));
 
-                    const duration = String(element?.durationInminute || "00:00");
-                    const [hours = "0", minutes = "0"] = duration.split(":");
-                    const timeStampInSeconds = (Number(hours) * 60 * 60) + (Number(minutes) * 60);
+                const mappedQuestions = questionData
+                    .map((element: any, index: number) => normalizeReviewQuestion(element, index))
+                    .filter((question: any) => Number(question.timestampSeconds) >= 0)
+                    .sort((a: any, b: any) => a.timestampSeconds - b.timestampSeconds);
 
-                    return {
-                        id: element.id,
-                        isMCQ: true,
-                        selectedAnswer: "",
-                        title: element.title,
-                        options: questionOptions,
-                        timeStampInSeconds,
-                    };
-                });
+                const savedAnswers = getSavedReviewAnswers();
+                const savedQuestionTitles = new Set(savedAnswers.map((item) => item.question.trim()));
+                const completedQuestionIds = mappedQuestions
+                    .filter((question: any) => savedQuestionTitles.has(question.title.trim()))
+                    .map((question: any) => String(question.id));
 
                 setReviewExamQuestions(mappedQuestions);
+                completedReviewIdsRef.current = new Set(completedQuestionIds);
+                triggeredReviewIdsRef.current = new Set();
+                setCompletedQuestionIds(completedQuestionIds);
+                setCurrentReviewQuestion(null);
+                setSelectedAnswer([]);
+                setShowResultPopup(false);
+                setAnswerResult(null);
+                setIsReviewActive(false);
             } else {
-               
+                setReviewExamQuestions([]);
+                setCompletedQuestionIds([]);
+                setCurrentReviewQuestion(null);
+                setSelectedAnswer([]);
+                setShowResultPopup(false);
+                setAnswerResult(null);
+                setIsReviewActive(false);
+                completedReviewIdsRef.current = new Set();
+                triggeredReviewIdsRef.current = new Set();
             }
         } catch (error) {
             console.log('error in fetching review question listing', error);
@@ -663,6 +792,146 @@ const ViewWebinar = () => {
         setCurrentQuestionIndex(questionIndex);
     };
 
+    const evaluateReviewAnswer = (question: any, answers: string[]) => {
+        if (!question) return;
+
+        const correctAnswers = question.options
+            .filter((option: any) => option.isCorrect)
+            .map((option: any) => String(option.value ?? option.label ?? option.option))
+            .filter(Boolean);
+
+        const normalizedSelected = answers.map((answer) => String(answer).trim());
+        const normalizedCorrect = correctAnswers.map((answer:any) => String(answer).trim());
+
+        const isCorrect =
+            question.isMCQ && question.supportsMultipleAnswers
+                ? normalizedSelected.length === normalizedCorrect.length &&
+                  normalizedSelected.every((value) => normalizedCorrect.includes(value))
+                : normalizedSelected[0] === normalizedCorrect[0];
+
+                if (isCorrect) {
+                        saveReviewAnswer(question, normalizedSelected);
+                }
+
+        setAnswerResult({
+            isCorrect,
+            correctAnswer: normalizedCorrect.join(', ') || 'N/A',
+            message: isCorrect ? 'Your answer is correct.' : 'Your answer is incorrect.',
+        });
+        setShowResultPopup(true);
+    };
+
+    const triggerReviewQuestion = (question: any) => {
+        if (!question) return;
+
+        const questionId = String(question.id);
+        if (completedReviewIdsRef.current.has(questionId) || triggeredReviewIdsRef.current.has(questionId)) {
+            return;
+        }
+
+        triggeredReviewIdsRef.current.add(questionId);
+
+        const media = getMediaElement(videoRef);
+        if (media) {
+            media.pause();
+            media.currentTime = Math.min(Number(media.currentTime || 0), Number(question.timestampSeconds || media.currentTime || 0));
+        }
+
+        setCurrentReviewQuestion(question);
+        setSelectedAnswer([]);
+        setShowResultPopup(false);
+        setAnswerResult(null);
+        setIsReviewActive(true);
+    };
+
+    const handleReviewOptionToggle = (optionValue: string) => {
+        if (!currentReviewQuestion || showResultPopup) return;
+
+        if (!currentReviewQuestion.isMCQ || !currentReviewQuestion.supportsMultipleAnswers) {
+            const nextValue = [optionValue];
+            setSelectedAnswer(nextValue);
+            evaluateReviewAnswer(currentReviewQuestion, nextValue);
+            return;
+        }
+
+        setSelectedAnswer((prev) => {
+            const exists = prev.includes(optionValue);
+            const next = exists ? prev.filter((value) => value !== optionValue) : [...prev, optionValue];
+            return next;
+        });
+    };
+
+    const handleReviewSubmit = () => {
+        if (!currentReviewQuestion || selectedAnswer.length === 0 || showResultPopup) return;
+        evaluateReviewAnswer(currentReviewQuestion, selectedAnswer);
+    };
+
+    const handleRetryReviewQuestion = () => {
+        setSelectedAnswer([]);
+        setAnswerResult(null);
+        setShowResultPopup(false);
+    };
+
+    const handleContinueReviewVideo = () => {
+        if (!currentReviewQuestion || !answerResult?.isCorrect) return;
+
+        const questionId = String(currentReviewQuestion.id);
+        completedReviewIdsRef.current.add(questionId);
+        setCompletedQuestionIds((prev) => prev.includes(questionId) ? prev : [...prev, questionId]);
+
+        setCurrentReviewQuestion(null);
+        setSelectedAnswer([]);
+        setShowResultPopup(false);
+        setAnswerResult(null);
+        setIsReviewActive(false);
+        triggeredReviewIdsRef.current.delete(questionId);
+
+        const media = getMediaElement(videoRef);
+        if (media) {
+            media.currentTime = Number(currentReviewQuestion.timestampSeconds || media.currentTime || 0);
+            media.play().catch(() => undefined);
+        }
+    };
+
+    useEffect(() => {
+        const media = getMediaElement(videoRef);
+        if (!media || reviewExamQuestions.length === 0) return;
+
+        const handleTimeUpdate = () => {
+            if (isReviewActive) return;
+
+            const currentTime = Number(media.currentTime || 0);
+            const nextQuestion = reviewExamQuestions.find((question) => {
+                const questionId = String(question.id);
+                return !completedReviewIdsRef.current.has(questionId) && !triggeredReviewIdsRef.current.has(questionId) && currentTime >= Number(question.timestampSeconds || 0);
+            });
+
+            if (nextQuestion) {
+                triggerReviewQuestion(nextQuestion);
+            }
+        };
+
+        const handleSeeking = () => {
+            if (!currentReviewQuestion) return;
+
+            const questionTimestamp = Number(currentReviewQuestion.timestampSeconds || 0);
+            const currentTime = Number(media.currentTime || 0);
+
+            if (!completedReviewIdsRef.current.has(String(currentReviewQuestion.id)) && currentTime > questionTimestamp) {
+                media.currentTime = questionTimestamp;
+                media.pause();
+            }
+        };
+
+        media.addEventListener('timeupdate', handleTimeUpdate);
+        media.addEventListener('seeking', handleSeeking);
+
+        return () => {
+            media.removeEventListener('timeupdate', handleTimeUpdate);
+            media.removeEventListener('seeking', handleSeeking);
+        };
+    }, [reviewExamQuestions, isReviewActive, currentReviewQuestion]);
+
     const checkFinalAnswers = () => {
         const finalAnswerJson = finalquestionList.map((question: any) => ({
             question: question?.title?.trim() || "",
@@ -962,47 +1231,80 @@ const ViewWebinar = () => {
                             </div>
                         </section>
 
-                        {reviewExamQuestions.length > 0 && !isReviewExamPassed && (
-                            <div id="reviewQuestionsSection" className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                                <h2 className="mb-4 text-xl font-semibold text-gray-800">Review Questions</h2>
+                        {currentReviewQuestion && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                                <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
+                                    <div className="mb-4 text-center">
+                                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Review Question</p>
+                                        <h3 className="mt-2 text-2xl font-bold text-slate-900">{currentReviewQuestion.title}</h3>
+                                    </div>
 
-                                {reviewExamQuestions[currentQuestionIndex] && (
-                                    <div className="space-y-4">
-                                        <h6 className="text-lg font-medium text-gray-700">
-                                            {reviewExamQuestions[currentQuestionIndex]?.title}
-                                        </h6>
+                                    <div className="space-y-3">
+                                        {currentReviewQuestion.options.map((option: any, optionIndex: number) => {
+                                            const checked = selectedAnswer.includes(option.value);
+                                            const isMultipleChoice = currentReviewQuestion.isMCQ && currentReviewQuestion.supportsMultipleAnswers;
 
-                                        <div className="space-y-2">
-                                            {reviewExamQuestions[currentQuestionIndex]?.options?.map((question: any, questionIndex: number) => (
+                                            return (
                                                 <label
-                                                    key={question?.id || questionIndex}
-                                                    className="flex cursor-pointer items-center space-x-3 rounded-md border border-gray-200 p-3 transition hover:bg-gray-100"
+                                                    key={option.id || `${optionIndex}-${option.value}`}
+                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition ${
+                                                        checked ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'
+                                                    } ${showResultPopup ? 'cursor-not-allowed opacity-80' : ''}`}
                                                 >
                                                     <input
-                                                        type="radio"
-                                                        id={`question_${questionIndex}`}
-                                                        name={`option_${currentQuestionIndex}`}
-                                                        value={question?.option}
-                                                        checked={reviewExamQuestions[currentQuestionIndex]?.selectedAnswer == question?.option}
-                                                        onChange={() => reviewExamsAnswer(question?.option, currentQuestionIndex)}
-                                                        disabled={isAnswerTrue}
-                                                        className="h-4 w-4 text-blue-500 focus:ring focus:ring-blue-300"
+                                                        type={isMultipleChoice ? 'checkbox' : 'radio'}
+                                                        name={`review-question-${currentReviewQuestion.id}`}
+                                                        value={option.value}
+                                                        checked={checked}
+                                                        disabled={showResultPopup}
+                                                        onChange={() => handleReviewOptionToggle(option.value)}
+                                                        className="h-4 w-4 accent-blue-600"
                                                     />
-                                                    <span className="text-gray-700">{question?.option}</span>
+                                                    <span className="text-base text-slate-700">{option.label}</span>
                                                 </label>
-                                            ))}
+                                            );
+                                        })}
+                                    </div>
+
+                                    {!showResultPopup && (
+                                        <div className="mt-5 flex justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={handleReviewSubmit}
+                                                disabled={selectedAnswer.length === 0}
+                                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                                            >
+                                                {currentReviewQuestion.isMCQ && currentReviewQuestion.supportsMultipleAnswers ? 'Check Answer' : 'Submit Answer'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {showResultPopup && answerResult && currentReviewQuestion && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                                <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+                                    <div className="mb-5 text-center">
+                                        <div className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full ${answerResult.isCorrect ? 'bg-emerald-100' : 'bg-red-100'}`}>
+                                            <span className="text-3xl">{answerResult.isCorrect ? '✅' : '❌'}</span>
                                         </div>
 
-                                        <Button
-                                            type="button"
-                                            onClick={CheckAnswer}
-                                            disabled={isAnswerTrue}
-                                            className="mt-2 bg-blue-500 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
-                                        >
-                                            Check Answer
-                                        </Button>
+                                        <h3 className={`text-2xl font-bold ${answerResult.isCorrect ? 'text-emerald-600' : 'text-red-600'}`}>
+                                            {answerResult.isCorrect ? 'Correct Answer' : 'Wrong Answer'}
+                                        </h3>
                                     </div>
-                                )}
+
+                                    <p className="text-center text-base text-slate-700">{answerResult.message}</p>
+
+                                    <button
+                                        type="button"
+                                        onClick={answerResult.isCorrect ? handleContinueReviewVideo : handleRetryReviewQuestion}
+                                        className="mt-6 w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-700"
+                                    >
+                                        {answerResult.isCorrect ? 'Continue Video' : 'Try Again'}
+                                    </button>
+                                </div>
                             </div>
                         )}
 
