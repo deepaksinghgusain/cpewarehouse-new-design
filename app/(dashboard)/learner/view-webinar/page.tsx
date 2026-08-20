@@ -1,193 +1,35 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { Button } from '@/components/ui/button';
-import { imageUrl } from '@/lib/constants';
-import { getReviewExamQuestion, GetUserSubscribedCourses, updateUserCourseApi } from '@/services/course';
-import { getAllFinalExamQuestion } from '@/services/exam';
-import { ArrowLeft, Award, BadgeCheck, Bell, Check, CheckCircle2, Download, FileText, Loader, Mail, Monitor, Phone, Play, Settings, Star, ThumbsUp, XCircle } from 'lucide-react'
+import { GetUserSubscribedCourses } from '@/services/course';
+import { ArrowLeft, BadgeCheck, Bell, Check, Download, FileText, Loader, Mail, Phone, Settings } from 'lucide-react'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from 'react-icons/fa6'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { jsPDF } from 'jspdf';
-import { getHeader } from '@/services/common';
-import MuxPlayer from '@mux/mux-player-react';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-const parseDurationToSeconds = (duration?: string | number | null): number => {
-    if (duration === null || duration === undefined || duration === "") return 0;
-
-    const value = String(duration).trim();
-    if (!value) return 0;
-
-    const normalized = value.replace(",", ".");
-    const match = normalized.match(/^((\d+):)?(\d{1,2}):(\d{1,2})(?:\.(\d+))?$/);
-
-    if (!match) {
-        const numeric = Number(normalized);
-        return Number.isFinite(numeric) ? numeric : 0;
-    }
-
-    const hours = match[2] ? Number(match[2]) : 0;
-    const minutes = Number(match[3]);
-    const seconds = Number(match[4]);
-    const milliseconds = match[5] ? Number(`0.${match[5]}`) : 0;
-
-    return hours * 3600 + minutes * 60 + seconds + milliseconds;
-};
-
-const normalizeReviewOption = (option: any, index: number) => {
-    const optionValue = option?.value ?? option?.option ?? option?.label ?? option?.text ?? option?.answer ?? option?.correctAnswer ?? `Option ${index + 1}`;
-    const optionLabel = option?.label ?? option?.option ?? option?.text ?? option?.value ?? option?.answer ?? option?.correctAnswer ?? `Option ${index + 1}`;
-
-    const isCorrect =
-        option?.isCorrect === true ||
-        option?.correct === true ||
-        option?.isAnswer === true ||
-        option?.correctAnswer === true ||
-        option?.answer === true ||
-        option?.isCorrectAnswer === true;
-
-    return {
-        id: String(option?.id ?? option?.optionId ?? option?.value ?? index),
-        label: String(optionLabel),
-        value: String(optionValue),
-        isCorrect,
-        raw: option,
-    };
-};
-
-const normalizeReviewQuestion = (question: any, index: number) => {
-    const safeOptions = Array.isArray(question?.options) ? question.options : [];
-
-    return {
-        id: String(question?.id ?? `${index}`),
-        title: String(question?.title ?? `Question ${index + 1}`),
-        isMCQ: Boolean(question?.isMCQ),
-        supportsMultipleAnswers: Boolean(
-            question?.allowMultipleAnswers ||
-            question?.multipleAnswers ||
-            question?.supportsMultipleAnswers ||
-            question?.multipleCorrectAnswers ||
-            Number(question?.maxSelections ?? 0) > 1
-        ),
-        durationInminute: question?.durationInminute ?? "00:00",
-        timestampSeconds: parseDurationToSeconds(question?.durationInminute),
-        options: safeOptions.map((option: any, optionIndex: number) => normalizeReviewOption(option, optionIndex)),
-        raw: question,
-    };
-};
-
-const getMediaElement = (ref: React.RefObject<any>) => {
-    const node = ref?.current;
-    if (!node) return null;
-
-    if (typeof node.currentTime === 'number' && typeof node.pause === 'function' && typeof node.play === 'function') {
-        return node;
-    }
-
-    if (node?.media && typeof node.media.currentTime === 'number' && typeof node.media.pause === 'function' && typeof node.media.play === 'function') {
-        return node.media;
-    }
-
-    if (node instanceof HTMLMediaElement) return node;
-
-    if (typeof node.querySelector === 'function') {
-        const media = node.querySelector('video');
-        if (media instanceof HTMLMediaElement) return media;
-
-        if (media && typeof media.currentTime === 'number' && typeof media.pause === 'function' && typeof media.play === 'function') {
-            return media;
-        }
-    }
-
-    return null;
-};
+import { FinalExam } from '@/components/self-study/final-exam';
+import { ReviewExam } from '@/components/self-study/review-exam';
+import { VideoPlayer } from '@/components/self-study/video-player';
+import { WebinarFaq } from '@/components/self-study/webinar-sections';
 
 const ViewWebinar = () => {
     const params = useParams<{ videoPath?: string[] }>();
     const searchParams = useSearchParams();
     const [slug, setSlug] = useState("");
     const [muxPlaybackId, setMuxPlaybackId] = useState("");
-    const [isReviewExamPassed, setIsReviewExamPassed] = useState(false);
     const [lastVideoViewed, setLastVideoViewed] = useState(0);
     const [userCourseId, setUserCourseId] = useState<number | null>(null);
     const [courseCompletedOn, setCourseCompletedOn] = useState<string | null>(null);
     const [selectedCourse, setSelectedCourse] = useState<any>(null);
-    const [prTime, setPrTime] = useState(0);
-    const [finalExamId, setFinalExamId] = useState<string>("");
-    const [finalquestionList, setFinalquestionList] = useState<any[]>([]);
-    const [finalQuestionCount, setFinalQuestionCount] = useState(0);
     const [err, setErr] = useState("");
-    const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
     const [viewerUserId, setViewerUserId] = useState("");
-    const [pauseBtnCount, setPauseBtnCount] = useState(0);
-    const [playBtnCount, setPlayBtnCount] = useState(0);
-    const [isPlay, setIsPlay] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const [videoWatchTime, setVideoWatchTime] = useState("0");
     const [vidViewPercent, setVidViewPercent] = useState("0.00");
-    const [isAnswerTrue, setIsAnswerTrue] = useState(false);
-    const [showQuestionOnTime, setShowQuestionOnTime] = useState(false);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [showFirstReviewQuestion, setShowFirstReviewQuestion] = useState(false);
-    const [isTimeoutCleared, setIsTimeoutCleared] = useState(false);
-    const [nextQuesRemainingTime, setNextQuesRemainingTime] = useState(0);
     const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
     const [isDownloadingHandout, setIsDownloadingHandout] = useState(false);
-    const [scoreObtained, setScoreObtained] = useState(0);
-    const [totalScore, setTotalScore] = useState(0);
-    const [totalPercentage, setTotalPercentage] = useState("0");
-    const [passPercentage, setPassPercentage] = useState(70);
-    const [isShow, setIsShow] = useState(false);
-    const [examResultType, setExamResultType] = useState<"pass" | "fail" | "">("");
     const [isCaptionOn, setIsCaptionOn] = useState(false);
-    const [finalAnswerJson, setFinalAnswerJson] = useState<any[]>([]);
-    const [reviewExamQuestions, setReviewExamQuestions] = useState<any[]>([]);
-    const [currentReviewQuestion, setCurrentReviewQuestion] = useState<any | null>(null);
-    const [selectedAnswer, setSelectedAnswer] = useState<string[]>([]);
-    const [showResultPopup, setShowResultPopup] = useState(false);
-    const [answerResult, setAnswerResult] = useState<{ isCorrect: boolean; correctAnswer: string; message: string } | null>(null);
-    const [completedQuestionIds, setCompletedQuestionIds] = useState<string[]>([]);
-    const [isReviewActive, setIsReviewActive] = useState(false);
 
     const videoRef = useRef<any>(null);
-    const prTimeRef = useRef(0);
-    const showReviewQTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const sendViewIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const isPausedRef = useRef(false);
-    const isAnswerTrueRef = useRef(false);
-    const showFirstReviewQuestionRef = useRef(false);
-    const completedReviewIdsRef = useRef<Set<string>>(new Set());
-    const triggeredReviewIdsRef = useRef<Set<string>>(new Set());
-
-    const getSavedReviewAnswers = (): Array<{ question: string; answer: string }> => {
-        try {
-            const savedAnswers = JSON.parse(localStorage.getItem('FinalAnswerList') || '[]');
-            return Array.isArray(savedAnswers)
-                ? savedAnswers.filter((item) => item?.question && item?.answer)
-                : [];
-        } catch {
-            return [];
-        }
-    };
-
-    const saveReviewAnswer = (question: any, answers: string[]) => {
-        const questionTitle = String(question?.title || '').trim();
-        const answer = answers.map((item) => String(item).trim()).filter(Boolean).join(', ');
-        if (!questionTitle || !answer) return;
-
-        const jsonData = {
-            question: questionTitle,
-            answer,
-        };
-        const savedAnswers = getSavedReviewAnswers().filter((item) => item.question !== questionTitle);
-
-        localStorage.setItem('FinalAnswerList', JSON.stringify([...savedAnswers, jsonData]));
-    };
 
     useEffect(() => {
         // Get video URL from query parameters (preserves full URL with query params)
@@ -216,57 +58,6 @@ const ViewWebinar = () => {
         setViewerUserId(localStorage.getItem("userId") || "");
     }, [params, searchParams]);
 
-    const isReviewExamExist = finalquestionList.length > 0;
-
-    useEffect(() => {
-        isPausedRef.current = isPaused;
-    }, [isPaused]);
-
-    useEffect(() => {
-        isAnswerTrueRef.current = isAnswerTrue;
-    }, [isAnswerTrue]);
-
-    useEffect(() => {
-        showFirstReviewQuestionRef.current = showFirstReviewQuestion;
-    }, [showFirstReviewQuestion]);
-
-    const openReviewQuestionPrompt = () => {
-        setShowFirstReviewQuestion(true);
-        setShowQuestionOnTime(false);
-    };
-
-    const showReviewQuestions = () => {
-        setShowFirstReviewQuestion(true);
-        setErr("");
-    };
-
-    const CheckAnswer = () => {
-        setIsAnswerTrue(true);
-        setShowQuestionOnTime(false);
-        setShowFirstReviewQuestion(false);
-    };
-
-    const resumeCountdown = () => {
-        if (timeoutIdRef.current) {
-            clearTimeout(timeoutIdRef.current);
-            timeoutIdRef.current = null;
-        }
-        setIsTimeoutCleared(false);
-    };
-
-    const sendVidViewToUsercourse = () => {
-        if (!userCourseId) return;
-
-        const storedVideoWatchTime = localStorage.getItem("videoWatchTime");
-
-        const jsonData = {
-            data: {
-                lastVideoView: Number(storedVideoWatchTime || 0),
-            }
-        };
-
-        updateUserCourse(jsonData);
-    };
 
     const webinarTitle = useMemo(() => {
         if (!slug) return "Self-Study";
@@ -312,44 +103,6 @@ const ViewWebinar = () => {
 
     const webinarImage = searchParams.get("image") || "";
 
-    const getFinalquestionListing = async (id: string) => {
-        try {
-
-            const res: any = await getAllFinalExamQuestion(id);
-
-            if (res?.exams?.data?.length > 0) {
-                const finalquestiondata = res.exams.data[0]?.attributes?.questions || [];
-                setFinalExamId(res.exams.data[0]?.id || "");
-
-                const finalquestions = finalquestiondata.map((element: any) => {
-                    const questionOptions = (element?.options || []).map((item: any) => ({
-                        id: item.id,
-                        option: item.option,
-                        isAnswer: item.isAnswer,
-                    }));
-
-                    return {
-                        id: element.id,
-                        isMCQ: true,
-                        selectedAnswer: "",
-                        title: element.title,
-                        options: questionOptions,
-                    };
-                });
-
-                setFinalquestionList(finalquestions);
-                setFinalQuestionCount(finalquestions.length);
-
-            } else {
-                setFinalExamId("");
-                setFinalquestionList([]);
-                setFinalQuestionCount(0);
-            }
-        } catch (error) {
-            console.log('error in fetching course listing', error);
-        }
-    };
-
     const getUserCourse = async (courseSlug: string) => {
         const userEmail = localStorage.getItem("email") || "";
         if (!userEmail || !courseSlug) return null;
@@ -366,16 +119,13 @@ const ViewWebinar = () => {
                 const viewedTime = Number(selectedCourse?.attributes?.lastVideoView || 0);
                 const courseDetails = selectedCourse?.attributes?.course?.data?.attributes || null;
 
-                setIsReviewExamPassed(!!selectedCourse?.attributes?.isReviewExamPassed);
                 setLastVideoViewed(viewedTime);
-                setVideoWatchTime(String(viewedTime));
                 setVidViewPercent((viewedTime > 0 && selectedCourse?.attributes?.duration
                     ? ((viewedTime * 100) / Number(selectedCourse.attributes.duration || 1)).toFixed(2)
                     : "0.00"));
                 localStorage.setItem("videoWatchTime", String(viewedTime));
                 setUserCourseId(Number(selectedCourse?.id) || null);
                 setCourseCompletedOn(selectedCourse?.attributes?.completedOn || null);
-                setPrTime(viewedTime);
                 setSelectedCourse(courseDetails);
 
                 return {
@@ -391,53 +141,6 @@ const ViewWebinar = () => {
         }
 
         return null;
-    };
-
-    const getReviewQuestionListing = async (id: any) => {
-        try {
-            const res = await getReviewExamQuestion(id);
-            const reviewExams = res?.reviewExams?.data || res?.data?.reviewExams?.data || [];
-
-            console.log(res, "reviewExams", reviewExams);
-
-            if (reviewExams.length > 0) {
-                const reviewExam = reviewExams[0];
-                const questionData = reviewExam?.attributes?.questions || [];
-
-                const mappedQuestions = questionData
-                    .map((element: any, index: number) => normalizeReviewQuestion(element, index))
-                    .filter((question: any) => Number(question.timestampSeconds) >= 0)
-                    .sort((a: any, b: any) => a.timestampSeconds - b.timestampSeconds);
-
-                const savedAnswers = getSavedReviewAnswers();
-                const savedQuestionTitles = new Set(savedAnswers.map((item) => item.question.trim()));
-                const completedQuestionIds = mappedQuestions
-                    .filter((question: any) => savedQuestionTitles.has(question.title.trim()))
-                    .map((question: any) => String(question.id));
-
-                setReviewExamQuestions(mappedQuestions);
-                completedReviewIdsRef.current = new Set(completedQuestionIds);
-                triggeredReviewIdsRef.current = new Set();
-                setCompletedQuestionIds(completedQuestionIds);
-                setCurrentReviewQuestion(null);
-                setSelectedAnswer([]);
-                setShowResultPopup(false);
-                setAnswerResult(null);
-                setIsReviewActive(false);
-            } else {
-                setReviewExamQuestions([]);
-                setCompletedQuestionIds([]);
-                setCurrentReviewQuestion(null);
-                setSelectedAnswer([]);
-                setShowResultPopup(false);
-                setAnswerResult(null);
-                setIsReviewActive(false);
-                completedReviewIdsRef.current = new Set();
-                triggeredReviewIdsRef.current = new Set();
-            }
-        } catch (error) {
-            console.log('error in fetching review question listing', error);
-        }
     };
 
     const formatCompletedDate = (completedOn: string | null) => {
@@ -567,488 +270,13 @@ const ViewWebinar = () => {
     useEffect(() => {
         if (!slug) return;
         getUserCourse(slug);
-        getFinalquestionListing(slug);
-        getReviewQuestionListing(slug);
     }, [slug]);
-
-    async function updateUserCourse(data: any) {
-        await updateUserCourseApi(userCourseId, data);
-    }
-
-    const syncVideoProgress = (currentTime: number, duration: number) => {
-        try {
-            const watched = Math.floor(currentTime).toFixed(0);
-            setVideoWatchTime(watched);
-            localStorage.setItem("videoWatchTime", watched);
-
-            if (duration > 0) {
-                const percent = ((Number(watched) * 100) / duration).toFixed(2);
-                setVidViewPercent(percent);
-            }
-
-            setPrTime(currentTime);
-            prTimeRef.current = currentTime;
-        } catch (error) {
-            console.error("Error updating video time:", error);
-        }
-    };
-
-    const handleVideoProgress = (event: any) => {
-        const target = event?.target || videoRef.current;
-        const currentTime = Number(target?.currentTime ?? 0);
-        const duration = Number(target?.duration ?? 0);
-
-        syncVideoProgress(currentTime, duration);
-
-        if (showQuestionOnTime && !isAnswerTrueRef.current && !target?.seeking) {
-            target?.pause?.();
-            openReviewQuestionPrompt();
-        }
-    };
-
-    const handleVideoLoadedMetadata = (event: any) => {
-        const target = event?.target || videoRef.current;
-        if (!target) return;
-
-        const savedViewedTime = Number(lastVideoViewed || videoWatchTime || 0);
-        if (savedViewedTime > 0 && Number(target.currentTime || 0) === 0) {
-            target.currentTime = savedViewedTime;
-            syncVideoProgress(savedViewedTime, Number(target.duration || 0));
-            localStorage.setItem("videoWatchTime", String(savedViewedTime));
-        }
-    };
-
-    const handleVideoPlay = () => {
-        setPlayBtnCount((prevPlayCount) => {
-            const nextCount = prevPlayCount + 1;
-            setIsPlay(true);
-
-            if ((nextCount === 1 || showFirstReviewQuestionRef.current) && isReviewExamExist && !isReviewExamPassed) {
-                showReviewQuestions();
-            }
-
-            if (nextCount > 1 && !isAnswerTrueRef.current && showQuestionOnTime) {
-                if (isReviewExamExist) {
-                    setIsPaused(true);
-                }
-            }
-
-            if (nextCount > 1 && isAnswerTrueRef.current && currentQuestionIndex < finalquestionList.length - 1) {
-                resumeCountdown();
-            }
-
-            return nextCount;
-        });
-
-        setIsPaused(false);
-        const bigPlayButton = document.querySelector('.vjs-big-play-button') as HTMLElement | null;
-        if (bigPlayButton) {
-            bigPlayButton.style.display = 'none';
-        }
-    };
-
-    const handleVideoPause = () => {
-        const currentTarget = videoRef.current;
-        const currentTime = Number(currentTarget?.currentTime ?? 0);
-
-        setPauseBtnCount((prev) => prev + 1);
-        setIsPlay(false);
-        setIsPaused(true);
-
-        const bigPlayButton = document.querySelector('.vjs-big-play-button') as HTMLElement | null;
-        if (bigPlayButton) {
-            bigPlayButton.style.display = 'block';
-        }
-
-        if (showFirstReviewQuestionRef.current) {
-            if (showReviewQTimeoutIdRef.current) {
-                clearTimeout(showReviewQTimeoutIdRef.current);
-                showReviewQTimeoutIdRef.current = null;
-            }
-        } else {
-            if (timeoutIdRef.current) {
-                clearTimeout(timeoutIdRef.current);
-                timeoutIdRef.current = null;
-            }
-            setIsTimeoutCleared(true);
-
-            if (isReviewExamExist && currentQuestionIndex < finalquestionList.length - 1) {
-                const nextQuestion = finalquestionList[currentQuestionIndex + 1];
-                const nextQuestionTime = Number((nextQuestion as any)?.timeStampInSeconds ?? 0);
-
-                if (Number.isFinite(nextQuestionTime) && nextQuestionTime > 0) {
-                    setNextQuesRemainingTime(Math.max(0, Math.floor(nextQuestionTime - currentTime)));
-                } else {
-                    setNextQuesRemainingTime(0);
-                }
-            }
-        }
-
-        if (sendViewIntervalRef.current) {
-            clearInterval(sendViewIntervalRef.current);
-            sendViewIntervalRef.current = null;
-        }
-    };
-
-    const handleVideoPlaying = () => {
-        if (!isPausedRef.current && videoRef.current) {
-            let time = Math.floor(videoRef.current.currentTime).toFixed(0);
-            localStorage.setItem("videoWatchTime", time);
-            setVideoWatchTime(time);
-            sendVidViewToUsercourse();
-        }
-
-        if (!sendViewIntervalRef.current) {
-            sendViewIntervalRef.current = setInterval(() => {
-                if (!isPausedRef.current && videoRef.current) {
-                    let time = Math.floor(videoRef.current.currentTime).toFixed(0);
-                    localStorage.setItem("videoWatchTime", time);
-                    setVideoWatchTime(time);
-                    sendVidViewToUsercourse();
-                }
-            }, 5000);
-        }
-    };
-
-    const handleVideoEnded = () => {
-        if (sendViewIntervalRef.current) {
-            clearInterval(sendViewIntervalRef.current);
-            sendViewIntervalRef.current = null;
-        }
-        setVidViewPercent("100.00");
-        setPrTime(0);
-        prTimeRef.current = 0;
-    };
-
-    const handleVideoSeeking = () => {
-        const currentTarget = videoRef.current;
-        if (!currentTarget) return;
-
-        const delta = currentTarget.currentTime - prTimeRef.current;
-        if (Math.abs(delta) > 1) {
-            currentTarget.currentTime = prTimeRef.current;
-        }
-    };
-
-    const selectAnswer = (option: any, selectedIndex: number) => {
-        const selectedAnswer = String(option ?? "").trim();
-
-        setFinalquestionList((prevList) => {
-            const selectedQuestion = prevList[selectedIndex];
-            const questionTitle = selectedQuestion?.title?.trim() || "";
-
-            setFinalAnswerJson((prevAnswers) => {
-                const nextList = [...prevAnswers];
-                nextList[selectedIndex] = {
-                    question: questionTitle,
-                    answer: selectedAnswer,
-                };
-                return nextList;
-            });
-
-            return prevList.map((question, index) =>
-                index === selectedIndex
-                    ? { ...question, selectedAnswer: option }
-                    : question
-            );
-        });
-    };
-
-    const handleFinalAnswerChange = (questionIndex: number, optionValue: string) => {
-        setFinalquestionList((prevList) =>
-            prevList.map((question, index) =>
-                index === questionIndex
-                    ? { ...question, selectedAnswer: optionValue }
-                    : question
-            )
-        );
-
-        selectAnswer(optionValue, questionIndex);
-    };
-
-    const reviewExamsAnswer = (selectedOption: string, questionIndex: number) => {
-        if (questionIndex < 0 || questionIndex >= finalquestionList.length) return;
-
-        const currentQuestion = finalquestionList[questionIndex];
-        const safeOption = String(selectedOption ?? "").trim();
-
-        setFinalquestionList((prevList) =>
-            prevList.map((question, index) =>
-                index === questionIndex
-                    ? { ...question, selectedAnswer: safeOption }
-                    : question
-            )
-        );
-
-        setFinalAnswerJson((prevList) => {
-            const nextList = [...prevList];
-            nextList[questionIndex] = {
-                question: currentQuestion?.title?.trim() || "",
-                answer: safeOption,
-            };
-            return nextList;
-        });
-
-        setCurrentQuestionIndex(questionIndex);
-    };
-
-    const evaluateReviewAnswer = (question: any, answers: string[]) => {
-        if (!question) return;
-
-        const correctAnswers = question.options
-            .filter((option: any) => option.isCorrect)
-            .map((option: any) => String(option.value ?? option.label ?? option.option))
-            .filter(Boolean);
-
-        const normalizedSelected = answers.map((answer) => String(answer).trim());
-        const normalizedCorrect = correctAnswers.map((answer:any) => String(answer).trim());
-
-        const isCorrect =
-            question.isMCQ && question.supportsMultipleAnswers
-                ? normalizedSelected.length === normalizedCorrect.length &&
-                  normalizedSelected.every((value) => normalizedCorrect.includes(value))
-                : normalizedSelected[0] === normalizedCorrect[0];
-
-                if (isCorrect) {
-                        saveReviewAnswer(question, normalizedSelected);
-                }
-
-        setAnswerResult({
-            isCorrect,
-            correctAnswer: normalizedCorrect.join(', ') || 'N/A',
-            message: isCorrect ? 'Your answer is correct.' : 'Your answer is incorrect.',
-        });
-        setShowResultPopup(true);
-    };
-
-    const triggerReviewQuestion = (question: any) => {
-        if (!question) return;
-
-        const questionId = String(question.id);
-        if (completedReviewIdsRef.current.has(questionId) || triggeredReviewIdsRef.current.has(questionId)) {
-            return;
-        }
-
-        triggeredReviewIdsRef.current.add(questionId);
-
-        const media = getMediaElement(videoRef);
-        if (media) {
-            media.pause();
-            media.currentTime = Math.min(Number(media.currentTime || 0), Number(question.timestampSeconds || media.currentTime || 0));
-        }
-
-        setCurrentReviewQuestion(question);
-        setSelectedAnswer([]);
-        setShowResultPopup(false);
-        setAnswerResult(null);
-        setIsReviewActive(true);
-    };
-
-    const handleReviewOptionToggle = (optionValue: string) => {
-        if (!currentReviewQuestion || showResultPopup) return;
-
-        if (!currentReviewQuestion.isMCQ || !currentReviewQuestion.supportsMultipleAnswers) {
-            const nextValue = [optionValue];
-            setSelectedAnswer(nextValue);
-            evaluateReviewAnswer(currentReviewQuestion, nextValue);
-            return;
-        }
-
-        setSelectedAnswer((prev) => {
-            const exists = prev.includes(optionValue);
-            const next = exists ? prev.filter((value) => value !== optionValue) : [...prev, optionValue];
-            return next;
-        });
-    };
-
-    const handleReviewSubmit = () => {
-        if (!currentReviewQuestion || selectedAnswer.length === 0 || showResultPopup) return;
-        evaluateReviewAnswer(currentReviewQuestion, selectedAnswer);
-    };
-
-    const handleRetryReviewQuestion = () => {
-        setSelectedAnswer([]);
-        setAnswerResult(null);
-        setShowResultPopup(false);
-    };
-
-    const handleContinueReviewVideo = () => {
-        if (!currentReviewQuestion || !answerResult?.isCorrect) return;
-
-        const questionId = String(currentReviewQuestion.id);
-        completedReviewIdsRef.current.add(questionId);
-        setCompletedQuestionIds((prev) => prev.includes(questionId) ? prev : [...prev, questionId]);
-
-        setCurrentReviewQuestion(null);
-        setSelectedAnswer([]);
-        setShowResultPopup(false);
-        setAnswerResult(null);
-        setIsReviewActive(false);
-        triggeredReviewIdsRef.current.delete(questionId);
-
-        const media = getMediaElement(videoRef);
-        if (media) {
-            media.currentTime = Number(currentReviewQuestion.timestampSeconds || media.currentTime || 0);
-            media.play().catch(() => undefined);
-        }
-    };
-
-    useEffect(() => {
-        const media = getMediaElement(videoRef);
-        if (!media || reviewExamQuestions.length === 0) return;
-
-        const handleTimeUpdate = () => {
-            if (isReviewActive) return;
-
-            const currentTime = Number(media.currentTime || 0);
-            const nextQuestion = reviewExamQuestions.find((question) => {
-                const questionId = String(question.id);
-                return !completedReviewIdsRef.current.has(questionId) && !triggeredReviewIdsRef.current.has(questionId) && currentTime >= Number(question.timestampSeconds || 0);
-            });
-
-            if (nextQuestion) {
-                triggerReviewQuestion(nextQuestion);
-            }
-        };
-
-        const handleSeeking = () => {
-            if (!currentReviewQuestion) return;
-
-            const questionTimestamp = Number(currentReviewQuestion.timestampSeconds || 0);
-            const currentTime = Number(media.currentTime || 0);
-
-            if (!completedReviewIdsRef.current.has(String(currentReviewQuestion.id)) && currentTime > questionTimestamp) {
-                media.currentTime = questionTimestamp;
-                media.pause();
-            }
-        };
-
-        media.addEventListener('timeupdate', handleTimeUpdate);
-        media.addEventListener('seeking', handleSeeking);
-
-        return () => {
-            media.removeEventListener('timeupdate', handleTimeUpdate);
-            media.removeEventListener('seeking', handleSeeking);
-        };
-    }, [reviewExamQuestions, isReviewActive, currentReviewQuestion]);
-
-    const checkFinalAnswers = () => {
-        const finalAnswerJson = finalquestionList.map((question: any) => ({
-            question: question?.title?.trim() || "",
-            answer: question?.selectedAnswer?.trim() || "",
-        }));
-
-        const hasEmptyAnswer = finalAnswerJson.some((item) => !item.question || !item.answer);
-
-        if (finalAnswerJson.length !== finalQuestionCount || hasEmptyAnswer) {
-            const message = 'Make sure you have answered each question';
-            setErr(message);
-            setShowSubmitConfirm(false);
-        } else {
-            setErr("");
-            setShowSubmitConfirm(true);
-        }
-
-        SubmitFinal(finalAnswerJson);
-    };
-
-    const SubmitFinal = async (finalAnswerJson: any[]) => {
-        setShowSubmitConfirm(false);
-        try {
-            const todayDate = new Date().toISOString().split("T")[0];
-
-            // Get pass percentage
-            const headerRes = await getHeader(); // replace with actual API
-            const pass = headerRes?.data?.data?.attributes?.examPassPercentage || 70;
-
-            setPassPercentage(pass);
-
-            const record = {
-                data: {
-                    answerJson: finalAnswerJson, // make sure this exists in state
-                    exam: finalExamId,           // same here
-                    startedOn: todayDate,
-                    endedOn: todayDate,
-                },
-            };
-
-            const token = localStorage.getItem("token") || "";
-
-            let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/user-exams", {
-                method: "POST",
-                body: JSON.stringify(record),
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "content-type": "application/json"
-                },
-            })
-
-            let res = await response.json();
-
-            if (
-                res.error?.status === 400 &&
-                res.error?.message
-                    ?.toLowerCase()
-                    .includes("already given the exam")
-            ) {
-                setErr("You have already submitted the exam. Multiple attempts are not allowed.");
-            }
-
-            if (res?.data) {
-                const score = res?.data.attributes.score;
-                const total = res?.data.attributes.totalScore;
-
-                setScoreObtained(score);
-                setTotalScore(total);
-
-                const percentage = ((score * 100) / total).toFixed(2);
-                setTotalPercentage(percentage);
-
-                const passed = parseFloat(percentage) >= pass;
-                setExamResultType(passed ? "pass" : "fail");
-                setIsShow(true);
-            }
-        } catch (error: any) {
-
-            if (
-                error?.response?.status === 400 &&
-                error?.response?.data?.error?.message
-                    ?.toLowerCase()
-                    .includes("already given the exam")
-            ) {
-                setErr("You have already submitted the exam. Multiple attempts are not allowed.");
-            }
-        }
-    };
 
     const programMaterials = [
         "CPE Certificate",
         "Forms (if applicable)",
         "Glossary of Terms",
         "Table Of Contents",
-    ];
-
-    const faqItems = [
-        {
-            question: "What is this service about?",
-            answer: "This service provides a platform to manage and streamline your workflow efficiently.",
-            isOpen: false
-        },
-        {
-            question: "How can I sign up?",
-            answer: "You can sign up by visiting our registration page and following the instructions.",
-            isOpen: false
-        },
-        {
-            question: "What payment methods are accepted?",
-            answer: "We accept credit cards, PayPal, and bank transfers.",
-            isOpen: false
-        },
-        {
-            question: "Can I cancel my subscription anytime?",
-            answer: "Yes, you can cancel your subscription at any time from your account settings.",
-            isOpen: false
-        }
     ];
 
     return (
@@ -1068,6 +296,8 @@ const ViewWebinar = () => {
                     </div>
                 </div>
             </div>
+
+            {err && <p className="mt-3 text-center text-sm font-medium text-red-600">{err}</p>}
 
             <div className="mt-4 flex gap-6 text-lg font-semibold w-full">
                 <Tabs defaultValue="overview" className=" bg-transparent w-full">
@@ -1149,30 +379,20 @@ const ViewWebinar = () => {
                                         <div className="grid h-full grid-cols-1">
                                             <div className="relative overflow-hidden bg-slate-900 p-4">
                                                 {playbackSource.src && (
-                                                    <MuxPlayer
+                                                    <VideoPlayer
+                                                        key={`${slug}-${lastVideoViewed}`}
                                                         ref={videoRef}
                                                         playbackId={playbackSource.src.split('/').pop()?.split('.')[0] || ''}
-                                                        streamType="on-demand"
-                                                        defaultHiddenCaptions={!isCaptionOn}
-                                                        onTimeUpdate={handleVideoProgress}
-                                                        onLoadedMetadata={handleVideoLoadedMetadata}
-                                                        onPlay={handleVideoPlay}
-                                                        onPause={handleVideoPause}
-                                                        onPlaying={handleVideoPlaying}
-                                                        onEnded={handleVideoEnded}
-                                                        onSeeking={handleVideoSeeking}
-                                                        style={{
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            borderRadius: '0.75rem',
+                                                        initialTime={lastVideoViewed}
+                                                        initialPercent={vidViewPercent}
+                                                        userCourseId={userCourseId}
+                                                        onProgress={(currentTime, duration) => {
+                                                            const watched = Math.floor(currentTime).toFixed(0);
+                                                            setVidViewPercent(duration > 0 ? ((Number(watched) * 100) / duration).toFixed(2) : "0.00");
                                                         }}
-                                                    >
-                                                    </MuxPlayer>
+                                                        defaultHiddenCaptions={!isCaptionOn}
+                                                    />
                                                 )}
-
-                                                <div className="absolute bottom-5 right-6 rounded-md bg-black/60 px-3 py-2 text-xs text-white">
-                                                    Watched: {videoWatchTime}s ({vidViewPercent}%)
-                                                </div>
 
                                             </div>
                                         </div>
@@ -1231,82 +451,10 @@ const ViewWebinar = () => {
                             </div>
                         </section>
 
-                        {currentReviewQuestion && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-                                <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
-                                    <div className="mb-4 text-center">
-                                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Review Question</p>
-                                        <h3 className="mt-2 text-2xl font-bold text-slate-900">{currentReviewQuestion.title}</h3>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        {currentReviewQuestion.options.map((option: any, optionIndex: number) => {
-                                            const checked = selectedAnswer.includes(option.value);
-                                            const isMultipleChoice = currentReviewQuestion.isMCQ && currentReviewQuestion.supportsMultipleAnswers;
-
-                                            return (
-                                                <label
-                                                    key={option.id || `${optionIndex}-${option.value}`}
-                                                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition ${
-                                                        checked ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'
-                                                    } ${showResultPopup ? 'cursor-not-allowed opacity-80' : ''}`}
-                                                >
-                                                    <input
-                                                        type={isMultipleChoice ? 'checkbox' : 'radio'}
-                                                        name={`review-question-${currentReviewQuestion.id}`}
-                                                        value={option.value}
-                                                        checked={checked}
-                                                        disabled={showResultPopup}
-                                                        onChange={() => handleReviewOptionToggle(option.value)}
-                                                        className="h-4 w-4 accent-blue-600"
-                                                    />
-                                                    <span className="text-base text-slate-700">{option.label}</span>
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
-
-                                    {!showResultPopup && (
-                                        <div className="mt-5 flex justify-end">
-                                            <button
-                                                type="button"
-                                                onClick={handleReviewSubmit}
-                                                disabled={selectedAnswer.length === 0}
-                                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
-                                            >
-                                                {currentReviewQuestion.isMCQ && currentReviewQuestion.supportsMultipleAnswers ? 'Check Answer' : 'Submit Answer'}
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {showResultPopup && answerResult && currentReviewQuestion && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-                                <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-                                    <div className="mb-5 text-center">
-                                        <div className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full ${answerResult.isCorrect ? 'bg-emerald-100' : 'bg-red-100'}`}>
-                                            <span className="text-3xl">{answerResult.isCorrect ? '✅' : '❌'}</span>
-                                        </div>
-
-                                        <h3 className={`text-2xl font-bold ${answerResult.isCorrect ? 'text-emerald-600' : 'text-red-600'}`}>
-                                            {answerResult.isCorrect ? 'Correct Answer' : 'Wrong Answer'}
-                                        </h3>
-                                    </div>
-
-                                    <p className="text-center text-base text-slate-700">{answerResult.message}</p>
-
-                                    <button
-                                        type="button"
-                                        onClick={answerResult.isCorrect ? handleContinueReviewVideo : handleRetryReviewQuestion}
-                                        className="mt-6 w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-700"
-                                    >
-                                        {answerResult.isCorrect ? 'Continue Video' : 'Try Again'}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                        <ReviewExam
+                            slug={slug}
+                            videoRef={videoRef}
+                        />
 
                         <section className="mt-8 mb-4 rounded-none bg-[#e9ecf6] px-6 py-10 md:px-12">
                             <div className="mx-auto max-w-7xl">
@@ -1354,172 +502,12 @@ const ViewWebinar = () => {
                         </section>
                     </TabsContent>
                     <TabsContent value="final-exam">
-                        <section className="mt-8 border-t border-gray-300 px-4 pt-2 pb-8 md:px-6">
-                            <div className="mx-auto">
-                                <div className="text-center">
-                                    <h2 className="text-2xl font-bold text-slate-900">Final Exam</h2>
-                                    <p className="mt-2 font-semibold text-slate-800">{finalQuestionCount} Questions</p>
-                                </div>
-
-                                {
-                                    finalquestionList.length > 0 && finalquestionList.map((item: any, index: number) => (
-                                        <div className="mt-7 rounded-xl border border-gray-200 bg-white p-5 shadow-sm" key={item?.id || index}>
-                                            <p className="font-semibold leading-snug text-slate-900">
-                                                {index + 1}. {item.title}
-                                            </p>
-
-                                            <div className="mt-4 space-y-3">
-                                                {
-                                                    item.options.length > 0 && item.options.map((option: any, optionIndex: number) => (
-                                                        <label key={option?.id || optionIndex} className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-300 bg-gray-100 px-3 py-3">
-                                                            <input
-                                                                type="radio"
-                                                                name={`radiogroup_-${index}`}
-                                                                checked={item?.selectedAnswer === option?.option}
-                                                                onChange={() => handleFinalAnswerChange(index, option?.option)}
-                                                                className="h-5 w-5 accent-blue-500" />
-                                                            <span className="font-normal">{option?.option}</span>
-                                                        </label>
-                                                    ))
-                                                }
-                                            </div>
-                                        </div>
-                                    ))
-                                }
-
-                                <div className='flex justify-center mt-4'>
-                                    <Button
-                                        className='bg-blue-500 text-white hover:bg-blue-600 cursor-pointer'
-                                        variant="default"
-                                        onClick={checkFinalAnswers}
-                                    >
-                                        Submit
-                                    </Button>
-                                </div>
-
-                                <Dialog open={isShow} onOpenChange={setIsShow}>
-                                    <DialogContent
-                                        showCloseButton={false}
-                                        className="max-w-md rounded-[28px] border-0 bg-white p-0 shadow-[0_24px_80px_rgba(17,24,39,0.22)] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
-                                    >
-                                        <div className="relative w-full p-8 text-center">
-                                            <DialogClose asChild>
-                                                <button
-                                                    type="button"
-                                                    className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-200"
-                                                    aria-label="Close"
-                                                >
-                                                    <span className="text-xl leading-none">×</span>
-                                                </button>
-                                            </DialogClose>
-
-                                            <div className="mb-5 flex justify-center">
-                                                {examResultType === "pass" ? (
-                                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 ring-8 ring-emerald-50">
-                                                        <CheckCircle2 className="h-12 w-12 text-emerald-600" strokeWidth={2.5} />
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-100 ring-8 ring-red-50">
-                                                        <XCircle className="h-12 w-12 text-red-600" strokeWidth={2.5} />
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <DialogHeader className="mb-3 text-center">
-                                                <DialogTitle className="text-3xl text-center font-bold uppercase tracking-tight text-slate-900">
-                                                    {examResultType === "pass" ? "Congratulations!" : "Exam Result"}
-                                                </DialogTitle>
-                                            </DialogHeader>
-
-                                            <DialogDescription className="text-base leading-7 text-slate-700">
-                                                {examResultType === "pass"
-                                                    ? `You passed the exam with ${totalPercentage}% and met the ${passPercentage}% requirement.`
-                                                    : `You scored ${totalPercentage}% and need at least ${passPercentage}% to pass this exam.`}
-                                            </DialogDescription>
-
-                                            <DialogClose asChild>
-                                                <Button className="mt-6 w-full rounded-xl bg-[#0b2d5c] text-white hover:bg-[#0d3a75]">
-                                                    Close
-                                                </Button>
-                                            </DialogClose>
-                                        </div>
-                                    </DialogContent>
-                                </Dialog>
-
-                                {err && (
-                                    <p className="mt-3 text-center text-sm font-medium text-red-600">{err}</p>
-                                )}
-
-                                {showSubmitConfirm && (
-                                    <p className="mt-3 text-center text-sm font-medium text-green-600">
-                                        All questions answered. Ready to submit.
-                                    </p>
-                                )}
-                            </div>
-                        </section>
+                        <FinalExam
+                            slug={slug}
+                        />
                     </TabsContent>
-                    <TabsContent value="faq" className=' mb-4 '>
-                        <section className="mt-8bg-gray-100 px-6 py-12 md:px-10">
-                            <div className="mx-auto max-w-6xl">
-                                <div className="text-center">
-                                    <h2 className="text-2xl font-bold text-slate-900">Frequently Asked Questions</h2>
-                                    <p className="mt-2 text-base text-slate-600">Find answers to common questions below.</p>
-                                </div>
-
-                                <div className="mx-auto mt-10 max-w-[980px] space-y-4">
-                                    <Accordion type="single" collapsible className="space-y-4">
-                                        {faqItems.map((item, index) => (
-                                            <AccordionItem
-                                                key={index}
-                                                value={`faq-item-${index}`}
-                                                className="rounded-xl border border-gray-300 bg-white px-4 shadow-sm"
-                                            >
-                                                <AccordionTrigger className="py-4 text-xl font-bold text-slate-900 hover:no-underline">
-                                                    {item.question}
-                                                </AccordionTrigger>
-                                                <AccordionContent className="text-slate-600">
-                                                    {item.answer}
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        ))}
-                                    </Accordion>
-                                </div>
-                            </div>
-                        </section>
-
-                        <section className="mt-8 border border-gray-200 bg-gray-100 p-6 shadow-sm md:p-10">
-                            <div className="grid items-center gap-8 lg:grid-cols-2">
-                                <div>
-                                    <h2 className="text-4xl font-bold leading-tight text-slate-900">We&apos;re here to help</h2>
-                                    <p className="mt-4 max-w-xl leading-relaxed text-slate-700">
-                                        <strong>Questions? Feedback?</strong> Our ears and eyes are always open. We are closed on <strong>US Holidays and weekends</strong>, but don&apos;t worry, our bots don&apos;t sleep.
-                                    </p>
-
-                                    <form className="mt-6 flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-center">
-                                        <input
-                                            type="email"
-                                            placeholder="Enter your email"
-                                            className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 text-lg text-slate-700 outline-none transition focus:border-indigo-500"
-                                        />
-                                        <button
-                                            type="button"
-                                            className="h-12 rounded-full bg-indigo-600 px-8 text-base font-semibold text-white shadow-sm transition hover:bg-indigo-700"
-                                        >
-                                            Submit
-                                        </button>
-                                    </form>
-                                </div>
-
-                                <div className="relative mx-auto w-full">
-                                    <div className="absolute h-[400px] w-[400px] inset-8 rounded-full bg-indigo-200/70"></div>
-                                    <img
-                                        src={"/assets/images/banner-4.png"}
-                                        alt="Customer support illustration"
-                                        className="relative z-10 w-full object-contain"
-                                    />
-                                </div>
-                            </div>
-                        </section>
+                    <TabsContent value="faq" className="mb-4">
+                        <WebinarFaq />
                     </TabsContent>
                 </Tabs>
             </div>
