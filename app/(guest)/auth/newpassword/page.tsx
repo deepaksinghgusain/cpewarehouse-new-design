@@ -8,7 +8,7 @@ import { resetPassword } from '@/services/auth'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Eye, EyeOff, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -27,7 +27,7 @@ type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>
 
 type PopupType = 'success' | 'error'
 
-const ResetPassword = () => {
+const ResetPasswordForm = () => {
     const searchParams = useSearchParams()
     const router = useRouter()
     const [showPopup, setShowPopup] = useState(false)
@@ -235,5 +235,11 @@ const ResetPassword = () => {
         </>
     )
 }
+
+const ResetPassword = () => (
+    <Suspense fallback={<div className="flex min-h-[300px] items-center justify-center">Loading...</div>}>
+        <ResetPasswordForm />
+    </Suspense>
+)
 
 export default ResetPassword

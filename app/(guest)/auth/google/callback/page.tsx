@@ -3,10 +3,10 @@
 import { userLoginRequest } from '@/store/actions/user-actions';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-const GoogleLogin = () => {
+const GoogleLoginForm = () => {
     const router = useRouter();
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
@@ -70,5 +70,11 @@ const GoogleLogin = () => {
         </div>
     );
 };
+
+const GoogleLogin = () => (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-700">Logging in...</div>}>
+        <GoogleLoginForm />
+    </Suspense>
+)
 
 export default GoogleLogin

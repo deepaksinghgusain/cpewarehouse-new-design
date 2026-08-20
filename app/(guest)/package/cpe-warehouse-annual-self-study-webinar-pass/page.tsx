@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { getPackageDetailbByGql } from "@/services/package";
@@ -90,21 +90,20 @@ const page = async () => {
         });
     }
 
-    return (<>
-        <section className="mx-auto">
-             <PackageHeader packageData={packageData} selectedCourse={selectedCourse} />
-        </section>
+    return (
+        <Suspense fallback={<div className="flex min-h-[300px] items-center justify-center">Loading...</div>}>
+            <section className="mx-auto">
+                <PackageHeader packageData={packageData} selectedCourse={selectedCourse} />
+            </section>
 
-        <section className="w-[90%] mx-auto mt-10">
-            <PackageTab packageData={packageData} />
-        </section>
+            <section className="mt-10 mx-auto w-[90%]">
+                <PackageTab packageData={packageData} />
+            </section>
 
-
-        <section className="w-[90%] mx-auto">
-            <PackageCourses courses={courses} />
-        </section>
-        
-    </>
+            <section className="mx-auto w-[90%]">
+                <PackageCourses courses={courses} />
+            </section>
+        </Suspense>
     );
 };
 
