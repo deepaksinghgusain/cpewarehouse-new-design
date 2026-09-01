@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/card';
 import { jsPDF } from 'jspdf';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { redirect } from 'next/navigation';
+import moment from 'moment';
 
 function PastEventCard({ event }: any) {
     const [err, setErr] = useState("");
@@ -20,7 +21,7 @@ function PastEventCard({ event }: any) {
     const [courseCompletedOn, setCourseCompletedOn] = useState<string | null>(null);
     const user = useSelector((state: RootState) => state.user.user as any) || {};
 
-     let category = ""
+    let category = ""
 
     if (event?.category.toLowerCase() === "live") {
         category = "Live Webinar"
@@ -166,8 +167,8 @@ function PastEventCard({ event }: any) {
                         </div>
 
                         <div className="flex items-center gap-2 text-gray-500 text-sm font-medium">
-                            <img src={imageUrl + event.instrutors.image.data.attributes.url} height="20" width="20" className='rounded-xl' />
-                            {event.instrutors?.firstName}
+                            <img src={imageUrl + event.instructors.image.data.attributes.url} height="20" width="20" className='rounded-xl' />
+                            {event.instructors?.firstName}
                         </div>
 
                     </div>
@@ -341,8 +342,8 @@ function RegisteredEventCard({ event, onLaunch }: any) {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <img src={imageUrl + event?.attributes?.instructors?.data[0].attributes?.image?.data?.attributes?.url} height="20" width="20" className='rounded-xl' />
-                            {event?.attributes?.instructors?.data[0].attributes?.firstName} {event?.attributes?.instructors?.data[0].attributes?.lastName}
+                            <img src={imageUrl + event.instructors?.image?.data?.attributes?.url} height="20" width="20" className='rounded-xl' />
+                            {event.instructors?.firstName} {event.instructors?.lastName}
                         </div>
                     </div>
 
@@ -494,6 +495,9 @@ const BasicDetails = () => {
     let [regEvent, setRegEvent] = useState([]);
     let [upcommingEvent, setUpcommingEvent] = useState([]);
     let [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [isSubscriptionExpired, setIsSubscriptionExpired] = useState(false);
+    const [subscriptionExpiredDate, setSubscriptionExpiredDate] = useState("");
+    const [isSubscriptionRenewalDue, setIsSubscriptionRenewalDue] = useState(false);
 
     const gotowebinar = (webinarId?: string, joinUrl?: string) => {
         const webinarLink = joinUrl || (webinarId ? `https://global.gotowebinar.com/join/${webinarId}` : "");
@@ -507,15 +511,15 @@ const BasicDetails = () => {
 
         const baseOrigin = window.location.origin;
         const params = new URLSearchParams();
-        
+
         // Pass video URL as query parameter to preserve all query params and special characters
         params.append('videoUrl', videoUrl.trim());
-        
+
         // Add slug if provided
         if (slug) {
             params.append('slug', slug);
         }
-        
+
         // Add image if provided
         if (eventImage) {
             const absoluteImageUrl = eventImage.startsWith("http") ? eventImage : `${imageUrl}${eventImage}`;
@@ -537,6 +541,7 @@ const BasicDetails = () => {
     async function getUserSubscription() {
 
         const token = localStorage.getItem("token");
+        const email = localStorage.getItem("email");
 
         let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/annual-pass-subscriptions?populate=user", {
             headers: {
@@ -545,7 +550,40 @@ const BasicDetails = () => {
             },
         })
 
-        let data = await response.json();
+        let res = await response.json();
+
+        const subscriptions = res.data.filter((d: any) =>
+            d.attributes?.user?.data?.attributes?.email === email
+        );
+
+        const today = new Date();
+        const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const activeSubscriptionEndDates = subscriptions.map((subscription: any) => {
+            const endDate = subscription.attributes?.endDate;
+            if (!endDate) return null;
+
+            const [year, month, day] = endDate.split('-').map(Number);
+            const subscriptionEndDate = new Date(year, month - 1, day);
+            return subscriptionEndDate >= todayDate ? subscriptionEndDate : null;
+        }).filter((endDate: Date | null): endDate is Date => endDate !== null);
+
+        const latestActiveEndDate = activeSubscriptionEndDates.length > 0
+            ? new Date(Math.max(...activeSubscriptionEndDates.map((endDate : any) => endDate.getTime())))
+            : null;
+
+        if (latestActiveEndDate) {
+            const daysUntilExpiration = Math.floor(
+                (latestActiveEndDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24)
+            );
+
+            setSubscriptionExpiredDate(latestActiveEndDate.toISOString().split('T')[0]);
+            setIsSubscriptionRenewalDue(daysUntilExpiration <= 15);
+        } else {
+            setSubscriptionExpiredDate("");
+            setIsSubscriptionRenewalDue(false);
+        }
+
+        setIsSubscriptionExpired(subscriptions.length > 0 && !latestActiveEndDate);
     }
 
     async function getEventlist() {
@@ -581,7 +619,7 @@ const BasicDetails = () => {
                         'startDate': course?.startDate,
                         'image': course?.image?.data?.attributes?.url,
                         'category': course?.category?.data?.attributes?.title,
-                        'instrutors': course?.instructors?.data?.[0]?.attributes,
+                        'instructors': course?.instructors?.data?.[0]?.attributes,
                         'webinarId': course?.webinarId || '',
                         'joinUrl': usercourse?.joinUrl,
                         'status': usercourse?.status,
@@ -619,15 +657,15 @@ const BasicDetails = () => {
 
         regEvent = coursesPurchased;
 
-        regEvent.sort((a: any, b: any) => {
-            if (a.courseType === 'Live Webinar' && b.courseType !== 'Live Webinar') {
-                return -1;
-            }
-            if (a.courseType !== 'Live Webinar' && b.courseType === 'Live Webinar') {
-                return 1;
-            }
-            return (Date.parse(a.startDate) < Date.parse(b.startDate)) ? -1 : 1;
-        });
+        // regEvent.sort((a: any, b: any) => {
+        //     if (a.courseType === 'Live Webinar' && b.courseType !== 'Live Webinar') {
+        //         return -1;
+        //     }
+        //     if (a.courseType !== 'Live Webinar' && b.courseType === 'Live Webinar') {
+        //         return 1;
+        //     }
+        //     return (Date.parse(a.startDate) < Date.parse(b.startDate)) ? -1 : 1;
+        // });
 
         setRegEvent(regEvent);
 
@@ -657,6 +695,7 @@ const BasicDetails = () => {
     }
 
     useEffect(() => {
+        getUserSubscription();
         const yearCertificates = certificatesByYear[selectedYear] || [];
         setCertificates(yearCertificates);
         settTotalCreditEarned(yearCertificates.reduce((sum: number, c: any) => sum + (c.credit || 0), 0));
@@ -770,24 +809,27 @@ const BasicDetails = () => {
                                     </div>
                                 </div>
 
-                                {/* Badge */}
-                                <div className="px-3 py-1 bg-green-50 border border-green-200 rounded-full text-green-700 text-sm font-medium flex gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="21" viewBox="0 0 15 21" fill="none">
-                                        <path d="M7.5 14.5C11.366 14.5 14.5 11.366 14.5 7.5C14.5 3.63401 11.366 0.5 7.5 0.5C3.63401 0.5 0.5 3.63401 0.5 7.5C0.5 11.366 3.63401 14.5 7.5 14.5Z" fill="url(#paint0_linear_3165_1965)" />
-                                        <path d="M3.46668 13.2219L2.5 20.5L7.0884 17.747C7.23805 17.6572 7.31288 17.6123 7.39276 17.5947C7.46341 17.5792 7.53659 17.5792 7.60724 17.5947C7.68712 17.6123 7.76195 17.6572 7.9116 17.747L12.5 20.5L11.5343 13.2212M14.5 7.5C14.5 11.366 11.366 14.5 7.5 14.5C3.63401 14.5 0.5 11.366 0.5 7.5C0.5 3.63401 3.63401 0.5 7.5 0.5C11.366 0.5 14.5 3.63401 14.5 7.5Z" stroke="url(#paint1_linear_3165_1965)" strokeLinecap="round" strokeLinejoin="round" />
-                                        <defs>
-                                            <linearGradient id="paint0_linear_3165_1965" x1="0.499782" y1="20.4999" x2="19.2918" y2="7.34543" gradientUnits="userSpaceOnUse">
-                                                <stop stopColor="#FF7A00" />
-                                                <stop offset="1" stopColor="#FFD439" />
-                                            </linearGradient>
-                                            <linearGradient id="paint1_linear_3165_1965" x1="0.499782" y1="20.4999" x2="19.2918" y2="7.34543" gradientUnits="userSpaceOnUse">
-                                                <stop stopColor="#FF7A00" />
-                                                <stop offset="1" stopColor="#FFD439" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    Subscribed member
-                                </div>
+
+                                {
+                                    !isSubscriptionExpired && <div className="px-3 py-1 bg-green-50 border border-green-200 rounded-full text-green-700 text-sm font-medium flex gap-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="21" viewBox="0 0 15 21" fill="none">
+                                            <path d="M7.5 14.5C11.366 14.5 14.5 11.366 14.5 7.5C14.5 3.63401 11.366 0.5 7.5 0.5C3.63401 0.5 0.5 3.63401 0.5 7.5C0.5 11.366 3.63401 14.5 7.5 14.5Z" fill="url(#paint0_linear_3165_1965)" />
+                                            <path d="M3.46668 13.2219L2.5 20.5L7.0884 17.747C7.23805 17.6572 7.31288 17.6123 7.39276 17.5947C7.46341 17.5792 7.53659 17.5792 7.60724 17.5947C7.68712 17.6123 7.76195 17.6572 7.9116 17.747L12.5 20.5L11.5343 13.2212M14.5 7.5C14.5 11.366 11.366 14.5 7.5 14.5C3.63401 14.5 0.5 11.366 0.5 7.5C0.5 3.63401 3.63401 0.5 7.5 0.5C11.366 0.5 14.5 3.63401 14.5 7.5Z" stroke="url(#paint1_linear_3165_1965)" strokeLinecap="round" strokeLinejoin="round" />
+                                            <defs>
+                                                <linearGradient id="paint0_linear_3165_1965" x1="0.499782" y1="20.4999" x2="19.2918" y2="7.34543" gradientUnits="userSpaceOnUse">
+                                                    <stop stopColor="#FF7A00" />
+                                                    <stop offset="1" stopColor="#FFD439" />
+                                                </linearGradient>
+                                                <linearGradient id="paint1_linear_3165_1965" x1="0.499782" y1="20.4999" x2="19.2918" y2="7.34543" gradientUnits="userSpaceOnUse">
+                                                    <stop stopColor="#FF7A00" />
+                                                    <stop offset="1" stopColor="#FFD439" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        Subscribed member
+                                    </div>
+                                }
+
                             </div>
 
                             {/* Divider */}
@@ -848,34 +890,38 @@ const BasicDetails = () => {
                         </Card>
 
                         {/* Subscription Card */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex overflow-hidden">
+                        {
+                            !isSubscriptionExpired && <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex overflow-hidden">
 
-                            <img
-                                src="/assets/images/anual-package.jpg"
-                                className="w-48 object-cover"
-                            />
+                                <img
+                                    src="/assets/images/anual-package.jpg"
+                                    className="w-48 object-cover"
+                                />
 
-                            <div className="p-6 flex flex-col justify-between flex-1">
+                                <div className="p-6 flex flex-col justify-between flex-1">
 
-                                <div>
-                                    <div className="text-lg font-semibold">
-                                        CPE Warehouse Live Events Pass
+                                    <div>
+                                        <div className="text-lg font-semibold">
+                                            CPE Warehouse Live Events Pass
+                                        </div>
+
+                                        <div className="text-gray-500 text-sm mt-1">
+                                            Valid Until -
+                                            <span className="font-bold ml-1">
+                                                {moment(subscriptionExpiredDate).format(" DD MMMM,  YYYY")}
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    <div className="text-gray-500 text-sm mt-1">
-                                        Valid Until -
-                                        <span className="font-bold ml-1">
-                                            02/06/2025
-                                        </span>
-                                    </div>
+                                    {isSubscriptionRenewalDue && (
+                                        <button className="bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold w-fit">
+                                            Renew Subscription
+                                        </button>
+                                    )}
+
                                 </div>
-
-                                <button className="bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold w-fit">
-                                    Renew Subscription
-                                </button>
-
                             </div>
-                        </div>
+                        }
 
                     </div>
 

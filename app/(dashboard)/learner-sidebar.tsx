@@ -29,8 +29,8 @@ const menuItems = [
 export default function LearnerSidebar() {
 
     const pathName = usePathname();
-
     const [logo, setLogo] = useState("");
+    const [isSubscriptionExpired, setIsSubscriptionExpired] = useState(false);
 
     const getHeaderData = async () => {
         const response: any = await getCommonData()
@@ -40,8 +40,42 @@ export default function LearnerSidebar() {
         setLogo(logo)
     }
 
+    async function getUserSubscription() {
+
+        const token = localStorage.getItem("token");
+        const email = localStorage.getItem("email");
+
+        let response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/annual-pass-subscriptions?populate=user", {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "content-type": "application/json"
+            },
+        })
+
+        let res = await response.json();
+
+        const subscriptions = res.data.filter((d: any) =>
+            d.attributes?.user?.data?.attributes?.email === email
+        );
+
+        const today = new Date();
+        const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const hasActiveSubscription = subscriptions.some((subscription: any) => {
+            const endDate = subscription.attributes?.endDate;
+            if (!endDate) return false;
+
+            const [year, month, day] = endDate.split('-').map(Number);
+            const subscriptionEndDate = new Date(year, month - 1, day);
+
+            return subscriptionEndDate >= todayDate;
+        });
+
+        setIsSubscriptionExpired(subscriptions.length > 0 && !hasActiveSubscription);
+    }
+
     useEffect(() => {
         getHeaderData();
+        getUserSubscription();
     }, [])
 
 
@@ -64,7 +98,7 @@ export default function LearnerSidebar() {
             </div>
 
             {/* Top Section */}
-            <div className="pt-8 flex flex-col gap-8 mb-20">
+            <div className="pt-8 flex flex-col gap-8 mb-5">
 
                 {/* Navigation */}
                 <div className="px-4 flex z-0 flex-col gap-2">
@@ -165,37 +199,39 @@ export default function LearnerSidebar() {
                 </div>
             </div>
 
-            {/* Bottom Upgrade Card */}
-            <div className="px-4 pb-8">
+            {
+                isSubscriptionExpired && <div className="px-4">
 
-                <div className="bg-gray-50 rounded-lg p-5 flex flex-col gap-4">
+                    <div className="bg-gray-50 rounded-lg p-5 flex flex-col gap-4">
 
-                    {/* Title */}
-                    <div className="relative">
-                        <p className="text-sm font-semibold text-slate-600 pr-8">
-                            Unlimited Access to Live Study and Self-Study
-                        </p>
+                        {/* Title */}
+                        <div className="relative">
+                            <p className="text-sm font-semibold text-slate-600 pr-8">
+                                Unlimited Access to Live Study and Self-Study
+                            </p>
 
-                        <button className="absolute right-0 top-0 p-1 rounded-md hover:bg-gray-200">
-                            <XMarkIcon className="w-5 h-5 text-gray-400" />
-                        </button>
+                            <button className="absolute right-0 top-0 p-1 rounded-md hover:bg-gray-200">
+                                <XMarkIcon className="w-5 h-5 text-gray-400" />
+                            </button>
+                        </div>
+
+                        {/* Image */}
+                        <img
+                            src="/assets/images/package.png"
+                            className="rounded-md w-full h-[160px] object-cover"
+                            alt="upgrade"
+                        />
+
+                        {/* Button */}
+                        <Link href="/package/cpe-warehouse-annual-live-webinar-pass" className="text-sm font-semibold text-indigo-600 hover:underline">
+                            Upgrade Now
+                        </Link>
+
                     </div>
 
-                    {/* Image */}
-                    <img
-                        src="/assets/images/package.png"
-                        className="rounded-md w-full h-[160px] object-cover"
-                        alt="upgrade"
-                    />
-
-                    {/* Button */}
-                    <button className="text-sm font-semibold text-indigo-600 hover:underline">
-                        Upgrade Now
-                    </button>
-
                 </div>
+            }
 
-            </div>
         </aside>
     );
 }

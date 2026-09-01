@@ -295,6 +295,7 @@ export function getCourses(IDarray: any) {
     query {
       courses(
         pagination: { limit: -1 }
+        sort: ["startDate:desc"]
         filters: {
           id: { notIn: [${IDarray}] }
           isActive: { eq: true }
