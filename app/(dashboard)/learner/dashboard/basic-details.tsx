@@ -498,6 +498,14 @@ const BasicDetails = () => {
     const [isSubscriptionExpired, setIsSubscriptionExpired] = useState(false);
     const [subscriptionExpiredDate, setSubscriptionExpiredDate] = useState("");
     const [isSubscriptionRenewalDue, setIsSubscriptionRenewalDue] = useState(false);
+    const registeredEventsForSelectedYear = regEvent.filter((event: any) => {
+        const eventDate = new Date(event.startDate);
+        return !Number.isNaN(eventDate.getTime()) && eventDate.getFullYear() === selectedYear;
+    });
+    const pastEventsForSelectedYear = pastEvents.filter((event: any) => {
+        const eventDate = new Date(event.startDate);
+        return !Number.isNaN(eventDate.getTime()) && eventDate.getFullYear() === selectedYear;
+    });
 
     const gotowebinar = (webinarId?: string, joinUrl?: string) => {
         const webinarLink = joinUrl || (webinarId ? `https://global.gotowebinar.com/join/${webinarId}` : "");
@@ -1021,13 +1029,13 @@ const BasicDetails = () => {
                                     <h2 className="text-lg font-semibold">Registered Event(s)</h2>
 
                                     <span className="text-xs px-2 py-1 border border-gray-200 rounded-md bg-gray-50">
-                                        {regEvent.length} events
+                                        {registeredEventsForSelectedYear.length} events
                                     </span>
                                 </div>
 
                                 {/* Events */}
                                 <div className="p-4 space-y-4 w-full">
-                                    {regEvent.length > 0 && regEvent.map((event, index) => (
+                                    {registeredEventsForSelectedYear.length > 0 && registeredEventsForSelectedYear.map((event, index) => (
                                         <RegisteredEventCard key={index} event={event} onLaunch={launchEvent} />
                                     ))}
                                 </div>
@@ -1044,7 +1052,7 @@ const BasicDetails = () => {
 
                                 {/* Events */}
                                 <div className="p-4 space-y-4">
-                                    {pastEvents.length > 0 && pastEvents.map((event, index) => (
+                                    {pastEventsForSelectedYear.length > 0 && pastEventsForSelectedYear.map((event, index) => (
                                         <PastEventCard key={index} event={event} />
                                     ))}
                                 </div>
