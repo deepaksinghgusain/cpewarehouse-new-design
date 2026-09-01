@@ -102,6 +102,8 @@ export function FinalExam({ slug }: FinalExamProps) {
         }
     }
 
+    const isSubmitDisabled = questions.length === 0 || questions.some((_, index) => !answers[index]?.trim())
+
     const handleSubmit = () => {
         const submittedAnswers = questions.map((question, index) => ({ question: question.title?.trim() || '', answer: answers[index]?.trim() || '' }))
         if (submittedAnswers.some((answer) => !answer.question || !answer.answer)) {
@@ -117,7 +119,7 @@ export function FinalExam({ slug }: FinalExamProps) {
             <div className="mx-auto">
                 <div className="text-center"><h2 className="text-2xl font-bold text-slate-900">Final Exam</h2><p className="mt-2 font-semibold text-slate-800">{questions.length} Questions</p></div>
                 {questions.map((question, index) => <div className="mt-7 rounded-xl border border-gray-200 bg-white p-5 shadow-sm" key={question.id || index}><p className="font-semibold leading-snug text-slate-900">{index + 1}. {question.title}</p><div className="mt-4 space-y-3">{question.options?.map((option, optionIndex) => <label key={option.id || optionIndex} className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-300 bg-gray-100 px-3 py-3"><input type="radio" name={`radiogroup_-${index}`} checked={answers[index] === option.option} onChange={() => handleAnswerChange(index, option.option || '')} className="h-5 w-5 accent-blue-500" /><span className="font-normal">{option.option}</span></label>)}</div></div>)}
-                <div className="mt-4 flex justify-center"><Button className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600" onClick={handleSubmit}>Submit</Button></div>
+                <div className="mt-4 flex justify-center"><Button className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500" onClick={handleSubmit} disabled={isSubmitDisabled}>Submit</Button></div>
                 {error && <p className="mt-3 text-center text-sm font-medium text-red-600">{error}</p>}
                 {showSubmitConfirmation && <p className="mt-3 text-center text-sm font-medium text-green-600">All questions answered. Ready to submit.</p>}
 

@@ -28,6 +28,7 @@ const ViewWebinar = () => {
     const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
     const [isDownloadingHandout, setIsDownloadingHandout] = useState(false);
     const [isCaptionOn, setIsCaptionOn] = useState(false);
+    const [activeTab, setActiveTab] = useState("overview");
 
     const videoRef = useRef<any>(null);
 
@@ -300,7 +301,7 @@ const ViewWebinar = () => {
             {err && <p className="mt-3 text-center text-sm font-medium text-red-600">{err}</p>}
 
             <div className="mt-4 flex gap-6 text-lg font-semibold w-full">
-                <Tabs defaultValue="overview" className=" bg-transparent w-full">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className=" bg-transparent w-full">
                     <TabsList variant="line" className='w-1/3 bg-transparent'>
                         <TabsTrigger value="overview" className="text-xl  font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Overview</TabsTrigger>
                         <TabsTrigger value="final-exam" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Final Exam</TabsTrigger>
@@ -454,6 +455,7 @@ const ViewWebinar = () => {
                         <ReviewExam
                             slug={slug}
                             videoRef={videoRef}
+                            onAllQuestionsCompleted={() => setActiveTab('final-exam')}
                         />
 
                         <section className="mt-8 mb-4 rounded-none bg-[#e9ecf6] px-6 py-10 md:px-12">

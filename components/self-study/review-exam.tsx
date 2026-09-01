@@ -8,11 +8,13 @@ export type ReviewOption = {
     value: string
     label: string
     isCorrect?: boolean
+    hint?: string
 }
 
 export type ReviewQuestion = {
     id: string
     title: string
+    hint?: string
     isMCQ: boolean
     supportsMultipleAnswers: boolean
     durationInminute?: string | number
@@ -38,6 +40,7 @@ type MediaElement = {
 type ReviewExamProps = {
     slug: string
     videoRef: React.RefObject<unknown>
+    onAllQuestionsCompleted?: () => void
 }
 
 type ReviewApiResponse = {
@@ -64,23 +67,40 @@ const toRecord = (value: unknown): Record<string, unknown> => (
 const normalizeQuestion = (value: unknown, index: number): ReviewQuestion => {
     const question = toRecord(value)
     const rawOptions = Array.isArray(question.options) ? question.options : []
+    const optionHints = rawOptions
+        .map((rawOption) => {
+            const option = toRecord(rawOption)
+            const hint = option.hint ?? option.questionHint ?? option.helpText ?? option.explanation
+            return typeof hint === 'string' ? hint.trim() : ''
+        })
+        .filter(Boolean)
+
     const options = rawOptions.map((rawOption, optionIndex) => {
         const option = toRecord(rawOption)
         const optionValue = option.value ?? option.option ?? option.label ?? option.text ?? option.answer ?? option.correctAnswer ?? `Option ${optionIndex + 1}`
         const optionLabel = option.label ?? option.option ?? option.text ?? option.value ?? option.answer ?? option.correctAnswer ?? `Option ${optionIndex + 1}`
         const isCorrect = option.isCorrect === true || option.correct === true || option.isAnswer === true || option.correctAnswer === true || option.answer === true || option.isCorrectAnswer === true
+        const hint = typeof option.hint === 'string' ? option.hint.trim() : typeof option.questionHint === 'string' ? option.questionHint.trim() : ''
 
         return {
             id: String(option.id ?? option.optionId ?? option.value ?? optionIndex),
             label: String(optionLabel),
             value: String(optionValue),
             isCorrect,
+            hint: hint || undefined,
         }
     })
+
+    const questionHint = typeof question.hint === 'string'
+        ? question.hint.trim()
+        : typeof question.questionHint === 'string'
+            ? question.questionHint.trim()
+            : optionHints[0] || ''
 
     return {
         id: String(question.id ?? index),
         title: String(question.title ?? `Question ${index + 1}`),
+        hint: questionHint || undefined,
         isMCQ: Boolean(question.isMCQ),
         supportsMultipleAnswers: Boolean(question.allowMultipleAnswers || question.multipleAnswers || question.supportsMultipleAnswers || question.multipleCorrectAnswers || Number(question.maxSelections ?? 0) > 1),
         durationInminute: String(question.durationInminute ?? '00:00'),
@@ -115,7 +135,7 @@ const getSavedAnswers = () => {
     }
 }
 
-export function ReviewExam({ slug, videoRef }: ReviewExamProps) {
+export function ReviewExam({ slug, videoRef, onAllQuestionsCompleted }: ReviewExamProps) {
     const [questions, setQuestions] = useState<ReviewQuestion[]>([])
     const [currentQuestion, setCurrentQuestion] = useState<ReviewQuestion | null>(null)
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>([])
@@ -152,7 +172,7 @@ export function ReviewExam({ slug, videoRef }: ReviewExamProps) {
         const media = getMediaElement(videoRef)
         if (!media || questions.length === 0) return
 
-        const handleTimeUpdate = () => {
+        const openNextReviewQuestion = () => {
             if (isReviewActive) return
             const nextQuestion = questions.find((question) => !completedIds.includes(question.id) && media.currentTime >= question.timestampSeconds)
             if (!nextQuestion) return
@@ -174,10 +194,14 @@ export function ReviewExam({ slug, videoRef }: ReviewExamProps) {
             }
         }
 
-        media.addEventListener('timeupdate', handleTimeUpdate)
+        media.addEventListener('timeupdate', openNextReviewQuestion)
+        media.addEventListener('pause', openNextReviewQuestion)
+        media.addEventListener('seeked', openNextReviewQuestion)
         media.addEventListener('seeking', handleSeeking)
         return () => {
-            media.removeEventListener('timeupdate', handleTimeUpdate)
+            media.removeEventListener('timeupdate', openNextReviewQuestion)
+            media.removeEventListener('pause', openNextReviewQuestion)
+            media.removeEventListener('seeked', openNextReviewQuestion)
             media.removeEventListener('seeking', handleSeeking)
         }
     }, [completedIds, currentQuestion, isReviewActive, questions, videoRef])
@@ -228,12 +252,22 @@ export function ReviewExam({ slug, videoRef }: ReviewExamProps) {
     const handleContinue = () => {
         if (!answerResult?.isCorrect) return
         const timestamp = currentQuestion.timestampSeconds
-        setCompletedIds((previous) => previous.includes(currentQuestion.id) ? previous : [...previous, currentQuestion.id])
+        const nextCompletedIds = completedIds.includes(currentQuestion.id)
+            ? completedIds
+            : [...completedIds, currentQuestion.id]
+
+        const isLastReviewQuestion = questions.length > 0 && questions.every((question) => nextCompletedIds.includes(question.id))
+
+        setCompletedIds(nextCompletedIds)
         setCurrentQuestion(null)
         setSelectedAnswers([])
         setAnswerResult(null)
         setShowResult(false)
         setIsReviewActive(false)
+
+        if (isLastReviewQuestion) {
+            onAllQuestionsCompleted?.()
+        }
 
         const media = getMediaElement(videoRef)
         if (media) {
@@ -249,6 +283,11 @@ export function ReviewExam({ slug, videoRef }: ReviewExamProps) {
                     <div className="mb-4 text-center">
                         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Review Question</p>
                         <h3 className="mt-2 text-2xl font-bold text-slate-900">{currentQuestion.title}</h3>
+                        {currentQuestion.hint && (
+                            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-left text-sm text-amber-900">
+                                <span className="font-semibold">Hint:</span> {currentQuestion.hint}
+                            </div>
+                        )}
                     </div>
                     <div className="space-y-3">
                         {currentQuestion.options.map((option, optionIndex) => {
