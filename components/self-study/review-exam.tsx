@@ -26,6 +26,7 @@ type AnswerResult = {
     isCorrect: boolean
     correctAnswer: string
     message: string
+    hint?: string
 }
 
 type MediaElement = {
@@ -221,11 +222,17 @@ export function ReviewExam({ slug, videoRef, onAllQuestionsCompleted }: ReviewEx
         const isCorrect = currentQuestion.isMCQ && currentQuestion.supportsMultipleAnswers
             ? normalizedAnswers.length === correctAnswers.length && normalizedAnswers.every((answer) => correctAnswers.includes(answer))
             : normalizedAnswers[0] === correctAnswers[0]
+        const answerHint = currentQuestion.options
+            .filter((option) => normalizedAnswers.includes(option.value.trim()) && !option.isCorrect && option.hint)
+            .map((option) => option.hint)
+            .filter((hint, index, hints): hint is string => Boolean(hint) && hints.indexOf(hint) === index)
+            .join(' ')
 
         setAnswerResult({
             isCorrect,
             correctAnswer: correctAnswers.join(', ') || 'N/A',
             message: isCorrect ? 'Your answer is correct.' : 'Your answer is incorrect.',
+            hint: isCorrect ? undefined : answerHint || currentQuestion.hint,
         })
         setShowResult(true)
         if (isCorrect) saveCorrectAnswer(normalizedAnswers)
@@ -283,11 +290,6 @@ export function ReviewExam({ slug, videoRef, onAllQuestionsCompleted }: ReviewEx
                     <div className="mb-4 text-center">
                         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Review Question</p>
                         <h3 className="mt-2 text-2xl font-bold text-slate-900">{currentQuestion.title}</h3>
-                        {currentQuestion.hint && (
-                            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-left text-sm text-amber-900">
-                                <span className="font-semibold">Hint:</span> {currentQuestion.hint}
-                            </div>
-                        )}
                     </div>
                     <div className="space-y-3">
                         {currentQuestion.options.map((option, optionIndex) => {
@@ -305,7 +307,7 @@ export function ReviewExam({ slug, videoRef, onAllQuestionsCompleted }: ReviewEx
                 </div>
             </div>
 
-            {showResult && answerResult && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"><div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-5 text-center"><div className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full ${answerResult.isCorrect ? 'bg-emerald-100' : 'bg-red-100'}`}><span className="text-3xl">{answerResult.isCorrect ? 'OK' : 'X'}</span></div><h3 className={`text-2xl font-bold ${answerResult.isCorrect ? 'text-emerald-600' : 'text-red-600'}`}>{answerResult.isCorrect ? 'Correct Answer' : 'Wrong Answer'}</h3></div><p className="text-center text-base text-slate-700">{answerResult.message}</p><button type="button" onClick={answerResult.isCorrect ? handleContinue : handleRetry} className="mt-6 w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-700">{answerResult.isCorrect ? 'Continue Video' : 'Try Again'}</button></div></div>}
+            {showResult && answerResult && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"><div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-5 text-center"><div className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full ${answerResult.isCorrect ? 'bg-emerald-100' : 'bg-red-100'}`}><span className="text-3xl">{answerResult.isCorrect ? 'OK' : 'X'}</span></div><h3 className={`text-2xl font-bold ${answerResult.isCorrect ? 'text-emerald-600' : 'text-red-600'}`}>{answerResult.isCorrect ? 'Correct Answer' : 'Wrong Answer'}</h3></div><p className="text-center text-base text-slate-700">{answerResult.message}</p>{answerResult.hint && <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900"><span className="font-semibold">Hint: </span>{answerResult.hint}</p>}<button type="button" onClick={answerResult.isCorrect ? handleContinue : handleRetry} className="mt-6 w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-700">{answerResult.isCorrect ? 'Continue Video' : 'Try Again'}</button></div></div>}
         </>
     )
 }

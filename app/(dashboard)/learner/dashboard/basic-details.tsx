@@ -601,10 +601,6 @@ const BasicDetails = () => {
         setIsSubscriptionExpired(subscriptions.length > 0 && !latestActiveEndDate);
     }
 
-    console.log(subscriptionExpiredDate);
-    console.log(isSubscriptionRenewalDue);
-    console.log(isSubscriptionExpired);
-
     async function getEventlist() {
         const email = localStorage.getItem('email')?.toString() || '';
 
