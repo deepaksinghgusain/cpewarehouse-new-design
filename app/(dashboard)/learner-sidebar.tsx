@@ -58,6 +58,11 @@ export default function LearnerSidebar() {
             d.attributes?.user?.data?.attributes?.email === email
         );
 
+        if (subscriptions.length === 0) {
+            setIsSubscriptionExpired(true);
+            return;
+        }
+
         const today = new Date();
         const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const hasActiveSubscription = subscriptions.some((subscription: any) => {
@@ -69,6 +74,8 @@ export default function LearnerSidebar() {
 
             return subscriptionEndDate >= todayDate;
         });
+
+
 
         setIsSubscriptionExpired(subscriptions.length > 0 && !hasActiveSubscription);
     }
