@@ -24,14 +24,14 @@ type FinalExamApiResponse = {
     }
 }
 
-type FinalExamProps = { slug: string }
+type FinalExamProps = { slug: string; onPassed?: () => void }
 
 type ExamApiResponse = {
     error?: { message?: string }
     data?: { attributes?: { score?: number; totalScore?: number } }
 }
 
-export function FinalExam({ slug }: FinalExamProps) {
+export function FinalExam({ slug, onPassed }: FinalExamProps) {
     const [questions, setQuestions] = useState<FinalQuestion[]>([])
     const [examId, setExamId] = useState('')
     const [answers, setAnswers] = useState<Record<number, string>>({})
@@ -95,7 +95,9 @@ export function FinalExam({ slug }: FinalExamProps) {
 
             const percentage = ((score * 100) / total).toFixed(2)
             setTotalPercentage(percentage)
-            setExamResultType(Number(percentage) >= requiredPassPercentage ? 'pass' : 'fail')
+            const passed = Number(percentage) >= requiredPassPercentage
+            setExamResultType(passed ? 'pass' : 'fail')
+            if (passed) onPassed?.()
             setIsResultOpen(true)
         } catch {
             setError('Unable to submit the exam right now. Please try again.')

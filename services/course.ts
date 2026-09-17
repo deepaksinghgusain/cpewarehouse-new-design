@@ -555,6 +555,14 @@ function getUserCourseGQL(email: string) {
                 id
                 attributes{
                   username
+                  user_exams {
+                    data {
+                      attributes {
+                        score
+                        totalScore
+                      }
+                    }
+                  }
                 }
               }
             }

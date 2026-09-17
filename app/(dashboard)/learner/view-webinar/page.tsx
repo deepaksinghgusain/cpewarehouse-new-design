@@ -26,6 +26,7 @@ const ViewWebinar = () => {
     const [viewerUserId, setViewerUserId] = useState("");
     const [vidViewPercent, setVidViewPercent] = useState("0.00");
     const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
+    const [hasPassedFinalExam, setHasPassedFinalExam] = useState(false);
     const [isDownloadingHandout, setIsDownloadingHandout] = useState(false);
     const [isCaptionOn, setIsCaptionOn] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
@@ -59,6 +60,47 @@ const ViewWebinar = () => {
         setViewerUserId(localStorage.getItem("userId") || "");
     }, [params, searchParams]);
 
+    useEffect(() => {
+        if (!slug) return;
+        void getExamresult(slug);
+    }, [slug]);
+
+    const getExamresult = async (courseSlug: string) => {
+        const userEmail = localStorage.getItem("email") || "";
+        const userId = localStorage.getItem("userId") || "";
+        if (!userEmail || !courseSlug) return;
+
+        try {
+            const response: any = await GetUserSubscribedCourses(userEmail);
+            const userCourse = response?.data?.find((item: any) => {
+                const itemCourseSlug = item?.attributes?.course?.data?.attributes?.slug;
+                const itemUserId = item?.attributes?.user?.data?.id;
+                return itemCourseSlug === courseSlug && (!userId || String(itemUserId) === String(userId));
+            });
+            const exams = userCourse?.attributes?.user?.data?.attributes?.user_exams?.data || [];
+            const hasPassed = exams.some((exam: any) => {
+                const totalScore = Number(exam?.attributes?.totalScore || 0);
+                const score = Number(exam?.attributes?.score || 0);
+                return totalScore > 0 && (score / totalScore) * 100 >= 70;
+            });
+
+            console.log("Exam result for course:", courseSlug, "Has passed:", hasPassed);
+
+            setHasPassedFinalExam(hasPassed);
+            if (hasPassed) {
+                localStorage.setItem(`finalExamPassed:${courseSlug}`, "true");
+            }
+        } catch (error) {
+            console.error("Unable to load exam result", error);
+            setHasPassedFinalExam(false);
+        }
+    };
+
+    const handleFinalExamPassed = () => {
+        if (!slug) return;
+        localStorage.setItem(`finalExamPassed:${slug}`, "true");
+        setHasPassedFinalExam(true);
+    };
 
     const webinarTitle = useMemo(() => {
         if (!slug) return "Self-Study";
@@ -435,10 +477,12 @@ const ViewWebinar = () => {
                                     <button
                                         type="button"
                                         onClick={downloadCertificate}
-                                        disabled={isDownloadingCertificate}
+                                        disabled={!hasPassedFinalExam || isDownloadingCertificate}
                                         className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 font-semibold text-white transition-all ${isDownloadingCertificate
                                             ? "bg-gray-400 cursor-not-allowed opacity-60 hover:bg-gray-400"
-                                            : "bg-slate-400 hover:bg-slate-500 cursor-pointer"
+                                            : hasPassedFinalExam
+                                                ? "bg-slate-400 hover:bg-slate-500 cursor-pointer"
+                                                : "bg-gray-300 cursor-not-allowed opacity-60"
                                             }`}
                                     >
                                         {isDownloadingCertificate ? (
@@ -446,7 +490,7 @@ const ViewWebinar = () => {
                                         ) : (
                                             <Download className="h-5 w-5 text-amber-300" />
                                         )}
-                                        {isDownloadingCertificate ? "Downloading..." : "Download Certificate"}
+                                        {isDownloadingCertificate ? "Downloading..." : hasPassedFinalExam ? "Download Certificate" : "Pass Final Exam to Download"}
                                     </button>
                                 </aside>
                             </div>
@@ -506,6 +550,7 @@ const ViewWebinar = () => {
                     <TabsContent value="final-exam">
                         <FinalExam
                             slug={slug}
+                            onPassed={handleFinalExamPassed}
                         />
                     </TabsContent>
                     <TabsContent value="faq" className="mb-4">
