@@ -51,7 +51,7 @@ export const Footer = () => {
 
           {
             footerMiddle?.length > 0 &&
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 px-8 py-10 text-sm text-gray-700">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 px-8 py-10 text-sm text-gray-700">
               {
                 footerMiddle.map((list: any, index: number) => (
                   <div key={index}>

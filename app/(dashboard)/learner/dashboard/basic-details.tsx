@@ -592,7 +592,7 @@ const BasicDetails = () => {
             );
 
             setSubscriptionExpiredDate(latestActiveEndDate.toISOString().split('T')[0]);
-            setIsSubscriptionRenewalDue(daysUntilExpiration <= 15);
+            setIsSubscriptionRenewalDue(daysUntilExpiration <= 30);
         } else {
             setSubscriptionExpiredDate("");
             setIsSubscriptionRenewalDue(false);
@@ -929,9 +929,9 @@ const BasicDetails = () => {
                                     </div>
 
                                     {isSubscriptionRenewalDue && (
-                                        <button className="bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold w-fit">
+                                        <Link href="/package/cpe-warehouse-annual-live-webinar-pass" className="bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold w-fit">
                                             Renew Subscription
-                                        </button>
+                                        </Link>
                                     )}
 
                                 </div>
