@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { z } from 'zod'
 import { Check, X } from 'lucide-react'
+import { sharewithcolleagueSend } from '@/services/sharewithcolleague'
 
 // Zod validation schema
 const shareFormSchema = z.object({
@@ -95,13 +96,14 @@ const ErrorModal = ({ message, onClose }: { message: string; onClose: () => void
 
 interface ShareWithColleagueProps {
     courseId?: string
-    courseTitle?: string
+    courseTitle?: string,
+    courseSlug?: string,
     isOpen: boolean
     onClose: () => void
     onSuccess?: () => void
 }
 
-const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, courseTitle = "Course", isOpen, onClose, onSuccess }) => {
+const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, courseTitle = "Course", courseSlug, isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState<Partial<ShareFormData>>({})
     const [errors, setErrors] = useState<Partial<Record<keyof ShareFormData, string>>>({})
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -157,12 +159,15 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                 courseTitle
             }
 
-            console.log("Form submitted successfully:", submitData)
+            const response = await sharewithcolleagueSend(submitData, courseSlug as string);
 
-            // TODO: Replace with actual API call
-            // const res = await shareWithColleague(submitData)
+            if (response?.error || !response?.data) {
+                const message = response?.error?.message || response?.message || "Unable to share the course right now. Please try again.";
+                setErrorMessage(message);
+                setShowErrorModal(true);
+                return;
+            }
 
-            // Simulate API call success
             setShowSuccessModal(true)
 
         } catch (error) {
@@ -183,6 +188,9 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                 }
             } else if (error instanceof Error) {
                 setErrorMessage(error.message)
+                setShowErrorModal(true)
+            } else {
+                setErrorMessage("Unable to share the course right now. Please try again.")
                 setShowErrorModal(true)
             }
         } finally {

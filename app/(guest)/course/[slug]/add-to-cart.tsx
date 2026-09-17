@@ -359,6 +359,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
         onClose={() => setShowShareModal(false)}
         courseId={courseData?.id}
         courseTitle={courseData?.title}
+        courseSlug={courseData?.slug}
         onSuccess={() => setShowShareModal(false)}
       />
     </div>
