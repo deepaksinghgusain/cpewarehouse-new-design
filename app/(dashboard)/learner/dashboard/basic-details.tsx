@@ -135,13 +135,13 @@ function PastEventCard({ event }: any) {
 
     return (
         <>
-            <div className="w-full p-4 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center gap-5">
+            <div className="flex w-full flex-col items-stretch gap-5 rounded-xl border border-gray-200 bg-white p-4 shadow-sm lg:flex-row lg:items-center">
 
                 {/* Course Image */}
                 <img
                     src={imageUrl + event.image}
                     alt="course"
-                    className="w-48 h-36 object-cover rounded-lg"
+                    className="h-36 w-full rounded-lg object-cover lg:w-48"
                 />
 
                 {/* Course Content */}
@@ -179,7 +179,7 @@ function PastEventCard({ event }: any) {
                     type="button"
                     onClick={downloadCertificate}
                     disabled={isDownloadingCertificate}
-                    className="flex items-center cursor-pointer gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg shadow-sm hover:bg-indigo-700 transition"
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 text-white shadow-sm transition hover:bg-indigo-700 lg:w-auto"
                 >
                     {isDownloadingCertificate ? (
                         <Loader className="h-5 w-5 text-amber-300 animate-spin" />
@@ -309,12 +309,12 @@ function RegisteredEventCard({ event, onLaunch }: any) {
 
     return (
         <>
-            <div className="flex items-center gap-6 p-4 border border-gray-200 rounded-xl hover:shadow-md transition w-full">
+            <div className="flex w-full flex-col items-stretch gap-6 rounded-xl border border-gray-200 p-4 transition hover:shadow-md lg:flex-row lg:items-center">
 
                 {/* Image */}
                 <img
                     src={imageUrl + event.image}
-                    className="w-48 h-36 rounded-lg object-cover"
+                    className="h-36 w-full rounded-lg object-cover lg:w-48"
                     alt=""
                 />
 
@@ -372,7 +372,7 @@ function RegisteredEventCard({ event, onLaunch }: any) {
                 <button
                     type="button"
                     onClick={() => onLaunch(event)}
-                    className="h-fit flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 cursor-pointer"
+                    className="flex h-fit w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 lg:w-auto"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                         <path d="M9.99967 12.5L7.49967 10M9.99967 12.5C11.1637 12.0573 12.2804 11.499 13.333 10.8334M9.99967 12.5V16.6667C9.99967 16.6667 12.5247 16.2084 13.333 15C14.233 13.65 13.333 10.8334 13.333 10.8334M7.49967 10C7.94313 8.84957 8.50151 7.74676 9.16634 6.70838C10.1373 5.15587 11.4894 3.87758 13.0938 2.99512C14.6983 2.11266 16.5019 1.65535 18.333 1.66671C18.333 3.93338 17.683 7.91671 13.333 10.8334M7.49967 10H3.33301C3.33301 10 3.79134 7.47504 4.99967 6.66671C6.34967 5.76671 9.16634 6.66671 9.16634 6.66671M3.74967 13.75C2.49967 14.8 2.08301 17.9167 2.08301 17.9167C2.08301 17.9167 5.19967 17.5 6.24967 16.25C6.84134 15.55 6.83301 14.475 6.17467 13.825C5.85076 13.5159 5.42409 13.3372 4.97653 13.3234C4.52897 13.3096 4.09207 13.4615 3.74967 13.75Z" stroke="white" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
@@ -410,13 +410,13 @@ function RecommendedEventCard({ event }: any) {
 
 
     return (
-        <div className="w-full p-4 bg-white rounded-xl border border-gray-200 shadow-sm flex gap-5 items-center">
+        <div className="flex w-full flex-col items-stretch gap-5 rounded-xl border border-gray-200 bg-white p-4 shadow-sm lg:flex-row lg:items-center">
 
             {/* Image */}
             <img
                 src={imageUrl + event.attributes.image.data.attributes.url}
                 alt="course"
-                className="w-48 h-40 object-cover rounded-lg"
+                className="h-40 w-full rounded-lg object-cover lg:w-48"
             />
 
             {/* Content */}
@@ -476,7 +476,7 @@ function RecommendedEventCard({ event }: any) {
             </div>
 
             {/* Button */}
-            <Link href={`/course/${event.attributes?.slug}`} className="px-4 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
+            <Link href={`/course/${event.attributes?.slug}`} className="w-full rounded-lg bg-indigo-600 px-4 py-3 text-center font-semibold text-white transition hover:bg-indigo-700 lg:w-auto">
                 Read more
             </Link>
         </div>
@@ -788,7 +788,7 @@ const BasicDetails = () => {
 
     return (
         <>
-            <div className="bg-gray-50 p-8 flex flex-col gap-6">
+            <div className="flex flex-col gap-6 bg-gray-50 p-4 sm:p-6 lg:p-8">
 
                 {/* Header */}
                 <div className="text-3xl font-semibold text-gray-800">
@@ -804,7 +804,7 @@ const BasicDetails = () => {
                         {/* Profile Card */}
                         <Card className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-6">
 
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-wrap items-start justify-between gap-4">
 
                                 {/* User */}
                                 <div className="flex items-center gap-4">
@@ -851,7 +851,7 @@ const BasicDetails = () => {
                             <div className="h-px bg-gray-200" />
 
                             {/* Info Grid */}
-                            <div className="grid grid-cols-2 gap-6 text-sm justify-center">
+                            <div className="grid grid-cols-1 justify-center gap-6 text-sm sm:grid-cols-2">
 
                                 <div className="h-10 flex flex-col justify-start items-start">
                                     <div className="inline-flex justify-start items-center gap-3">
@@ -887,14 +887,14 @@ const BasicDetails = () => {
                                     </div>
                                 </div>
 
-                                <div className='ml-12'>
+                                <div className='sm:ml-12'>
                                     <div className="text-gray-500 font-semibold">
                                         PTIN
                                     </div>
                                     <div>{user.ptin}</div>
                                 </div>
 
-                                <div className='ml-12'>
+                                <div className='sm:ml-12'>
                                     <div className="text-gray-500 font-semibold">
                                         CFP ID
                                     </div>
@@ -906,11 +906,11 @@ const BasicDetails = () => {
 
                         {/* Subscription Card */}
                         {
-                            !isSubscriptionExpired && <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex overflow-hidden">
+                            !isSubscriptionExpired && <div className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm sm:flex-row">
 
                                 <img
                                     src="/assets/images/anual-package.jpg"
-                                    className="w-48 object-cover"
+                                    className="h-40 w-full object-cover sm:h-auto sm:w-48"
                                 />
 
                                 <div className="p-6 flex flex-col justify-between flex-1">
@@ -944,7 +944,7 @@ const BasicDetails = () => {
                         <div className="relative flex flex-col gap-5 p-6 bg-white rounded-xl border border-gray-200 shadow-sm w-full">
 
                             {/* Year Button */}
-                            <div className="absolute top-5 right-5">
+                            <div className="self-end lg:absolute lg:right-5 lg:top-5">
                                 <Select value={String(selectedYear)} onValueChange={(value) => setSelectedYear(Number(value))}>
                                     <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-300 rounded-lg shadow-sm">
 
@@ -978,7 +978,7 @@ const BasicDetails = () => {
                             </div>
 
                             {/* Content */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 lg:pr-36">
                                 <span className="text-6xl font-normal text-indigo-500 leading-[64px]">
                                     {totalCreditEarned}
                                 </span>
@@ -1020,19 +1020,19 @@ const BasicDetails = () => {
                 </div>
             </div>
 
-            <div className="w-full p-8 space-y-4">
+            <div className="w-full space-y-4 p-4 sm:p-6 lg:p-8">
                 {/* Tabs */}
                 <div className="borde-b border-gray-200  text-lg font-semibold w-full">
                     <Tabs defaultValue="registered-event" className=" bg-transparent w-full">
-                        <TabsList variant="line" className='w-[400px] ml-24 bg-transparent border-b border-gray-200'>
+                        <TabsList variant="line" className='ml-0 w-full max-w-full justify-start overflow-x-auto bg-transparent border-b border-gray-200 lg:ml-24 lg:w-[400px]'>
                             <TabsTrigger value="registered-event" className="text-xl  font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Registered Event(s)</TabsTrigger>
                             <TabsTrigger value="past-event" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Past Event(s)</TabsTrigger>
                             <TabsTrigger value="recommended-events" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Recommended Events</TabsTrigger>
                         </TabsList>
                         <TabsContent value="registered-event">
-                            <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                            <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                                 {/* Header */}
-                                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-4 py-4 sm:px-6">
                                     <h2 className="text-lg font-semibold">Registered Event(s)</h2>
 
                                     <span className="text-xs px-2 py-1 border border-gray-200 rounded-md bg-gray-50">
@@ -1049,9 +1049,9 @@ const BasicDetails = () => {
                             </div>
                         </TabsContent>
                         <TabsContent value="past-event">
-                            <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                            <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                                 {/* Header */}
-                                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-4 py-4 sm:px-6">
                                     <h2 className="text-lg font-semibold">
                                         Past Event
                                     </h2>
@@ -1066,9 +1066,9 @@ const BasicDetails = () => {
                             </div>
                         </TabsContent>
                         <TabsContent value="recommended-events">
-                            <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                            <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                                 {/* Header */}
-                                <div className="flex items-center justify-end px-6 py-4 border-b border-gray-200">
+                                <div className="flex items-center justify-end border-b border-gray-200 px-4 py-4 sm:px-6">
                                     <Link href="/course-catalog" className="text-lg font-semibold">
                                         View All Courses
                                     </Link>

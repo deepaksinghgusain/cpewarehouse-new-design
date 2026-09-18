@@ -208,11 +208,11 @@ const ProfileForm = () => {
     if (mounted) {
         return (
             <Form {...form}>
-                <form className='space-y-4 mt-10' onSubmit={form.handleSubmit(onSubmit)}>
+                <form className='mt-6 space-y-4 sm:mt-10' onSubmit={form.handleSubmit(onSubmit)}>
 
                     <div className="w-full self-stretch pt-8 pb-12 bg-white inline-flex flex-col justify-start items-start gap-8 overflow-hidden">
                         <div className="self-stretch flex flex-col justify-start items-start gap-6">
-                            <div className="self-stretch px-8 flex flex-col justify-start items-start gap-6">
+                            <div className="self-stretch px-4 flex flex-col justify-start items-start gap-6 sm:px-6 lg:px-8">
                                 <div className="self-stretch flex flex-col justify-start items-start gap-5">
                                     <div className="self-stretch inline-flex justify-start items-start gap-4 flex-wrap content-start">
                                         <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
@@ -223,7 +223,7 @@ const ProfileForm = () => {
                             </div>
                         </div>
                         <div className="self-stretch flex flex-col justify-start items-start gap-6">
-                            <div className="self-stretch px-8 flex flex-col justify-start items-start gap-6">
+                            <div className="self-stretch px-4 flex flex-col justify-start items-start gap-6 sm:px-6 lg:px-8">
                                 <div className="self-stretch flex flex-col justify-start items-start gap-5">
                                     <div className="self-stretch inline-flex justify-start items-start gap-4">
                                         <div className="flex-1 self-stretch inline-flex flex-col justify-center items-start gap-1">
@@ -233,13 +233,13 @@ const ProfileForm = () => {
                                     </div>
                                     <div className="self-stretch h-px bg-gray-200" />
                                 </div>
-                                <div className="self-stretch inline-flex justify-start items-start gap-5">
+                                <div className="self-stretch flex flex-col justify-start items-stretch gap-5 lg:flex-row lg:items-start">
                                     <div className="w-16 h-16 relative ">
                                         <div className="w-16 h-16 left-0 top-0 absolute  border-[0.75px] rounded-[50%]">
                                             <img src={imagePreview ? imagePreview : imageUrl + profileImage} className="rounded-[50%]" />
                                         </div>
                                     </div>
-                                    <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
+                                    <div className="w-full flex-1 inline-flex flex-col justify-start items-start gap-4">
                                         <div className="self-stretch px-6 py-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-center gap-1">
                                             <div className="self-stretch flex flex-col justify-start items-center gap-3">
                                                 <div className="w-10 h-10 relative bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_-2px_0px_0px_rgba(16,24,40,0.05)] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] ">
@@ -287,10 +287,10 @@ const ProfileForm = () => {
                                     </div>
                                 </div>
                                 <div className="self-stretch flex flex-col justify-start items-start gap-5">
-                                    <div className="self-stretch inline-flex justify-start items-start gap-8 flex-wrap content-start">
+                                    <div className="self-stretch flex flex-col justify-start items-stretch gap-8 lg:flex-row lg:items-start">
                                         <div className="flex-1 bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start overflow-hidden">
                                             <div className="self-stretch p-6 bg-white flex flex-col justify-start items-start gap-6">
-                                                <div className="self-stretch inline-flex justify-start items-start gap-6">
+                                                <div className="self-stretch flex flex-col justify-start items-stretch gap-6 lg:flex-row lg:items-start">
                                                     <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
                                                         <div className="self-stretch flex flex-col justify-start items-start gap-1.5">
                                                             <FieldGroup>
@@ -521,7 +521,7 @@ const ProfileForm = () => {
                                         </div >
                                     </div >
                                     <div className="self-stretch h-px bg-gray-200" />
-                                    <div className="self-stretch inline-flex justify-start items-start gap-8 flex-wrap content-start">
+                                    <div className="self-stretch flex flex-col justify-start items-stretch gap-8 lg:flex-row lg:items-start">
                                         <div className="flex-1 max-w-72 min-w-48 inline-flex flex-col justify-start items-start">
                                             <div className="inline-flex justify-start items-center gap-0.5">
                                                 <div className="justify-start text-gray-900 text-lg font-semibold font-['Inter'] leading-7">Additional information</div>
@@ -533,7 +533,7 @@ const ProfileForm = () => {
                                     <div className="self-stretch inline-flex justify-start items-start gap-8 flex-wrap content-start">
                                         <div className="flex-1 bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start overflow-hidden">
                                             <div className="self-stretch p-6 bg-white flex flex-col justify-start items-start gap-6">
-                                                <div className="self-stretch inline-flex justify-start items-start gap-6">
+                                                <div className="self-stretch flex flex-col justify-start items-stretch gap-6 lg:flex-row lg:items-start">
                                                     <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
                                                         <div className="self-stretch flex flex-col justify-start items-start gap-1.5">
                                                             <FieldGroup>
@@ -743,7 +743,7 @@ const ProfileForm = () => {
                                                         />
                                                     </FieldGroup>
                                                 </div >
-                                                <div className="self-stretch inline-flex justify-start items-start gap-6">
+                                                <div className="self-stretch flex flex-col justify-start items-stretch gap-6 lg:flex-row lg:items-start">
                                                     <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
                                                         <div className="self-stretch flex flex-col justify-start items-start gap-1.5">
                                                             <FieldGroup>

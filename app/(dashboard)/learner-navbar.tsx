@@ -4,6 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import SearchComponent from '@/components/shared/Search';
 import { ChevronDown, Search } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,7 +23,7 @@ const LearnerNavBar = () => {
         ? `${imageUrl}${user.profileImage.url}`
         : "https://placehold.co/29x29";
 
-    const handlogout = () => {
+    const handleLogout = () => {
         dispatch(userLogoutRequest());
 
         localStorage.removeItem('remember');
@@ -41,10 +42,21 @@ const LearnerNavBar = () => {
     }
 
     return (
-        <div className="sticky top-0 z-50 bg-white py-5 w-full max-w-[1280px] px-8  flex justify-between items-center">
+        <div className="sticky top-0 z-50 flex w-full max-w-[1280px] flex-wrap items-center justify-between gap-3 bg-white px-4 py-4 sm:px-6 lg:flex-nowrap lg:gap-0 lg:px-8 lg:py-5">
+
+            <Link href="/" className="lg:hidden" aria-label="Go to homepage">
+                <Image
+                    src="/assets/images/logo.png"
+                    alt="CPE Warehouse"
+                    width={120}
+                    height={42}
+                    className="h-10 w-auto object-contain"
+                    priority
+                />
+            </Link>
 
             {/* LEFT MENU */}
-            <div className="flex items-center gap-1">
+            <div className="hidden items-center gap-1 lg:flex">
 
                 <div className="px-3 py-2 rounded-md flex items-center gap-2">
                     <Link href="/about-us" className="text-base font-semibold text-gray-600">
@@ -73,10 +85,10 @@ const LearnerNavBar = () => {
 
 
             {/* RIGHT SIDE */}
-            <div className="flex items-center gap-4">
+            <div className="ml-auto flex items-center gap-2 sm:gap-4 lg:ml-0 lg:gap-4">
 
                 {/* icon box */}
-                <div className="relative">
+                <div className="relative hidden lg:block">
                     <button
                         type="button"
                         onClick={() => setIsSearchOpen((prev) => !prev)}
@@ -87,7 +99,7 @@ const LearnerNavBar = () => {
                     </button>
 
                     {isSearchOpen && (
-                        <div className="absolute right-0 top-[52px] z-[60] w-[360px] rounded-xl border border-gray-200 bg-white p-3 shadow-xl">
+                        <div className="absolute right-0 top-[52px] z-[60] w-[min(360px,calc(100vw-2rem))] rounded-xl border border-gray-200 bg-white p-3 shadow-xl">
                             <SearchComponent />
                         </div>
                     )}
@@ -105,17 +117,17 @@ const LearnerNavBar = () => {
 
                 {/* avatar */}
                 <img
-                    className="w-7 h-7"
+                    className="hidden h-7 w-7 lg:block"
                     src={profileImage}
                     alt="profile"
                 />
 
-                {/* dashboard button */}
+                {/* account menu */}
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                         <button className="px-4 py-2.5 cursor-pointer bg-white rounded-lg border border-gray-300 shadow-sm flex items-center gap-2">
-                            <span className="text-base font-semibold text-slate-700">
-                                Dashboard
+                            <span className="max-w-[120px] truncate text-base font-semibold text-slate-700 sm:max-w-none">
+                                {user?.firstName || user?.username || 'My Account'}
                             </span>
                             <ChevronDown className="w-4 h-4" />
                         </button>
@@ -134,7 +146,7 @@ const LearnerNavBar = () => {
                         <DropdownMenuItem className="cursor-pointer" asChild>
                             <Link href="/learner/profile" prefetch={false}>Profile</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer" onClick={handlogout}>
+                        <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                             Logout
                         </DropdownMenuItem>
                     </DropdownMenuContent>

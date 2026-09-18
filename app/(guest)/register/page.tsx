@@ -20,8 +20,8 @@ const RegisterPage = async () => {
     return (
         <>
             <section>
-                <div className="inline-flex justify-start items-start py-5">
-                    <Link href="/" className="pl-5 pr-5 inline-flex flex-col justify-start items-start">
+                <div className="inline-flex max-w-full justify-start items-start py-5">
+                    <Link href="/" className="inline-flex max-w-full flex-col items-start justify-start px-5">
                        {
                          logo &&  <img className="w-full h-full" src={ logo  } />
                        }
@@ -29,14 +29,14 @@ const RegisterPage = async () => {
                 </div>
             </section>
 
-            <section className="bg-[#f4f9ff]">
-                <div className="container mx-auto w-1/2">
+            <section className="overflow-x-hidden bg-[#f4f9ff]">
+                <div className="container mx-auto w-full px-4 sm:px-6 lg:w-1/2 lg:px-0">
                     <div className="h-auto flex-col justify-center items-center gap-6 inline-flex">
-                        <div className="self-stretch h-[116px] flex-col justify-center items-center gap-6 flex">
-                            <div className="w-[768px] h-[116px] flex-col justify-center items-start gap-6 flex">
+                        <div className="flex h-auto w-full flex-col items-center justify-center gap-6 lg:h-[116px]">
+                            <div className="flex h-auto w-full flex-col items-start justify-center gap-6 lg:h-[116px] lg:w-[768px]">
                                 <div className="self-stretch grow shrink basis-0 flex-col justify-start items-start gap-6 flex">
                                     <div
-                                        className="w-[768px] h-[116px] py-6 rounded-xl flex-col justify-start items-start gap-8 flex overflow-hidden">
+                                        className="h-auto w-full rounded-xl py-6 lg:h-[116px] lg:w-[768px]">
                                         <div className="self-stretch h-11 flex-col justify-center items-start gap-6 flex">
                                             <div className="text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">Create Account</div>
                                         </div>

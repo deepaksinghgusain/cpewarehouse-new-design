@@ -127,7 +127,7 @@ function CertificateCard({ data }: any) {
 
           <span
             onClick={() => downloadCertificate()}
-            className="px-3 py-1.5 flex cursor-pointer items-center gap-2 text-xs font-medium text-indigo-600"
+            className="flex cursor-pointer items-center gap-2 whitespace-nowrap px-3 py-1.5 text-xs font-medium text-indigo-600"
           >
             {isDownloadingCertificate ? (
               <Loader className="h-5 w-5 text-amber-300 animate-spin" />
@@ -277,11 +277,11 @@ export default function CertificateDataTable() {
 
   return (
     <>
-      <div className="bg-white py-8 px-8 flex flex-col gap-8">
-        <h1 className="text-3xl font-semibold text-gray-900">Certificate(s)</h1>
+      <div className="flex flex-col gap-6 bg-white px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 lg:px-8">
+        <h1 className="text-2xl font-semibold text-gray-900 sm:text-3xl">Certificate(s)</h1>
 
         {/* PAGE TITLE */}
-        <div className="flex gap-4 justify-end bg-[#eee] py-4 px-4 items-center max-w-6xl w-full">
+        <div className="flex w-full max-w-6xl items-center justify-end bg-[#eee] px-4 py-4">
 
           <Select value={String(selectedYear)} onValueChange={(value) => setSelectedYear(Number(value))}>
             <SelectTrigger className="w-[120px] flex items-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-300 rounded-lg shadow-sm">
@@ -316,9 +316,9 @@ export default function CertificateDataTable() {
         </div>
       </div>
 
-      <div className="px-8 py-6">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
 
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
 
 
           {loading ? (
@@ -334,7 +334,8 @@ export default function CertificateDataTable() {
 
           ) : (
             <>
-              <table className="w-full">
+              <div className="w-full overflow-x-auto">
+              <table className="w-full min-w-[820px]">
 
                 <thead className="bg-gray-50">
                   <tr>
@@ -366,8 +367,9 @@ export default function CertificateDataTable() {
                 </tbody>
 
               </table>
+              </div>
 
-              <div className="flex items-center justify-between px-6 py-4 border-t border-t-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between gap-3 overflow-x-auto border-t border-t-gray-200 bg-gray-50 px-4 py-4 sm:px-6">
 
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -376,7 +378,7 @@ export default function CertificateDataTable() {
                   Previous
                 </button>
 
-                <div className="flex gap-2">
+                <div className="flex shrink-0 gap-2">
                   {Array.from({ length: totalPages }, (_, i) => (
                     <button
                       key={i}

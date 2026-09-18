@@ -71,12 +71,12 @@ const Password = () => {
     }
 
     return (
-        <div className="w-full bg-white py-8">
+        <div className="w-full bg-white py-6 sm:py-8">
 
-            <div className="w-full mx-auto px-8">
+            <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
 
                 {/* Page Title */}
-                <h1 className="text-3xl font-semibold text-gray-900 mb-10">
+                <h1 className="mb-8 text-2xl font-semibold text-gray-900 sm:mb-10 sm:text-3xl">
                     Change Password
                 </h1>
 
@@ -98,13 +98,13 @@ const Password = () => {
 
 
                         {/* Current Password */}
-                        <div className="grid grid-cols-3 gap-8 items-center">
+                        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-3 lg:items-center lg:gap-8">
 
                             <label className="text-sm font-semibold text-gray-700">
                                 Current password *
                             </label>
 
-                            <div className="col-span-2">
+                            <div className="lg:col-span-2">
                                 <FieldGroup>
                                     <Controller
                                         name="currentPassword"
@@ -152,13 +152,13 @@ const Password = () => {
                         <div className="border-b border-b-gray-200"></div>
 
                         {/* New Password */}
-                        <div className="grid grid-cols-3 gap-8 items-center">
+                        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-3 lg:items-center lg:gap-8">
 
                             <label className="text-sm font-semibold text-gray-700">
                                 New password *
                             </label>
 
-                            <div className="col-span-2">
+                            <div className="lg:col-span-2">
                                 <FieldGroup>
                                     <Controller
                                         name="password"
@@ -202,13 +202,13 @@ const Password = () => {
                         <div className="border-b border-b-gray-200"></div>
 
                         {/* Confirm Password */}
-                        <div className="grid grid-cols-3 gap-8 items-center">
+                        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-3 lg:items-center lg:gap-8">
 
                             <label className="text-sm font-semibold text-gray-700">
                                 Confirm new password *
                             </label>
 
-                            <div className="col-span-2">
+                            <div className="lg:col-span-2">
                                 <FieldGroup>
                                     <Controller
                                         name="confirmPassword"
@@ -252,11 +252,11 @@ const Password = () => {
                         </div>
 
                         {/* Footer */}
-                        <div className="border-t border-t-gray-200 pt-6 flex justify-end">
+                        <div className="flex justify-end border-t border-t-gray-200 pt-6">
 
                             <button
                                 type="submit"
-                                className="bg-indigo-600 cursor-pointer text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+                                className="w-full cursor-pointer rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700 sm:w-auto"
                             >
                                 Change password
                             </button>

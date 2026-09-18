@@ -36,7 +36,7 @@ export const Footer = () => {
       <footer className="bg-gray-50 border-t border-gray-200">
         <div className='w-[90%] mx-auto '>
 
-          <div className="flex justify-between items-center px-8 py-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-between items-center px-8 py-6 border-b border-gray-200">
             <div>
               <h2 className="font-semibold text-gray-800">{footerTop?.title}</h2>
               <p className="text-sm text-gray-600">

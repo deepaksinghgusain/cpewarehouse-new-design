@@ -95,10 +95,10 @@ const RegisterForm = () => {
     return (
         <Form {...form}>
             <form className='space-y-4 ' onSubmit={form.handleSubmit(onSubmit)}>
-                <section className="container mx-auto w-1/2">
+                <section className="container mx-auto w-full min-w-0 overflow-x-hidden px-4 sm:px-6 lg:w-1/2 lg:px-0">
 
                     <div
-                        className="w-[768px] mt-4 py-4 bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex overflow-hidden">
+                        className="mt-4 inline-flex w-full flex-col items-start justify-start overflow-hidden rounded-xl border border-[#e4e7ec] bg-white py-4 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] lg:w-[768px]">
                         {
                             error && (
                                 <div className="self-stretch text-[#f04438] text-sm text-center font-blod text-xl mb-4 font-normal font-['Inter'] leading-tight">
@@ -107,7 +107,7 @@ const RegisterForm = () => {
                             )
                         }
 
-                        <div className="self-stretch px-6 py-4 flex-col justify-start items-start gap-6 flex">
+                        <div className="flex w-full flex-col items-start justify-start gap-6 px-4 py-4 sm:px-6">
                             <div className="self-stretch h-[54px] flex-col justify-start items-start gap-5 flex">
                                 <div className="self-stretch justify-start items-start gap-4 inline-flex">
                                     <div className="grow shrink basis-0 self-stretch flex-col justify-center items-start gap-1 inline-flex">
@@ -119,7 +119,7 @@ const RegisterForm = () => {
                                 </div>
                             </div>
 
-                            <div className="w-[720px] justify-start items-start gap-6 inline-flex">
+                            <div className="flex w-full min-w-0 flex-col items-stretch justify-start gap-6 lg:w-[720px] lg:flex-row">
 
                                 <div className="grow shrink basis-0 flex-col justify-start items-start gap-1.5 inline-flex">
                                     <div className="self-stretch flex-col justify-start items-start gap-1.5 flex">
@@ -284,9 +284,9 @@ const RegisterForm = () => {
                                     />
                                 </FieldGroup>
                             </div>
-                            <div className="w-[744px] flex-col justify-start items-start gap-6 flex">
-                                <div className="flex-col justify-start items-start gap-1.5 flex">
-                                    <div className="w-[720px] inline-flex flex-col justify-start items-start gap-1.5">
+                            <div className="flex w-full min-w-0 flex-col items-start justify-start gap-6 lg:w-[744px]">
+                                <div className="flex w-full flex-col items-start justify-start gap-1.5">
+                                    <div className="inline-flex w-full flex-col items-start justify-start gap-1.5 lg:w-[720px]">
                                         <FieldGroup>
                                             <Controller
                                                 name="password"
@@ -341,9 +341,9 @@ const RegisterForm = () => {
                         </div>
                     </div>
                     <div
-                        className="w-[768px] my-8 py-4 bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex overflow-hidden">
+                        className="my-8 inline-flex w-full flex-col items-start justify-start overflow-hidden rounded-xl border border-[#e4e7ec] bg-white py-4 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] lg:w-[768px]">
 
-                        <div className="w-full p-6 bg-white flex-col justify-start items-start gap-6 inline-flex">
+                        <div className="flex w-full flex-col items-start justify-start gap-6 bg-white p-4 sm:p-6">
                             <div className="flex-col justify-start items-start gap-5 flex">
                                 <div className="self-stretch justify-start items-start gap-4 inline-flex">
                                     <div className="grow shrink basis-0 self-stretch flex-col justify-center items-start gap-1 inline-flex">
@@ -354,7 +354,7 @@ const RegisterForm = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="self-stretch justify-start items-start gap-6 inline-flex">
+                            <div className="flex w-full min-w-0 flex-col items-stretch justify-start gap-6 lg:flex-row">
                                 <div className="grow shrink basis-0 flex-col justify-start items-start gap-1.5 inline-flex">
                                     <div className="self-stretch flex-col justify-start items-start gap-1.5 flex">
                                         <FieldGroup>
@@ -556,7 +556,7 @@ const RegisterForm = () => {
                                     />
                                 </FieldGroup>
                             </div>
-                            <div className="self-stretch justify-start items-start gap-6 inline-flex">
+                            <div className="flex w-full min-w-0 flex-col items-stretch justify-start gap-6 lg:flex-row">
                                 <div className="grow shrink basis-0 flex-col justify-start items-start gap-1.5 inline-flex">
                                     <div className="self-stretch h-[70px] flex-col justify-start items-start gap-1.5 flex">
                                         <FieldGroup>
@@ -703,15 +703,15 @@ const RegisterForm = () => {
                                     />
                                 </FieldGroup>
                             </div>
-                            <div className="self-stretch justify-center items-baseline gap-1 inline-flex">
-                                <div className="text-[#475467] text-lg font-normal font-['Inter'] leading-7">Allready have  CPE warehouse Account?</div>
+                            <div className="flex flex-wrap items-baseline justify-center gap-1 text-center">
+                                <div className="text-lg font-normal leading-7 text-[#475467]">Allready have  CPE warehouse Account?</div>
                                 <div className="justify-center items-center gap-1.5 flex overflow-hidden">
                                     <Link href="/login" className="text-[#2970fe] text-lg font-semibold font-['Inter'] leading-7">Login</Link>
                                 </div>
                             </div>
                         </div>
 
-                        <div className='w-[95%] mx-auto'>
+                        <div className='mx-auto w-[calc(100%-2rem)] sm:w-[95%]'>
                             <Button type='submit' className="rounded-full text-white cursor-pointer bg-[#2970fe] hover:bg-[#134ab7] px-5 py-3 w-full h-[50px] font-semibold font-['Inter'] leading-7  text-lg" variant="default">
                                 {
                                     isPending ? (<Loader className='w-4 h-4 animate-spin cursor-pointer' />) : (
