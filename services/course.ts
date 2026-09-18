@@ -24,26 +24,20 @@ export async function updateUserCourseApi(id: any, data: any) {
   })
 }
 
-export async function getAllCourses(title?: any) {
-  let search = title || '';
+export async function getAllCourses(title?: string): Promise<any[]> {
+  const search = title || "";
 
-  if (search !== '') {
-    const { data }: { data: any } = await client.query({
-      query: getCoursesWithTitleGql(true, true, search),
-      fetchPolicy: "network-only",
-    });
+  const { data }: { data?: { courses?: { data?: any[] } } } = await client.query({
+    query:
+      search !== ""
+        ? getCoursesWithTitleGql(true, true, search)
+        : getCoursesGql(true, true),
+    fetchPolicy: "network-only",
+  });
 
-    return data;
-  } else {
+  const courses = data?.courses?.data ?? [];
 
-    const { data }: { data: any } = await client.query({
-      query: getCoursesGql(true, true),
-      fetchPolicy: "network-only",
-    });
-
-    return data;
-  }
-
+  return courses;
 }
 
 export async function getcoursesBySlug(slug: any) {

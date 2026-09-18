@@ -1,6 +1,5 @@
 import React from 'react'
 import moment from "moment-timezone";
-import Link from 'next/link';
 import { imageUrl } from '@/lib/constants';
 import { getAllCourses, getCourseDetailPage, getcoursesBySlug } from '@/services/course';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -49,11 +48,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
         sponsorship = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.sponsorship')[0];
     }
 
-    res = await getAllCourses();
+    const allCourses = await getAllCourses();
 
     relatedCourses = []
-    if (res) {
-        const coursesArray = res?.data?.courses?.data;
+    if (allCourses) {
+        const coursesArray = allCourses;
 
         if (keywords) {
             keywords?.forEach((element: any) => {
@@ -93,26 +92,15 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
             relatedCourses = [];
         }
 
-
-        function getInstructorName(instructors: any) {
-            const name: string[] = []
-            instructors.data.forEach((element: any, index: number) => {
-
-                name.push(element?.attributes?.firstName + ' ' + element?.attributes.lastName)
-            })
-
-            return name.join(',');
-        }
-
         return (
             <>
-                <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+                <section className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
                     <AddToCardComponent courseData={{...courseData, id: courseId}} instructor={instructor} />
                 </section >
 
                 <section className="mt-10 sm:mt-20">
                     <div
-                        className="mx-auto flex w-[calc(100%-2rem)] max-w-7xl flex-col items-start gap-2 self-stretch border-b border-[#dee1e9] sm:w-[90%]">
+                        className="mx-auto flex w-[calc(100%-1rem)] flex-col items-start gap-2 self-stretch border-b border-[#dee1e9] sm:w-[90%]">
                         <Tabs defaultValue="Course Outline" className="w-full bg-transparent border-b border-[#dee1e9]">
                             <TabsList variant="line" className='w-full justify-start overflow-x-auto bg-transparent border-b border-[#dee1e9] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
                                 <TabsTrigger value="Course Outline" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">Course Outline</TabsTrigger>
@@ -198,7 +186,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                         className="w-full overflow-hidden bg-Colors-Background-bg-primary py-8 text-[#475467] sm:py-12">
                                         <div className="w-full px-0 sm:px-8">
                                             <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
-                                                <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content }} >
+                                                <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content ?? '' }} >
                                                 </div>
                                             </div>
                                         </div>
@@ -588,7 +576,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4 border-b border-[#e4e7ec] pb-14 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="w-full grid grid-cols-1 gap-4 border-b border-[#e4e7ec] pb-14 sm:grid-cols-2 lg:grid-cols-4">
                             {
                                 relatedCourses.length > 0 && relatedCourses.map((course: any, index: number) => (
                                     <CourseCard course={course} key={index} />

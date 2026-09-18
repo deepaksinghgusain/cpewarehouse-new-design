@@ -86,9 +86,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
     async function getAllRelatedCourses(keywords: string[]) {
         relatedCourses = []
 
-        let res = await getAllCourses();
-
-        const coursesArray = res.data.courses.data;
+        const coursesArray = await getAllCourses();
 
         if (keywords) {
             keywords?.forEach((element: any) => {

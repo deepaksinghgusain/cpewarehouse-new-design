@@ -320,7 +320,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                 </div>
                 <div className="w-6 h-6 relative  overflow-hidden"></div>
               </div>
-              <div className="flex  justify-center items-center">
+              <div className="flex  justify-center items-center mb-4">
                 <div className="mr-2 cursor-pointer">
                   <svg
                     fill="#000000"
@@ -343,7 +343,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                 </div>
                 <button
                   onClick={() => setShowShareModal(true)}
-                  className="cursor-pointer text-[#18212f] text-xl font-['Inter'] leading-[30px] hover:text-[#db6803] transition duration-200"
+                  className="cursor-pointer text-[#18212f] text-xl  font-['Inter'] leading-[30px] hover:text-[#db6803] transition duration-200"
                 >
                   Share with Colleague
                 </button>
