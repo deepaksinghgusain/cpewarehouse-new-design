@@ -48,10 +48,10 @@ export const Header = () => {
 
         if (pathname !== "/login" && pathname !== "/register") {
             return (
-                <div className='border-b border-gray-300'>
+                <div className='border-b border-gray-300  z-10'>
                     <div className='w-[90%] mx-auto'>
-                        <header className="fixed top-0 left-0 z-10 w-full bg-white px-4 py-4 sm:px-6 sm:py-6">
-                            <nav className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 lg:flex-nowrap lg:gap-8">
+                        <header className="fixed top-0 left-0 w-full bg-white px-4 py-4 sm:px-6 sm:py-6">
+                            <nav className="mx-auto flex w-full flex-wrap items-center justify-between gap-4 lg:flex-nowrap lg:gap-8">
                                 <div className="flex shrink-0 items-center">
                                     <Link href="/">
                                         {
@@ -155,7 +155,7 @@ export const Header = () => {
                         {
                             !pathname.includes("learner") && <section className="">
                                 <div className="container mx-auto">
-                                    <div className="mt-25 flex min-h-[72px] items-center justify-center px-4 sm:px-8">
+                                    <div className="mt-20 flex min-h-[72px] items-center justify-center px-4 sm:px-8">
                                         <div className="flex items-center justify-center gap-4">
                                             <div className="hidden items-center justify-center gap-6 sm:flex">
                                                 <div

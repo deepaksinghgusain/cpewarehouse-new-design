@@ -7,8 +7,6 @@ import React from 'react'
 
 const page = async () => {
 
-    // let res : any;
-
     const res = await getPageContent('bundle-and-subscription');
     let heroImageSection: any;
     let accreditedPartners: any;

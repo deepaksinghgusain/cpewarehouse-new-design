@@ -52,12 +52,12 @@ export default async function page() {
 
   return (
     <>
-      <section className="mx-auto mt-12 w-[calc(100%-2rem)] max-w-7xl sm:mt-16 sm:w-[90%]">
-        <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
-          <div className="grow shrink basis-0 flex-col justify-start items-start md:mb-20">
-            <div className="flex-col justify-start items-start gap-12 flex mb-8">
+      <section className="mx-auto w-[calc(100%-1rem)] h-auto mt-4 sm:mt-[-60px] sm:w-[90%]">
+        <div className="grid grid-cols-1 items-center md:grid-cols-2">
+          <div className="grow shrink basis-0 flex-col justify-start items-start">
+            <div className="flex-col justify-start items-start gap-6 flex mb-4">
               <div className="self-stretch text-3xl font-semibold leading-tight text-[#101828] sm:text-5xl sm:leading-[50px]">{frontPageBanner?.title}</div>
-              <div className="flex flex-col items-start gap-5 pl-0 sm:pl-4">
+              <div className="flex flex-col items-start gap-3 pl-0 sm:pl-2">
 
                 {
                   frontPageBanner.list.length > 0 && frontPageBanner.list.map((item: any, index: number) => (
@@ -86,13 +86,13 @@ export default async function page() {
               </div>
             </div>
           </div>
-          <div className="relative aspect-square w-full">
-            <Image alt='' src={imageUrl + frontPageBanner?.image?.data?.attributes?.url} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain" loading="eager" />
+          <div className="relative aspect-square h-full">
+            <Image alt='' src={imageUrl + frontPageBanner?.image?.data?.attributes?.url} fill sizes="(max-width: 900px) 100vw, 50vw" className="object-contain" loading="eager" />
           </div>
         </div>
       </section>
 
-      <div className="mx-auto mt-12 grid w-[calc(100%-2rem)] max-w-7xl grid-cols-1 gap-10 sm:mt-16 sm:w-[90%] md:grid-cols-2">
+      <div className="mx-auto grid w-[calc(100%-1rem)] grid-cols-1 gap-10 sm:mt-0 sm:w-[90%] md:grid-cols-2">
         <div className="grow shrink basis-0 flex-col justify-start items-start gap-5 inline-flex">
           <div className="text-3xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">{highlightsimple?.title}</div>
           <div className="text-lg font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">{highlightsimple?.description}</div>
@@ -121,12 +121,12 @@ export default async function page() {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-12 h-[240px] w-[calc(100%-2rem)] max-w-7xl sm:mt-16 sm:h-[400px] sm:w-[90%] lg:h-[600px]">
+      <div className="relative mx-auto mt-12 h-[240px] w-[calc(100%-1rem)] sm:mt-16 sm:h-[400px] sm:w-[90%] lg:h-[600px]">
         <Image src={imageUrl + highlightsimple?.image?.data?.attributes?.url} alt="" fill sizes="(max-width: 768px) 100vw, 90vw" className="object-cover" />
       </div>
 
       <section className="bg-[#eef4ff] mt-10">
-        <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
           <div className="flex flex-col items-center justify-center gap-10 py-10 sm:gap-16 sm:py-16">
             <div className="w-full px-0 sm:px-8">
               <div className="flex w-full flex-col items-stretch overflow-hidden rounded-3xl bg-[#6071f3] shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] lg:flex-row">
@@ -154,7 +154,7 @@ export default async function page() {
         </div>
       </section>
 
-      <section className="mx-auto mt-12 w-[calc(100%-2rem)] max-w-7xl sm:mt-16 sm:w-[90%]">
+      <section className="mx-auto mt-12 w-[calc(100%-1rem)] sm:mt-16 sm:w-[90%]">
         <div className="flex w-full flex-col gap-10 overflow-hidden rounded-[10px] sm:gap-16">
           <div className="w-full bg-white px-0 sm:px-8">
             <div className="flex flex-col items-center gap-8">
@@ -193,7 +193,7 @@ export default async function page() {
       <Testimonial />
 
       <section className="h-auto bg-[#f9fafb] py-12 sm:py-24">
-        <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
           <div className="mb-10 flex flex-col gap-8 sm:mb-12">
             <div className="flex flex-col items-center gap-5">
                 <div className="flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -244,7 +244,7 @@ export default async function page() {
         </div>
       </section>
 
-      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+      <section className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
         <div className="flex flex-col items-center justify-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
           <div className="flex w-full flex-col items-center gap-10 px-0 sm:px-8 lg:flex-row lg:gap-16">
             <div className="flex flex-1 flex-col items-start gap-8 sm:gap-12">
