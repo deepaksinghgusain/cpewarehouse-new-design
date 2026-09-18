@@ -11,7 +11,7 @@ const PackageHeader = ({ packageData, selectedCourse }: any) => {
     const [seats, setSeats] = useState(1);
 
     return (
-        <div className="w-full h-[500px]  pb-8 grid grid-cols-7 gap-2 items-center"
+        <div className="grid min-h-[500px] w-full grid-cols-1 items-center gap-8 px-4 py-8 sm:px-8 lg:grid-cols-7 lg:gap-2 lg:px-0 lg:pb-8"
             style={{
                 backgroundImage: `
                     linear-gradient(
@@ -26,7 +26,7 @@ const PackageHeader = ({ packageData, selectedCourse }: any) => {
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
             }}>
-            <div className="col-span-4 grid grid-cols-2 px-10 flex-col justify-start items-start gap-12 inline-flex w-full">
+            <div className="inline-flex w-full flex-col items-start justify-start gap-12 lg:col-span-4 lg:px-10">
                 <div className="flex-col justify-start items-center gap-6 flex">
                     <div className="self-stretch  flex-col justify-start items-start gap-4 flex">
 
@@ -38,12 +38,12 @@ const PackageHeader = ({ packageData, selectedCourse }: any) => {
                 </div>
             </div>
 
-            <div className="col-span-3 justify-start items-start gap-4 px-10 inline-flex">
-                <div className="flex flex-wrap items-start justify-between">
+            <div className="inline-flex w-full items-start justify-start gap-4 lg:col-span-3 lg:px-10">
+                <div className="flex w-full flex-wrap items-start justify-between gap-6">
                     {/* Left Section */}
                     <div className="space-y-4">
-                        <div className="flex gap-4">
-                            <div className="flex overflow-hidden rounded-xl">
+                        <div className="flex w-full flex-wrap items-stretch gap-4">
+                            <div className="flex max-w-full overflow-hidden rounded-xl">
                                 {/* Price */}
                                 <div className="bg-emerald-600 px-4 py-0 text-white flex items-center gap-4">
                                     <span className="font-bold">

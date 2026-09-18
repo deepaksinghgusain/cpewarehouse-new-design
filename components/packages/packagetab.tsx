@@ -7,8 +7,8 @@ import { Button } from '../ui/button'
 const PackageTab = ({ packageData }: any) => {
 
     return (
-        <Tabs defaultValue="outline" className="w-full bg-transparent mb-10 ">
-            <TabsList variant="line" className="w-[400px] bg-transparent ">
+        <Tabs defaultValue="outline" className="mb-10 w-full bg-transparent">
+            <TabsList variant="line" className="w-full max-w-[400px] bg-transparent">
                 <TabsTrigger
                     value="outline"
                     className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500"
@@ -23,11 +23,11 @@ const PackageTab = ({ packageData }: any) => {
                 </TabsTrigger>
             </TabsList>
             <TabsContent value="outline">
-                <div className="grid grid-cols-2 gap-4 my-10">
+                <div className="my-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
                     <div>
                         <h3 >{packageData?.desc}</h3>
-                        <div className="mt-4 mb-4">
-                            <Image alt="packageimage" src={imageUrl + packageData?.image?.data?.attributes?.url}
+                        <div className="mb-4 mt-4">
+                            <Image className="h-auto w-full max-w-[500px]" alt="packageimage" src={imageUrl + packageData?.image?.data?.attributes?.url}
                                 width={500}
                                 height={300}
                             />
@@ -51,7 +51,7 @@ const PackageTab = ({ packageData }: any) => {
                         <div className="col-sm-12 ">
                             <div className="package-deal-right-content">
 
-                                <div className="about-list faq mt-3 ml-5">
+                                <div className="about-list faq mt-3 ml-0 sm:ml-5">
                                     <div className="text-[#475467] text-[18px] font-normal font-['Inter']"
                                         dangerouslySetInnerHTML={{ __html: packageData?.faqs?.faq[0]?.answer }} ></div>
                                 </div>

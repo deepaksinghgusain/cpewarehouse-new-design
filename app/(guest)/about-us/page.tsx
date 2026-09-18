@@ -25,7 +25,7 @@ const AboutPage = async () => {
 
   return (
     <>
-      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+      <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
         <div className="flex flex-col items-center gap-10 overflow-hidden py-10 sm:gap-16 sm:py-12">
           <div className="w-full px-0 sm:px-8">
             <div className="self-stretch justify-start items-start gap-8 inline-flex">
@@ -73,7 +73,7 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+      <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
         <div className="flex flex-col items-center gap-12 overflow-hidden bg-white py-10 sm:gap-24 sm:py-12">
           <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex">
             <div className="self-stretch h-11 flex-col justify-start items-center gap-8 flex">
@@ -222,7 +222,7 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+      <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
         <div className="flex flex-col items-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
           <div className="w-full px-0 sm:px-8">
             <div className="self-stretch justify-between items-start inline-flex">
@@ -272,7 +272,7 @@ const AboutPage = async () => {
       </section>
 
       <section className="bg-[#6071f3]">
-        <div className="container mx-auto">
+        <div className="w-[calc(100%-2rem)] sm:w-[90%] mx-auto">
           <div className="flex flex-col items-center gap-10 overflow-hidden py-12 sm:gap-16 sm:py-24">
             <div className="w-full px-4 sm:px-8">
               <div className="self-stretch h-[94px] flex-col justify-start items-center gap-12 flex">
@@ -288,8 +288,8 @@ const AboutPage = async () => {
               <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 {
                   commitment.list.length > 0 && commitment.list.map((item: any, index: number) => (
-                    <div className="min-w-0" key={index}>
-                      <div className="w-12 h-12 p-3 bg-white rounded-[10px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#e4e7ec] justify-center items-center inline-flex overflow-hidden">
+                    <div className="flex flex-col items-center justify-center gap-4" key={index}>
+                      <div className=" p-3 bg-white rounded-[10px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#e4e7ec] justify-center items-center inline-flex overflow-hidden">
                         <div className="w-6 h-6 relative flex-col justify-start items-start flex overflow-hidden">
                           <img src={imageUrl + item?.image?.data?.attributes.url} alt="" />
                         </div>
@@ -307,7 +307,7 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+      <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
         <div className="flex w-full flex-col items-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
           <div className="w-full px-0 sm:px-8">
             <div className="self-stretch h-[124px] flex-col justify-start items-start gap-12 flex">
@@ -354,7 +354,7 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+      <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
         <div className="flex w-full flex-col items-center justify-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
           <div className="w-full px-0 sm:px-8">
             <div className="flex w-full flex-col items-stretch overflow-hidden rounded-3xl bg-gray-50 lg:flex-row">
@@ -377,7 +377,7 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+      <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
         <div className="flex flex-col items-center gap-10 overflow-hidden bg-Colors-Background-bg-primary py-12 sm:gap-16 sm:py-24">
           <div className="w-full px-0 sm:px-8">
             <div className="self-stretch flex flex-col justify-start items-center gap-8">
@@ -392,7 +392,18 @@ const AboutPage = async () => {
           <div className="w-full px-0 sm:px-8">
             <div className="grid w-full grid-cols-1 justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {ourTeam.team.length > 0 && ourTeam.team.map((team: any, index: number) => (
-                <div className="flex-1 min-w-60 inline-flex flex-col justify-start items-center gap-5" key={index}>
+                <div
+                  className={`inline-flex w-full max-w-60 flex-col items-center justify-center gap-5 ${
+                    index === ourTeam.team.length - 1 && ourTeam.team.length % 2 === 1
+                      ? 'sm:col-span-2 sm:justify-self-center'
+                      : ''
+                  } ${
+                    index === ourTeam.team.length - 1 && ourTeam.team.length % 4 === 1
+                      ? 'lg:col-start-2'
+                      : ''
+                  }`}
+                  key={index}
+                >
                   <div className="w-24 h-24 relative rounded-full">
                     <div className="w-24 h-24 left-0 top-0 absolute rounded-full border-[0.75px] border-Component-colors-Components-Avatars-avatar-contrast-border/10">
                       <img src={ imageUrl + team.image.data.attributes.url } alt="" />

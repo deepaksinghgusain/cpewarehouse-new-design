@@ -566,7 +566,7 @@ const PackageTabs = ({
       </TabsContent>
       <TabsContent value="FAQ">
         <section className="container mx-auto">
-          <div className="w-full py-10 bg-white flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
+          <div className="w-full bg-white flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
             <div className="self-stretch h-[94px] px-8 flex-col justify-start items-start gap-8 flex">
               <div className="self-stretch h-[94px] flex-col justify-start items-center gap-8 flex">
                 <div className="self-stretch h-[94px] flex-col justify-start items-center gap-5 flex">

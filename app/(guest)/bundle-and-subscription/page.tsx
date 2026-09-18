@@ -29,8 +29,8 @@ const page = async () => {
 
     return (
         <>
-            <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
-                <div className="grid grid-cols-1 items-center gap-8 py-8 md:grid-cols-2 md:py-12">
+            <section className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
+                <div className="grid grid-cols-1 items-center gap-8 py-8 md:grid-cols-2 md:py-2">
                     <div className="flex min-w-0 flex-col items-start gap-8 md:gap-12">
                         <div className="flex w-full flex-col items-start gap-6">
                             <div className="flex w-full flex-col items-start gap-4">
@@ -47,7 +47,7 @@ const page = async () => {
                         </div>
                     </div>
                     <div className="flex w-full justify-center overflow-hidden">
-                        <div className="w-full max-w-xl bg-gradient-to-b pt-8 sm:pt-[61px]">
+                        <div className="w-full bg-gradient-to-b pt-8 sm:pt-[61px]">
                             <div className="p-4 sm:p-8">
                                 <img src="/assets/images/sign-up-banner.jpg" className="h-auto w-full rounded-2xl object-contain" alt="" />
                             </div>
@@ -56,7 +56,7 @@ const page = async () => {
                 </div>
             </section>
 
-            <section className="mx-auto my-8 w-[calc(100%-2rem)] max-w-7xl sm:my-10 sm:w-[90%]">
+            <section className="mx-auto my-8 w-[calc(100%-1rem)] sm:my-10 sm:w-[90%]">
                 <div className="w-full flex justify-between">
                     <div className="inline-flex border-b-2 border-[#155dee] px-1 pb-3">
                         <div className="text-xl font-semibold leading-loose text-[#155dee] sm:text-2xl">Bundle & Subscriptions
@@ -107,7 +107,7 @@ const page = async () => {
                                                 course.attributes?.category?.data?.attributes?.title === "Recorded" && <div
                                                     className="h-6 px-2.5 py-0.5 bg-[#f8f8fb] rounded-full border border-[#d5d8eb] justify-start items-center inline-flex">
                                                     <div className="text-center text-[#353e72] text-sm font-medium font-['Inter'] leading-tight">
-                                                        Recorded
+                                                        Self-Study
                                                     </div>
                                                 </div>
                                             }
@@ -124,7 +124,7 @@ const page = async () => {
                                         </div>
 
                                     </div>
-                                    <AddToCart course={{...course, id: course.id}} type="package" quantity={1} absolute={false} />
+                                    <AddToCart course={{...course, id: course.id}} type="package" quantity={1} />
                                 </div>
                             ))
                         }
@@ -134,7 +134,7 @@ const page = async () => {
                 </div>
             </section>
 
-            <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+            <section className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
                 <div className="flex w-full flex-col items-center gap-10 overflow-hidden bg-white py-10 sm:gap-[38px] sm:py-12">
                     <div className="w-full px-0 sm:px-8">
                         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3">

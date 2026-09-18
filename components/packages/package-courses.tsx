@@ -17,7 +17,7 @@ const PackageCourses = ({ courses }: any) => {
                         </div>
 
                         <div className="w-full my-8">
-                            <div className="grid grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
                                 {courses.map((course: any, index: number) => (
                                     <div
                                         key={index}
@@ -26,7 +26,7 @@ const PackageCourses = ({ courses }: any) => {
                                         <div className="w-full min-h-[128px] relative bg-gradient-to-t from-cyan-300 to-indigo-600 rounded-[10px] overflow-hidden">
                                             <div className="h-6 w-full  flex-col justify-center items-center inline-flex bg-[#8078d4]">
                                                 <div className="w-full h-14 p-4 bg-white/30 border-t border-white/30 backdrop-blur-xl flex-col justify-start items-start gap-6 flex">
-                                                    <div className="w-full justify-start items-start gap-6 inline-flex">
+                                                    <div className="inline-flex w-full items-start justify-start gap-6">
                                                         <div className="flex-col justify-start items-center inline-flex mt-2">
                                                             <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">
                                                                 Credits:
@@ -54,7 +54,7 @@ const PackageCourses = ({ courses }: any) => {
                                                             ),
                                                         )}
                                                 </div>
-                                                <div className="w-[280px] mt-2 justify-start">
+                                                <div className="mt-2 w-full max-w-[280px] justify-start">
                                                     <div className="flex-col justify-start items-start">
                                                         <div className="text-white text-sm font-semibold font-['Inter'] leading-tight">
                                                             {course.attributes?.instructors.data.length >
@@ -73,7 +73,7 @@ const PackageCourses = ({ courses }: any) => {
                                             </div>
                                         </div>
 
-                                        <div className="px-5 h-56 pb-6 mt-4 flex-col justify-start items-start gap-[18px] inline-flex">
+                                        <div className="mt-4 inline-flex h-auto min-h-56 flex-col items-start justify-start gap-[18px] px-5 pb-6">
                                             <div className="self-stretch justify-start items-start gap-2 inline-flex">
                                                 {course.attributes?.category?.data?.attributes
                                                     ?.title === "Live" && (

@@ -159,7 +159,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
 
     return (
         <>
-            <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+            <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
                 <div className="grid grid-cols-1 items-start gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_minmax(300px,442px)] lg:gap-12">
                         <div className="flex min-w-0 flex-col items-start gap-8 lg:gap-12">
                             <div className="flex-col justify-start items-start gap-6 flex">
@@ -267,7 +267,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                     </div>
             </section>
 
-            <div className='mx-auto mt-8 w-[calc(100%-2rem)] max-w-7xl sm:mt-10 sm:w-[90%]'>
+            <div className='mx-auto mt-8 w-[calc(100%-2rem)] sm:mt-10 sm:w-[90%]'>
                 <PackageTabs packageData={packageData} packageContact={packageContact} PackageCourses={PackageCourses} twoLettertimezone={twoLettertimezone} />
             </div>
         </>
