@@ -133,9 +133,11 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                             <div className="flex-col justify-start items-start">
                                                 <div className="text-white text-sm font-semibold font-['Inter'] leading-tight">
                                                     {
-                                                        course.attributes?.instructors.data.length > 0 && course.attributes?.instructors.data.map((instructor: any, index: number) => (
-                                                            <span key={index}>{instructor?.attributes?.firstName} {instructor?.attributes?.lastName}</span>
-                                                        ))
+                                                        course.attributes?.instructors?.data?.length > 0 &&
+                                                        course.attributes.instructors.data
+                                                            .map((instructor: any) => `${instructor?.attributes?.firstName ?? ''} ${instructor?.attributes?.lastName ?? ''}`.trim())
+                                                            .filter(Boolean)
+                                                            .join(' | ')
                                                     }
                                                 </div>
                                             </div>
@@ -189,7 +191,9 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                     </div>
 
                                 </div>
-                                <AddToCart course={course} quantity={1} absolute={false} />
+                                 <div className="mt-4">
+                                    <AddToCart course={course} quantity={1} />
+                                </div>
                             </div>
                         )) : <div>No Record</div>
                     }

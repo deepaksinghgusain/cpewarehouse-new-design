@@ -32,7 +32,7 @@ const CourseCatalogPage = async () => {
                         </div>
                     </div>
                     <div className="flex w-full justify-center overflow-hidden">
-                        <div className="w-full max-w-3xl bg-gradient-to-b pt-8 sm:pt-[61px]">
+                        <div className="w-full max-w-3xl bg-gradient-to-b pt-2 sm:pt-[50px]">
                             <div className="p-4 sm:p-8">
                                 <img src={imageUrl + heroImageSection?.image?.data?.attributes?.url} className="h-auto w-full rounded-2xl object-contain" alt="" />
                             </div>

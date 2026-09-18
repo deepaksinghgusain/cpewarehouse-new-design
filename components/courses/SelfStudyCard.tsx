@@ -180,9 +180,11 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                         }
 
                                     </div>
-                                    <AddToCart course={course} quantity={1} absolute={false} />
+                                    <div className="mt-4">
+                                        <AddToCart course={course} quantity={1} />
+                                    </div>
                                 </div>
-                                <div className="add-to-card flex flex-col items-center gap-2 overflow-hidden px-2 pb-3">
+                                <div className="add-to-card mt-4 flex flex-col items-center gap-2 overflow-hidden px-2 pb-3">
                                     <img className="max-w-full" src="/assets/images/bar-code-image.png" alt="" />
                                 </div>
                             </div>

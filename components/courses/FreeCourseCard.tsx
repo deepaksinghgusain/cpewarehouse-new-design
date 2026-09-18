@@ -190,7 +190,9 @@ const FreeCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                     </div>
 
                                 </div>
-                                <AddToCart course={course} quantity={1} absolute={false} />
+                                <div className="mt-4">
+                                    <AddToCart course={course} quantity={1} />
+                                </div>
                             </div>
                         )) : <div>No Record</div>
                     }

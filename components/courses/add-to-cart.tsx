@@ -161,7 +161,7 @@ const AddToCart = ({ course, quantity, type, absolute = true, className }: { cou
     }
   }
 
-  let baseClassName = className ? className : "absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden cursor-pointer";
+  let baseClassName = className ? className : "absolute bottom-1 h-10 ml-2 add-to-card inline-flex justify-center items-center gap-2 overflow-hidden cursor-pointer bg-white";
 
   return (
     <div
