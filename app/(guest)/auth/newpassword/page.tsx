@@ -54,7 +54,6 @@ const ResetPasswordForm = () => {
     }
 
     const onSubmit = async (values: ResetPasswordFormValues) => {
-        console.log('reset password values', values)
         setPopupType('success')
 
         const res = await resetPassword({
@@ -62,8 +61,6 @@ const ResetPasswordForm = () => {
             password: values.password,
             passwordConfirmation: values.confirmPassword,
         })
-
-        console.log('reset password response', res)
 
         const success = Boolean(
             res &&

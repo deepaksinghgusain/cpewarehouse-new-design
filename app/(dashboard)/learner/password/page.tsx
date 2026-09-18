@@ -94,7 +94,7 @@ const Password = () => {
                 </div>
 
                 <Form {...form}>
-                    <form className='mt-6 space-y-8 w-full' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+                    <form className='mt-6 space-y-8 w-full' onSubmit={form.handleSubmit(onSubmit)}>
 
 
                         {/* Current Password */}

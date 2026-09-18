@@ -94,7 +94,7 @@ const RegisterForm = () => {
 
     return (
         <Form {...form}>
-            <form className='space-y-4 ' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+            <form className='space-y-4 ' onSubmit={form.handleSubmit(onSubmit)}>
                 <section className="container mx-auto w-1/2">
 
                     <div

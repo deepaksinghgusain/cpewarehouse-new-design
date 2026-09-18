@@ -116,8 +116,6 @@ const ProfileForm = () => {
             try {
                 const token = localStorage.getItem("token")
                 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-                console.log("apiBaseUrl", apiBaseUrl);
                 
                 if (!apiBaseUrl) {
                     setError(true);
@@ -210,7 +208,7 @@ const ProfileForm = () => {
     if (mounted) {
         return (
             <Form {...form}>
-                <form className='space-y-4 mt-10' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+                <form className='space-y-4 mt-10' onSubmit={form.handleSubmit(onSubmit)}>
 
                     <div className="w-full self-stretch pt-8 pb-12 bg-white inline-flex flex-col justify-start items-start gap-8 overflow-hidden">
                         <div className="self-stretch flex flex-col justify-start items-start gap-6">

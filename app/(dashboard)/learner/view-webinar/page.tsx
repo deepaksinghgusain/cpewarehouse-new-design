@@ -83,9 +83,7 @@ const ViewWebinar = () => {
                 const score = Number(exam?.attributes?.score || 0);
                 return totalScore > 0 && (score / totalScore) * 100 >= 70;
             });
-
-            console.log("Exam result for course:", courseSlug, "Has passed:", hasPassed);
-
+            
             setHasPassedFinalExam(hasPassed);
             if (hasPassed) {
                 localStorage.setItem(`finalExamPassed:${courseSlug}`, "true");
