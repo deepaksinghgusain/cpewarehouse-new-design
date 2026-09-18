@@ -161,10 +161,9 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
 
     return (
         <>
-            <section className="w-[90%] mx-auto">
-                <div className="h-[530px] pt-16 pb-8 justify-center items-center gap-24 inline-flex">
-                    <div className="w-full grid grid-cols-3 gap-30">
-                        <div className="flex-col justify-start items-start gap-12 col-span-2">
+            <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+                <div className="grid grid-cols-1 items-start gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_minmax(300px,442px)] lg:gap-12">
+                        <div className="flex min-w-0 flex-col items-start gap-8 lg:gap-12">
                             <div className="flex-col justify-start items-start gap-6 flex">
                                 <div className=" flex-col justify-start items-start gap-4 flex">
                                     <div className="justify-start items-center gap-3 inline-flex">
@@ -186,7 +185,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                             <div className="text-[#088ab2] text-sm font-semibold font-['Inter'] leading-tight">Tax</div>
                                         </div>
                                     </div>
-                                    <div className="self-stretch text-[#101828] text-3xl font-semibold font-['Inter'] leading-[38px]">
+                                    <div className="self-stretch text-2xl font-semibold leading-8 text-[#101828] sm:text-3xl sm:leading-[38px]">
                                         {packageData?.title}</div>
                                     <div className="pl-1 pr-2.5 py-1 rounded-full justify-start items-center gap-3 inline-flex">
                                         <div className="text-[#667084] text-base font-semibold font-['Inter'] line-through leading-[38px]">
@@ -203,7 +202,7 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                 className="bg-blue-500 hover:bg-blue-600 w-[200px] text-white flex justify-center items-center cursor-pointer mt-4 rounded-xl px-5 h-10 tracking-wide"
                             />
 
-                            <div className="self-stretch mt-10 flex-col justify-start items-start gap-5 flex">
+                            <div className="mt-8 flex w-full flex-col items-start gap-5 sm:mt-10">
                                 <div className="self-stretch  flex-col justify-start items-start gap-8 flex">
                                     <div className="self-stretch justify-start items-center gap-5 inline-flex">
                                         <div className="justify-start items-center gap-2 flex">
@@ -228,21 +227,20 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                 </div>
                             </div>
                         </div>
-                        <div
-                            className="h-[442px] bg-white rounded-xl shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] flex-col justify-start items-end inline-flex overflow-hidden">
-                            <div className="self-stretch h-[147px] px-6 pt-6 flex-col justify-start items-center gap-5 flex">
+                        <div className="flex w-full flex-col items-end overflow-hidden rounded-xl bg-white shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)]">
+                            <div className="w-full px-4 pt-4 sm:px-6 sm:pt-6">
                                 <div className="pr-[9px] pb-1 justify-start items-center inline-flex overflow-hidden">
-                                    <div className="w-[343px] h-[119px] border border-[#175cd3]">
-                                        <img src={imageUrl + heroImageSection?.backgroundImage?.data?.attributes.url} />
+                                    <div className="h-auto w-full max-w-[343px] border border-[#175cd3]">
+                                        <img className="h-auto w-full object-contain" src={imageUrl + heroImageSection?.backgroundImage?.data?.attributes.url} alt="Package" />
                                     </div>
                                 </div>
                             </div>
-                            <div className="self-stretch h-60 px-6 pt-6 flex-col justify-start items-center gap-4 flex">
-                                <div className="self-stretch h-[216px] flex-col justify-start items-start gap-4 flex">
+                            <div className="w-full px-4 pb-6 pt-4 sm:px-6 sm:pt-6">
+                                <div className="flex w-full flex-col items-start gap-4">
                                     {
                                         packageData?.key_features.length > 0 && packageData?.key_features.map((list: any, index: number) => (
-                                            <div className="self-stretch justify-start items-start gap-3 inline-flex" key={index}>
-                                                <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
+                                            <div className="flex w-full items-start gap-3" key={index}>
+                                                <div className="relative h-6 w-6 shrink-0 rounded-full bg-[#dbf9e6]">
 
                                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <g id="Check icon">
@@ -269,10 +267,9 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                             </div>
                         </div>
                     </div>
-                </div>
             </section>
 
-            <div className='w-[90%] mx-auto mt-10'>
+            <div className='mx-auto mt-8 w-[calc(100%-2rem)] max-w-7xl sm:mt-10 sm:w-[90%]'>
                 <PackageTabs packageData={packageData} packageContact={packageContact} PackageCourses={PackageCourses} twoLettertimezone={twoLettertimezone} />
             </div>
         </>

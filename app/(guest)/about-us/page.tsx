@@ -25,9 +25,9 @@ const AboutPage = async () => {
 
   return (
     <>
-      <section className="w-[90%] mx-auto">
-        <div className="h-[533px] pt-12 flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
-          <div className="self-stretch h-[124px] px-8 flex-col justify-start items-start gap-16 flex">
+      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="flex flex-col items-center gap-10 overflow-hidden py-10 sm:gap-16 sm:py-12">
+          <div className="w-full px-0 sm:px-8">
             <div className="self-stretch justify-start items-start gap-8 inline-flex">
               <div className="grow shrink basis-0 flex-col justify-start items-start gap-5 inline-flex">
                 <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">{aboutFirst?.title}</div>
@@ -35,13 +35,13 @@ const AboutPage = async () => {
               </div>
             </div>
           </div>
-          <div className="self-stretch h-[140px] px-8 flex-col justify-start items-start gap-16 flex">
-            <div className="self-stretch justify-start items-start gap-8 inline-flex">
+          <div className="w-full px-0 sm:px-8">
+            <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
 
               {
                 aboutFirst?.list.length > 0 && aboutFirst.list.map((list: any, index: number) => (
-                  <div className="grow shrink basis-0 flex-col justify-start items-start gap-5 inline-flex" key={index}>
-                    <div className="self-stretch h-[140px] flex-col justify-start items-start gap-3 flex">
+                  <div className="min-w-0" key={index}>
+                    <div className="flex flex-col items-start gap-3">
                       <div className="self-stretch text-[#6071f3] text-4xl font-semibold font-['Inter'] leading-[44px]">{list?.Sno}</div>
                       <div className="self-stretch h-[84px] flex-col justify-start items-start gap-2 flex">
                         <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">{list?.title}</div>
@@ -54,7 +54,7 @@ const AboutPage = async () => {
 
             </div>
           </div>
-          <div className="self-stretch h-12 px-8 flex-col justify-start items-start gap-16 flex">
+          <div className="w-full px-0 sm:px-8">
             <div className="self-stretch justify-start items-start gap-8 inline-flex">
               <div className="justify-start items-start gap-3 flex">
                 <div className="px-[18px] py-3 bg-white rounded-lg shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#d0d5dd] justify-center items-center gap-1.5 flex overflow-hidden">
@@ -73,8 +73,8 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="w-[90%] mx-auto">
-        <div className="py-12 bg-white flex-col justify-start items-center gap-24 inline-flex overflow-hidden">
+      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="flex flex-col items-center gap-12 overflow-hidden bg-white py-10 sm:gap-24 sm:py-12">
           <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex">
             <div className="self-stretch h-11 flex-col justify-start items-center gap-8 flex">
               <div className="self-stretch h-11 flex-col justify-start items-center gap-5 flex">
@@ -89,7 +89,7 @@ const AboutPage = async () => {
             portfolio.Section.length > 0 && portfolio.Section.map((item: any, index: number) => {
 
               if (index == 0) {
-                return <div key={index} className="about-container-1 self-stretch px-8 justify-start items-center gap-24 inline-flex">
+                  return <div key={index} className="about-container-1 flex w-full flex-col items-center gap-10 px-0 py-8 sm:px-8 lg:flex-row lg:gap-24">
                   <div className="grow shrink basis-0 flex-col justify-start items-start gap-8 inline-flex">
                     <div className="self-stretch h-[110px] flex-col justify-start items-start gap-5 flex">
                       <div className="self-stretch h-[110px] flex-col justify-start items-start gap-4 flex">
@@ -127,13 +127,13 @@ const AboutPage = async () => {
                       </div>
                     </div>
                   </div>
-                  <img className="h-[512px] relative" src={imageUrl + item.image.data.attributes.url} />
+                  <img className="h-auto max-h-[512px] w-full max-w-[512px] object-contain" src={imageUrl + item.image.data.attributes.url} alt="" />
                 </div>
               }
 
               if (index == 1) {
-                return <div key={index} className="about-container-2 self-stretch px-8 justify-start items-center gap-24 inline-flex">
-                  <img className="h-[512px] relative" src={imageUrl + item.image.data.attributes.url} />
+                return <div key={index} className="about-container-2 flex w-full flex-col items-center gap-10 px-0 py-8 sm:px-8 lg:flex-row lg:gap-24">
+                  <img className="h-auto max-h-[512px] w-full max-w-[512px] object-contain lg:order-first" src={imageUrl + item.image.data.attributes.url} alt="" />
                   <div className="grow shrink basis-0 flex-col justify-start items-start gap-8 inline-flex">
                     <div className="self-stretch h-[110px] flex-col justify-start items-start gap-5 flex">
                       <div className="self-stretch h-[110px] flex-col justify-start items-start gap-4 flex">
@@ -176,7 +176,7 @@ const AboutPage = async () => {
               }
 
               if (index == 2) {
-                return <div key={index} className="about-container-3 self-stretch px-8 justify-start items-center gap-24 inline-flex">
+                return <div key={index} className="about-container-3 flex w-full flex-col items-center gap-10 px-0 py-8 sm:px-8 lg:flex-row lg:gap-24">
                   <div className="grow shrink basis-0 flex-col justify-start items-start gap-8 inline-flex">
                     <div className="self-stretch h-[110px] flex-col justify-start items-start gap-5 flex">
                       <div className="self-stretch h-[110px] flex-col justify-start items-start gap-4 flex">
@@ -214,7 +214,7 @@ const AboutPage = async () => {
                       </div>
                     </div>
                   </div>
-                  <img className="h-[512px] relative" src={imageUrl + item.image.data.attributes.url} />
+                  <img className="h-auto max-h-[512px] w-full max-w-[512px] object-contain" src={imageUrl + item.image.data.attributes.url} alt="" />
                 </div>
               }
             })
@@ -222,9 +222,9 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="w-[90%] mx-auto">
-        <div className="h-[940px] py-24 bg-white flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
-          <div className="self-stretch h-[124px] px-8 flex-col justify-start items-start gap-8 flex">
+      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="flex flex-col items-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
+          <div className="w-full px-0 sm:px-8">
             <div className="self-stretch justify-between items-start inline-flex">
               <div className="grow shrink basis-0 flex-col justify-start items-start gap-5 inline-flex">
                 <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
@@ -241,9 +241,9 @@ const AboutPage = async () => {
               </div>
             </div>
           </div>
-          <div className="self-stretch h-[560px] px-8 flex-col justify-start items-center gap-16 flex">
-            <div className="self-stretch justify-start items-start gap-16 inline-flex">
-              <div className="w-1/2 grow shrink basis-0 flex-col justify-start items-start inline-flex">
+          <div className="w-full px-0 sm:px-8">
+            <div className="flex w-full flex-col items-start gap-10 lg:flex-row lg:gap-16">
+              <div className="w-full min-w-0 lg:w-1/2">
                 <div className="self-stretch h-[168px] flex-col justify-start items-start flex">
                   <div className="self-stretch"><span className="text-[#475467] text-lg font-normal font-['Inter'] leading-7">{mission.about}</span></div>
                 </div>
@@ -263,8 +263,8 @@ const AboutPage = async () => {
                   ))
                 }
               </div>
-              <div className="w-1/2">
-                <img className="h-[560px] relative" src={imageUrl + mission.image.data.attributes.url} />
+              <div className="w-full lg:w-1/2">
+                <img className="h-auto max-h-[560px] w-full object-contain" src={imageUrl + mission.image.data.attributes.url} alt="" />
               </div>
             </div>
           </div>
@@ -273,8 +273,8 @@ const AboutPage = async () => {
 
       <section className="bg-[#6071f3]">
         <div className="container mx-auto">
-          <div className="h-[504px] py-24  flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
-            <div className="self-stretch h-[94px] px-8 flex-col justify-start items-start gap-8 flex">
+          <div className="flex flex-col items-center gap-10 overflow-hidden py-12 sm:gap-16 sm:py-24">
+            <div className="w-full px-4 sm:px-8">
               <div className="self-stretch h-[94px] flex-col justify-start items-center gap-12 flex">
                 <div className="self-stretch h-[94px] flex-col justify-start items-center gap-5 flex">
                   <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
@@ -284,17 +284,17 @@ const AboutPage = async () => {
                 </div>
               </div>
             </div>
-            <div className="self-stretch h-[154px] px-8 flex-col justify-start items-start gap-16 flex">
-              <div className="self-stretch justify-start items-start gap-8 inline-flex">
+            <div className="w-full px-4 sm:px-8">
+              <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 {
                   commitment.list.length > 0 && commitment.list.map((item: any, index: number) => (
-                    <div className="grow shrink basis-0 flex-col justify-start items-center gap-5 inline-flex" key={index}>
+                    <div className="min-w-0" key={index}>
                       <div className="w-12 h-12 p-3 bg-white rounded-[10px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#e4e7ec] justify-center items-center inline-flex overflow-hidden">
                         <div className="w-6 h-6 relative flex-col justify-start items-start flex overflow-hidden">
                           <img src={imageUrl + item?.image?.data?.attributes.url} alt="" />
                         </div>
                       </div>
-                      <div className="self-stretch h-[86px] flex-col justify-start items-center gap-2 flex">
+                      <div className="flex flex-col items-center gap-2">
                         <div className="self-stretch text-center text-white text-xl font-semibold font-['Inter'] leading-[30px]">{item.title}</div>
                         <div className="self-stretch text-center text-white text-base font-normal font-['Inter'] leading-normal">{item?.description}</div>
                       </div>
@@ -307,9 +307,9 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="w-[90%]  mx-auto">
-        <div className="w-full h-[886px] py-24 bg-white flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
-          <div className="self-stretch h-[124px] px-8 flex-col justify-start items-start gap-8 flex">
+      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="flex w-full flex-col items-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
+          <div className="w-full px-0 sm:px-8">
             <div className="self-stretch h-[124px] flex-col justify-start items-start gap-12 flex">
               <div className="self-stretch h-[124px] flex-col justify-start items-start gap-5 flex">
                 <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
@@ -319,8 +319,8 @@ const AboutPage = async () => {
               </div>
             </div>
           </div>
-          <div className="px-8">
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 gap-12">
+          <div className="w-full px-0 sm:px-8">
+            <div className="grid w-full grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
               {values.list.length > 0 && values.list.map((item: any, index: number) => (
                 <div className="flex-col justify-start items-start" key={index}>
                   <div className="w-12 h-12 p-3 bg-white rounded-[10px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#e4e7ec] justify-center items-center inline-flex overflow-hidden">
@@ -354,13 +354,13 @@ const AboutPage = async () => {
         </div>
       </section>
 
-      <section className="w-[90%] mx-auto">
-        <div className="h-[640px] py-24 bg-white flex-col justify-center items-center gap-16 inline-flex overflow-hidden">
-          <div className="self-stretch px-8 justify-center items-center inline-flex">
-            <div className="grow shrink basis-0 h-[448px] bg-gray-50 rounded-3xl justify-start items-center flex overflow-hidden">
-              <div className="grow shrink basis-0 p-16 flex-col justify-center items-start gap-10 inline-flex">
-                <div className="self-stretch h-[168px] flex-col justify-start items-start gap-8 flex">
-                  <div className="self-stretch h-[88px] flex-col justify-start items-start gap-6 flex">
+      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="flex w-full flex-col items-center justify-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
+          <div className="w-full px-0 sm:px-8">
+            <div className="flex w-full flex-col items-stretch overflow-hidden rounded-3xl bg-gray-50 lg:flex-row">
+              <div className="flex flex-1 flex-col items-start justify-center gap-8 p-6 sm:p-16">
+                <div className="flex flex-col items-start gap-8">
+                  <div className="flex flex-col items-start gap-6">
                     <div className="self-stretch text-[#101828] text-4xl font-medium font-['Inter'] leading-[44px]">{ourFaculty?.title}</div>
                   </div>
                   <div className="px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 inline-flex overflow-hidden">
@@ -371,15 +371,15 @@ const AboutPage = async () => {
                   </div>
                 </div>
               </div>
-              <img className="w-[480px] h-[448px] relative" src={imageUrl + ourFaculty.image.data.attributes.url} />
+              <img className="h-auto max-h-[448px] w-full object-cover lg:w-[480px]" src={imageUrl + ourFaculty.image.data.attributes.url} alt="" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="w-[90%] mx-auto">
-        <div className="py-24 bg-Colors-Background-bg-primary inline-flex flex-col justify-start items-center gap-16 overflow-hidden">
-          <div className="w-full  px-8 flex flex-col justify-start items-start gap-8">
+      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="flex flex-col items-center gap-10 overflow-hidden bg-Colors-Background-bg-primary py-12 sm:gap-16 sm:py-24">
+          <div className="w-full px-0 sm:px-8">
             <div className="self-stretch flex flex-col justify-start items-center gap-8">
               <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-5">
                 <div className="self-stretch flex flex-col justify-start items-start gap-3">
@@ -389,8 +389,8 @@ const AboutPage = async () => {
               </div>
             </div>
           </div>
-          <div className="w-full px-8 flex flex-col justify-start items-start gap-16">
-            <div className="self-stretch inline-flex justify-center items-start gap-8 flex-wrap content-start">
+          <div className="w-full px-0 sm:px-8">
+            <div className="grid w-full grid-cols-1 justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {ourTeam.team.length > 0 && ourTeam.team.map((team: any, index: number) => (
                 <div className="flex-1 min-w-60 inline-flex flex-col justify-start items-center gap-5" key={index}>
                   <div className="w-24 h-24 relative rounded-full">
