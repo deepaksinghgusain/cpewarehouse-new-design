@@ -93,21 +93,21 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
 
     return (
 
-        <div className="flex gap-5 ml-1 mt-6">
+        <div className="mt-4 flex w-full gap-5 sm:mt-6">
 
             <div className="w-full flex flex-col  content-start flex-wrap gap-2">
 
-                <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 mb-5 gap-6">
+                <section className="mb-5 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                     {
                         filterCourse.length > 0 ? filterCourse.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage).map((course: any, index: number) => (
                             <div
                                 key={index}
-                                className="course-container flex  flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-sky-500">
+                                className="course-container flex flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-sky-500">
                                 <div
                                     className="w-full min-h-[128px] relative bg-gradient-to-t from-cyan-300 to-indigo-600 rounded-[10px] overflow-hidden">
                                     <div className="h-6 w-full  flex-col justify-center items-center inline-flex bg-[#8078d4]">
                                         <div
-                                            className="w-full h-14 p-4 bg-white/30 border-t border-white/30 backdrop-blur-xl flex-col justify-start items-start gap-6 flex">
+                                            className="flex h-12 w-full flex-col items-start justify-start gap-3 border-t border-white/30 bg-white/30 p-3 backdrop-blur-xl sm:h-14 sm:gap-6 sm:p-4">
                                             <div className="w-full justify-start items-start gap-6 inline-flex">
                                                 <div className="flex-col justify-start items-center inline-flex mt-2">
                                                     <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">Credits:
@@ -118,7 +118,7 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="ml-4 mt-4 pb-2">
+                                    <div className="ml-3 mt-2 pb-2 sm:ml-4 sm:mt-4">
                                         <div className="flex">
 
                                             {
@@ -129,7 +129,7 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
 
 
                                         </div>
-                                        <div className="w-[280px] mt-2 justify-start">
+                                        <div className="mt-2 max-w-full justify-start">
                                             <div className="flex-col justify-start items-start">
                                                 <div className="text-white text-sm font-semibold font-['Inter'] leading-tight">
                                                     {
@@ -144,8 +144,8 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
 
                                 </div>
 
-                                <div className="px-5 h-min-70 pb-6 my-4 flex-col justify-start items-start gap-[18px] inline-flex">
-                                    <div className="self-stretch justify-start items-start gap-2 inline-flex">
+                                <div className="my-2 flex flex-col items-start gap-3 px-3 pb-4 sm:my-4 sm:gap-[18px] sm:px-5 sm:pb-6">
+                                    <div className="flex w-full flex-wrap items-start justify-start gap-2">
 
                                         {
                                             course.attributes?.category?.data?.attributes?.title === "Live" && <div
@@ -165,9 +165,9 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                         </div>
 
                                     </div>
-                                    <div className="self-stretch h-56 flex-col justify-start items-start gap-2 flex">
+                                    <div className="flex min-h-24 flex-col items-start gap-2 max-[500px]:min-h-20 sm:min-h-56">
                                         <Link href={`/course/${course.attributes?.slug}`}>
-                                            <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">{course.attributes?.title}</div>
+                                            <div className="self-stretch text-base font-semibold leading-6 text-[#101828] sm:text-lg sm:leading-7">{course.attributes?.title}</div>
                                         </Link>
                                         {
                                             course.attributes?.category?.data?.attributes?.title !== "Recorded" && <div
@@ -189,7 +189,7 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                     </div>
 
                                 </div>
-                                <AddToCart course={course} quantity={1} />
+                                <AddToCart course={course} quantity={1} absolute={false} />
                             </div>
                         )) : <div>No Record</div>
                     }

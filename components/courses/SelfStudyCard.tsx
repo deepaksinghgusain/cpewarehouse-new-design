@@ -94,11 +94,11 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
     }, [courses.length, JSON.stringify(filterValue)])
 
     return (
-        <div className="flex gap-5 ml-1 mt-6">
+        <div className="mt-4 flex w-full gap-5 sm:mt-6">
 
             <div className="w-full flex  content-start flex-wrap gap-2">
 
-                <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 mb-5 gap-6">
+                <section className="mb-5 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                     {
                         filterCourse.length > 0 ? filterCourse.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage).map((course: any, index: number) => (
                             <div
@@ -108,7 +108,7 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                 <div className="w-full relative bg-gradient-to-t from-purple-800 to-indigo-300 rounded-[10px] overflow-hidden">
                                     <div className="h-6 w-full flex-col justify-center items-center inline-flex">
                                         <div
-                                            className="w-full h-14 p-4 bg-gradient-to-b from-black/0 to-black/30 backdrop-blur-xl flex-col justify-start items-start gap-6 flex">
+                                            className="flex h-12 w-full flex-col items-start justify-start gap-3 bg-gradient-to-b from-black/0 to-black/30 p-3 backdrop-blur-xl sm:h-14 sm:gap-6 sm:p-4">
                                             <div className="w-full justify-start items-start gap-6 inline-flex">
                                                 <div className="flex-col justify-start items-center inline-flex mt-2">
                                                     <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">Credits:
@@ -118,7 +118,7 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="ml-4 mt-4">
+                                    <div className="ml-3 mt-2 sm:ml-4 sm:mt-4">
                                         <div className="flex">
                                             {
                                                 course.attributes?.instructors.data.length > 0 && course.attributes?.instructors.data.map((instructor: any, index: number) => (
@@ -126,7 +126,7 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                                 ))
                                             }
                                         </div>
-                                        <div className="w-[280px] mt-2 justify-start items-center gap-2.5 inline-flex">
+                                        <div className="mt-2 max-w-full items-center gap-2.5">
                                             <div className="flex-col justify-start items-start inline-flex">
                                                 <div className="text-white text-sm font-semibold font-['Inter'] leading-tight">
                                                     {
@@ -141,8 +141,8 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
 
                                 </div>
 
-                                <div className="px-5 pb-6 mt-4 h-min-70  flex-col justify-start items-start gap-[18px] inline-flex">
-                                    <div className="self-stretch justify-start items-start gap-2 inline-flex">
+                                <div className="mt-2 flex flex-col items-start gap-3 px-3 pb-4 sm:mt-4 sm:gap-[18px] sm:px-5 sm:pb-6">
+                                    <div className="flex w-full flex-wrap items-start justify-start gap-2">
                                         <div
                                             className="px-2.5 py-0.5 bg-[#fdf1f9] rounded-full border border-[#fbceee] justify-start items-center flex">
                                             <div className="text-center text-[#c01573] text-sm font-medium font-['Inter'] leading-tight">Self Study
@@ -156,9 +156,9 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                         </div>
 
                                     </div>
-                                    <div className="self-stretch h-56 flex-col justify-start items-start gap-2 flex">
+                                    <div className="flex min-h-24 flex-col items-start gap-2 max-[500px]:min-h-20 sm:min-h-56">
                                         <Link href={`/course/${course?.attributes?.slug}`}>
-                                            <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
+                                            <div className="self-stretch text-base font-semibold leading-6 text-[#101828] sm:text-lg sm:leading-7">
                                                 {course?.attributes?.title}</div>
                                         </Link>
                                         {
@@ -180,14 +180,10 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                         }
 
                                     </div>
-                                    <div className="absolute bottom-18">   
-                                        <AddToCart course={course} quantity={1} absolute={true} className="flex cursor-pointer z-10" />
-                                    </div>
+                                    <AddToCart course={course} quantity={1} absolute={false} />
                                 </div>
-                                <div className="absolute bottom-3 ml-2 add-to-card flex flex-col justify-start items-center gap-2 overflow-hidden">
-                                    <div className="mt-4">
-                                        <img src="/assets/images/bar-code-image.png" alt="" />
-                                    </div>
+                                <div className="add-to-card flex flex-col items-center gap-2 overflow-hidden px-2 pb-3">
+                                    <img className="max-w-full" src="/assets/images/bar-code-image.png" alt="" />
                                 </div>
                             </div>
                         )) : <div>No Record</div>

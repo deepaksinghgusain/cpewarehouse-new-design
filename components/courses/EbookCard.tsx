@@ -91,11 +91,11 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
     }, [courses.length, JSON.stringify(filterValue)])
 
     return (
-        <div className="flex gap-5 ml-1 mt-6">
+        <div className="mt-4 flex w-full gap-5 sm:mt-6">
 
             <div className="w-full flex  content-start flex-wrap gap-2">
 
-                <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ml-4 mb-5 gap-6">
+                <section className="mb-5 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                     {
                         filterCourse.length > 0 ? filterCourse.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage).map((course: any, index: number) => (
                             <div
@@ -103,7 +103,7 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
                                 className="course-container flex flex-col w-full h-full relative rounded-[10px] outline-1 outline-offset-[-1px] outline-sky-300 shadow shadow-gray-500">
 
                                 <div className="w-full h-32 relative bg-gradient-to-t from-purple-300 to-blue-300 rounded-[10px] overflow-hidden">
-                                    <div className="ml-4 mt-4">
+                                    <div className="ml-3 mt-2 sm:ml-4 sm:mt-4">
                                         <div className="flex">
                                             {
                                                 course.attributes?.instructors.data.length > 0 && course.attributes?.instructors.data.map((instructor: any, index: number) => (
@@ -111,7 +111,7 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
                                                 ))
                                             }
                                         </div>
-                                        <div className="w-[280px] mt-2 justify-start items-center gap-2.5 inline-flex">
+                                        <div className="mt-2 max-w-full items-center gap-2.5">
                                             <div className="flex-col justify-start items-start inline-flex">
                                                 <div className="text-white text-sm font-semibold font-['Inter'] leading-tight">
                                                     {
@@ -125,8 +125,8 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
                                     </div>
                                 </div>
 
-                                <div className="px-5 h-56 pb-6 mt-4 flex-col justify-start items-start gap-[18px] inline-flex">
-                                    <div className="self-stretch justify-start items-start gap-2 inline-flex">
+                                <div className="mt-2 flex min-h-24 flex-col items-start gap-3 px-3 pb-4 sm:mt-4 sm:min-h-56 sm:gap-[18px] sm:px-5 sm:pb-6">
+                                    <div className="flex w-full flex-wrap items-start justify-start gap-2">
 
                                         <div
                                             className="pl-2 pr-2.5 py-0.5 bg-orange-100 rounded-full outline-1 outline-offset-[-1px] outline-orange-400 inline-flex justify-start items-center gap-1.5">
@@ -143,15 +143,15 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
                                         }
 
                                     </div>
-                                    <div className="self-stretch flex-col justify-start items-start gap-2 flex">
+                                    <div className="flex w-full flex-col items-start gap-2">
                                         <Link href={`/course/${course?.attributes?.slug}`}>
-                                            <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
+                                            <div className="self-stretch text-base font-semibold leading-6 text-[#101828] sm:text-lg sm:leading-7">
                                                 {course?.attributes?.title}</div>
                                         </Link>
                                     </div>
                                 </div>
-                                <div className="absolute bottom-5 ml-2 add-to-card flex flex-col justify-start items-center gap-2 overflow-hidden">
-                                    <AddToCart course={course} quantity={1} />
+                                <div className="add-to-card mt-auto flex flex-col items-start gap-2 overflow-hidden px-5 pb-3">
+                                    <AddToCart course={course} quantity={1} absolute={false} />
                                     <div>
                                         <img src="/assets/images/bar-code-image.png" alt="" />
                                     </div>

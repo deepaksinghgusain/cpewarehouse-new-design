@@ -84,19 +84,28 @@ const CourseCatalog = () => {
     }
 
     return (
-        <section className="container mx-auto my-10 flex">
+        <section className="container mx-auto my-6 flex w-full flex-col gap-5 px-2 sm:my-10 sm:gap-6 sm:px-4 lg:flex-row lg:gap-8 max-[500px]:px-3">
 
-            <div className="w-1/5">
+            <div className="w-full lg:hidden">
+                <details className="rounded-lg border border-[#e4e7ec] bg-white">
+                    <summary className="cursor-pointer px-4 py-3 text-base font-semibold text-[#101828]">Filter courses</summary>
+                    <div className="border-t border-[#e4e7ec] p-3">
+                        <FilterCourse getFilterValues={getFilterValues} setFilterValues={setFilterValues} />
+                    </div>
+                </details>
+            </div>
+
+            <div className="hidden w-full shrink-0 lg:block lg:w-1/5">
                 <FilterCourse getFilterValues={getFilterValues} setFilterValues={setFilterValues} />
             </div>
 
-            <div className="w-4/5">
+            <div className="min-w-0 w-full mx-auto lg:w-4/5">
                 <Tabs defaultValue="Live Webinar" className="w-full bg-transparent border-b border-[#dee1e9]">
-                    <TabsList variant="line" className='w-full bg-transparent  border-b border-[#dee1e9]'>
-                        <TabsTrigger value="Live Webinar" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Live Webinar</TabsTrigger>
-                        <TabsTrigger value="Self-Study" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Self-Study</TabsTrigger>
-                        <TabsTrigger value="eBook" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">eBook</TabsTrigger>
-                        <TabsTrigger value="Free CPE" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Free CPE</TabsTrigger>
+                    <TabsList variant="line" className='w-full justify-start gap-0 overflow-x-auto bg-transparent border-b border-[#dee1e9] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+                        <TabsTrigger value="Live Webinar" className="shrink-0 px-3 text-sm font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose sm:px-4 sm:text-2xl data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Live Webinar</TabsTrigger>
+                        <TabsTrigger value="Self-Study" className="shrink-0 px-3 text-sm font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose sm:px-4 sm:text-2xl data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Self-Study</TabsTrigger>
+                        <TabsTrigger value="eBook" className="shrink-0 px-3 text-sm font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose sm:px-4 sm:text-2xl data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">eBook</TabsTrigger>
+                        <TabsTrigger value="Free CPE" className="shrink-0 px-3 text-sm font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose sm:px-4 sm:text-2xl data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Free CPE</TabsTrigger>
                     </TabsList>
                     <TabsContent value="Live Webinar">
                         <LiveCourseCard courses={course.liveCourseListing} filterValue={filterValue} />
