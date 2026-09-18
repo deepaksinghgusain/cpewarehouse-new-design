@@ -37,24 +37,22 @@ const NewsLetter = () => {
     }
 
     return (
-        <section className="container mx-auto">
-            <div className="h-[444px] pb-24 bg-white flex-col justify-center items-center overflow-hidden">
-                <div className="self-stretch h-[348px] px-8 flex-col justify-start items-start gap-8 flex">
-                    <div className="self-stretch h-[348px] p-16 bg-gray-50 rounded-2xl flex-col justify-start items-center gap-8 flex">
-                        <div className="self-stretch h-[94px] flex-col justify-start items-center gap-5 flex">
-                            <div className="self-stretch text-center text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">{newsLetter?.title}</div>
-                            <div className="self-stretch text-center text-[#475467] text-xl font-normal font-['Inter'] leading-[30px]">{newsLetter?.sub_title}</div>
+        <section className="container mx-auto px-4 sm:px-6">
+            <div className="bg-white py-10 sm:py-24">
+                <div className="w-full">
+                    <div className="flex flex-col items-center gap-8 rounded-2xl bg-gray-50 p-6 sm:p-16">
+                        <div className="flex w-full flex-col items-center gap-5">
+                            <div className="w-full text-center text-2xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">{newsLetter?.title}</div>
+                            <div className="w-full text-center text-lg font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">{newsLetter?.sub_title}</div>
                         </div>
-                        <form onSubmit={submit}>
-                            <div className="justify-center items-start gap-4 inline-flex">
-                                <div className="grow shrink basis-0 flex-col justify-center inline-flex">
-                                    <div className="self-stretch h-12 flex-col justify-start items-start gap-1.5 flex w-[400px]">
-                                        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Enter your email" className="self-stretch px-3.5 py-3 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-[#d0d5dd] focus:outline-gray-500 justify-start items-center gap-2 inline-flex" />
-                                    </div>
+                        <form onSubmit={submit} className="w-full max-w-2xl">
+                            <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:gap-4">
+                                <div className="min-w-0 flex-1">
+                                    <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Enter your email" className="h-12 w-full rounded-lg border border-[#d0d5dd] bg-white px-3.5 py-3 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] focus:outline-gray-500" />
                                 </div>
-                                <div className="px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
-                                    <div className="px-0.5 justify-center items-center flex">
-                                        <button type='submit' className="text-white cursor-pointer text-base font-semibold font-['Inter'] leading-normal">Subscribe</button>
+                                <div className="flex justify-center rounded-[28px] border-2 border-white bg-[#2970fe] px-[18px] py-3 shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] sm:shrink-0">
+                                    <div className="px-0.5">
+                                        <button type='submit' className="w-full cursor-pointer text-base font-semibold leading-normal text-white">Subscribe</button>
                                     </div>
                                 </div>
                             </div>

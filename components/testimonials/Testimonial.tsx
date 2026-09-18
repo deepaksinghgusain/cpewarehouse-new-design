@@ -90,10 +90,10 @@ const Testimonial = () => {
     }, []);
 
     return (
-        <section className="bg-[#eef4ff] mt-10  py-24">
-            <div className="w-[90%] mx-auto bg-white  px-8">
-                <div className='grid md:grid-cols-2 grid-cols-1 items-center'>
-                    <div className='relative'>
+        <section className="mt-10 bg-[#eef4ff] py-12 sm:py-24">
+            <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl bg-white px-4 py-6 sm:w-[90%] sm:px-8 sm:py-10">
+                <div className='grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-8'>
+                    <div className='relative min-w-0'>
                         <Swiper
                             modules={[Pagination, Autoplay]}
                             onSwiper={(swiper) => (swiperRef.current = swiper)}
@@ -205,7 +205,7 @@ const Testimonial = () => {
                                             }
                                         </div>
                                         <div
-                                            className="text-Colors-Text-text-primary-(900) text-1xl font-medium font-['Inter'] leading-[20px] p-4"
+                                            className="p-4 text-base font-medium leading-6 text-Colors-Text-text-primary-(900) sm:text-lg"
                                             dangerouslySetInnerHTML={{ __html: item.attributes.message }}></div>
                                         <div className="inline-flex justify-start items-start gap-3">
                                             <div className="flex-1 flex justify-start items-start gap-4">
@@ -230,10 +230,12 @@ const Testimonial = () => {
                             ))}
                         </Swiper>
 
-                        <div className="absolute flex justify-start items-start gap-8 cursor-pointer right-20 top-[200px] bg-white z-10">
-                            <div
+                        <div className="mt-6 flex justify-end gap-3 bg-white sm:absolute sm:bottom-0 sm:right-0 sm:mt-0 sm:gap-4">
+                            <button
+                                type="button"
+                                aria-label="Previous testimonial"
                                 onClick={() => swiperRef.current?.slidePrev()}
-                                className="w-10 h-10 rounded-full  outline-1 outline-offset-[-1px] outline-[#667085] flex justify-center items-center gap-3">
+                                className="flex h-10 w-10 items-center justify-center rounded-full outline-1 outline-offset-[-1px] outline-[#667085]">
                                 <div className="w-6 h-6 relative overflow-hidden ">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g id="arrow-left">
@@ -242,10 +244,12 @@ const Testimonial = () => {
                                         </g>
                                     </svg>
                                 </div>
-                            </div>
-                            <div
+                            </button>
+                            <button
+                                type="button"
+                                aria-label="Next testimonial"
                                 onClick={() => swiperRef.current?.slideNext()}
-                                className=" cursor-pointer w-10 h-10 rounded-full outline-1 outline-offset-[-1px] outline-[#667085] flex justify-center items-center gap-3">
+                                className="flex h-10 w-10 items-center justify-center rounded-full outline-1 outline-offset-[-1px] outline-[#667085]">
                                 <div className="w-6 h-6 relative overflow-hidden">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g id="arrow-right">
@@ -254,12 +258,12 @@ const Testimonial = () => {
                                         </g>
                                     </svg>
                                 </div>
-                            </div>
+                            </button>
                         </div>
                     </div>
-                    <div>
-                        <div className="">
-                            <img className="" src={imageUrl + testimonialBanner?.image?.data?.attributes.url} />
+                    <div className="flex min-w-0 justify-center">
+                        <div className="w-full max-w-[520px]">
+                            <img className="h-auto w-full object-contain" src={imageUrl + testimonialBanner?.image?.data?.attributes.url} alt="" />
                         </div>
                     </div>
                 </div>

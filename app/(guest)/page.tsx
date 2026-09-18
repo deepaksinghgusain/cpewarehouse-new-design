@@ -52,12 +52,12 @@ export default async function page() {
 
   return (
     <>
-      <section className="mt-16 w-[90%] mx-auto">
-        <div className="grid md:grid-cols-2 grid-cols-1 gap-8">
+      <section className="mx-auto mt-12 w-[calc(100%-2rem)] max-w-7xl sm:mt-16 sm:w-[90%]">
+        <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
           <div className="grow shrink basis-0 flex-col justify-start items-start md:mb-20">
             <div className="flex-col justify-start items-start gap-12 flex mb-8">
-              <div className="self-stretch text-[#101828] text-5xl font-semibold font-['Inter'] leading-[50px]">{frontPageBanner?.title}</div>
-              <div className="self-stretch h-[268px] pl-4 flex-col justify-start items-start gap-5 flex">
+              <div className="self-stretch text-3xl font-semibold leading-tight text-[#101828] sm:text-5xl sm:leading-[50px]">{frontPageBanner?.title}</div>
+              <div className="flex flex-col items-start gap-5 pl-0 sm:pl-4">
 
                 {
                   frontPageBanner.list.length > 0 && frontPageBanner.list.map((item: any, index: number) => (
@@ -86,16 +86,16 @@ export default async function page() {
               </div>
             </div>
           </div>
-          <div className="w-full h-full">
-            <Image alt='' src={imageUrl + frontPageBanner?.image?.data?.attributes?.url} height={800} width={800} loading="eager" />
+          <div className="relative aspect-square w-full">
+            <Image alt='' src={imageUrl + frontPageBanner?.image?.data?.attributes?.url} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain" loading="eager" />
           </div>
         </div>
       </section>
 
-      <div className="grid sm:grid-cols-2 grid-cols-1 mt-16 w-[90%] mx-auto">
+      <div className="mx-auto mt-12 grid w-[calc(100%-2rem)] max-w-7xl grid-cols-1 gap-10 sm:mt-16 sm:w-[90%] md:grid-cols-2">
         <div className="grow shrink basis-0 flex-col justify-start items-start gap-5 inline-flex">
-          <div className="text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">{highlightsimple?.title}</div>
-          <div className="text-[#475467] text-xl font-normal font-['Inter'] leading-[30px]">{highlightsimple?.description}</div>
+          <div className="text-3xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">{highlightsimple?.title}</div>
+          <div className="text-lg font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">{highlightsimple?.description}</div>
         </div>
         <div className="grow shrink basis-0 flex-col justify-start items-start gap-12 inline-flex">
           {
@@ -106,7 +106,7 @@ export default async function page() {
                   </div>
                 </div>
                 <div className="grow shrink basis-0 flex-col justify-start items-start gap-5 inline-flex">
-                  <div className="h-[120px] pt-2.5 flex-col justify-start items-start gap-2 flex">
+                  <div className="flex flex-col items-start gap-2 pt-2.5">
                     <div className="text-[#101828] text-xl font-semibold font-['Inter'] leading-[30px]">
                       {list?.title}
                     </div>
@@ -121,17 +121,17 @@ export default async function page() {
         </div>
       </div>
 
-      <div className="relative w-[90%] mx-auto h-[600px] mt-16 ">
+      <div className="relative mx-auto mt-12 h-[240px] w-[calc(100%-2rem)] max-w-7xl sm:mt-16 sm:h-[400px] sm:w-[90%] lg:h-[600px]">
         <Image src={imageUrl + highlightsimple?.image?.data?.attributes?.url} alt="" fill sizes="(max-width: 768px) 100vw, 90vw" className="object-cover" />
       </div>
 
       <section className="bg-[#eef4ff] mt-10">
-        <div className="w-[90%] mx-auto">
-          <div className="h-[592px] flex-col justify-center items-center gap-16 inline-flex overflow-hidden">
-            <div className="self-stretch px-8 justify-center items-center inline-flex">
-              <div className="grow shrink basis-0 h-[400px] bg-[#6071f3] rounded-3xl shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] justify-start items-center flex overflow-hidden">
-                <div className="grow shrink basis-0 p-16 flex-col justify-center items-start gap-12 inline-flex">
-                  <div className="self-stretch h-[156px] flex-col justify-start items-start gap-5 flex">
+        <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+          <div className="flex flex-col items-center justify-center gap-10 py-10 sm:gap-16 sm:py-16">
+            <div className="w-full px-0 sm:px-8">
+              <div className="flex w-full flex-col items-stretch overflow-hidden rounded-3xl bg-[#6071f3] shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] lg:flex-row">
+                <div className="flex flex-1 flex-col items-start justify-center gap-8 p-6 sm:gap-12 sm:p-16">
+                  <div className="flex flex-col items-start gap-5">
                     <div className="self-stretch text-white text-3xl font-semibold font-['Inter'] leading-[38px]">{liveWebinarPass.title}</div>
                     <div className="self-stretch text-white text-xl font-normal font-['Inter'] leading-[30px]">{liveWebinarPass.sub_title}</div>
                   </div>
@@ -145,7 +145,7 @@ export default async function page() {
                     </div>
                   </div>
                 </div>
-                <div className="w-[480px] h-[400px] relative">
+                <div className="relative h-[260px] w-full shrink-0 sm:h-[360px] lg:h-[400px] lg:w-[480px]">
                   <Image fill alt='' sizes="(max-width: 768px) 100vw, 480px" src={imageUrl + liveWebinarPass.image.data.attributes.url} />
                 </div>
               </div>
@@ -154,34 +154,32 @@ export default async function page() {
         </div>
       </section>
 
-      <section className='w-[90%] mx-auto mt-16'>
-        <div className="rounded-[10px] inline-flex flex-col justify-start items-center gap-16 overflow-hidden">
-          <div className="w-full  px-8 bg-white flex flex-col justify-start items-start gap-8">
-            <div className="self-stretch flex flex-col justify-start items-center gap-8">
-              <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-5">
-                <div className="self-stretch flex flex-col justify-start items-start gap-3">
-                  <div className="self-stretch text-center justify-start text-Colors-Text-text-primary-(900) text-4xl font-semibold font-['Inter'] leading-10">{approval.title}</div>
+      <section className="mx-auto mt-12 w-[calc(100%-2rem)] max-w-7xl sm:mt-16 sm:w-[90%]">
+        <div className="flex w-full flex-col gap-10 overflow-hidden rounded-[10px] sm:gap-16">
+          <div className="w-full bg-white px-0 sm:px-8">
+            <div className="flex flex-col items-center gap-8">
+              <div className="flex w-full max-w-[768px] flex-col items-center gap-5">
+                <div className="flex w-full flex-col items-start gap-3">
+                  <div className="w-full text-center text-3xl font-semibold leading-tight text-Colors-Text-text-primary-(900) sm:text-4xl sm:leading-10">{approval.title}</div>
                 </div>
-                <div className="self-stretch text-center justify-start text-Colors-Text-text-tertiary-(600) text-xl font-normal font-['Inter'] leading-loose">{approval.sub_title}</div>
+                <div className="w-full text-center text-lg font-normal leading-7 text-Colors-Text-text-tertiary-(600) sm:text-xl sm:leading-loose">{approval.sub_title}</div>
               </div>
             </div>
           </div>
-          <div className="w-full  px-8 flex flex-col justify-start items-start gap-16">
-            <div className="self-stretch inline-flex justify-center items-start gap-8 flex-wrap content-start">
+          <div className="w-full px-0 sm:px-8">
+            <div className="grid w-full grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {
                 approval.list.length > 0 && approval.list.map((list: any, index: number) => (
-                  <div key={index} className="flex-1 h-[560px] min-w-80 rounded-[10px] solid border border-[#dadee3]  inline-flex flex-col justify-start items-start gap-5">
-                    <div className="self-stretch h-48 relative bg-gradient-to-b from-Colors-Cyan-25 to-gray-300 rounded-tr-[10px] rounded-br-[10px]">
-                      <div className="w-44 h-36 pt-2 left-[97px] top-[29px] absolute inline-flex justify-center items-start">
-                        <Image alt='' className="w-full h-full object-contain" fill sizes="(max-width: 768px) 100vw, 33vw" src={imageUrl + list.image.data.attributes.url} />
+                  <div key={index} className="flex min-w-0 flex-col overflow-hidden rounded-[10px] border border-[#dadee3]">
+                    <div className="relative h-50 w-full rounded-t-[10px] bg-gradient-to-b from-Colors-Cyan-25 to-gray-300">
+                      <div className="absolute h-25 mt-5 inset-0 p-3 sm:p-4">
+                        <Image alt={list.title || "Approval logo"} className="object-contain" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" src={imageUrl + list.image.data.attributes.url} />
                       </div>
                     </div>
-                    <div className="self-stretch p-4 flex flex-col justify-start items-start gap-6">
-                      <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                        <div className="self-stretch inline-flex justify-start items-start gap-4">
-                          <div className="flex-1 justify-start text-Colors-Text-text-primary-(900) text-2xl font-semibold font-['Inter'] leading-loose">{list.title}</div>
-                        </div>
-                        <div className="self-stretch justify-start text-[#475467] text-base font-normal leading-normal" dangerouslySetInnerHTML={{ __html: list.description }}></div>
+                    <div className="flex h-full flex-col items-start gap-6 p-4">
+                      <div className="flex w-full flex-col items-start gap-2">
+                        <div className="w-full text-xl font-semibold leading-8 text-Colors-Text-text-primary-(900) sm:text-2xl sm:leading-loose">{list.title}</div>
+                        <div className="w-full text-base font-normal leading-normal text-[#475467]" dangerouslySetInnerHTML={{ __html: list.description }}></div>
                       </div>
                     </div>
                   </div>
@@ -194,32 +192,30 @@ export default async function page() {
 
       <Testimonial />
 
-      <section className="bg-[#f9fafb] py-24 h-auto ">
-        <div className="w-[90%] mx-auto">
-          <div className="self-stretch h-[94px] mb-12 flex-col justify-start items-start gap-8 flex">
-            <div className="self-stretch h-[94px] flex-col justify-start items-center gap-8 flex">
-              <div className="self-stretch h-[94px] flex-col justify-start items-center gap-5 flex">
-                <div className="self-stretch h-11 justify-between items-start gap-3 flex">
-                  <div className="self-stretch text-left text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">
+      <section className="h-auto bg-[#f9fafb] py-12 sm:py-24">
+        <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+          <div className="mb-10 flex flex-col gap-8 sm:mb-12">
+            <div className="flex flex-col items-center gap-5">
+                <div className="flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                  <div className="text-left text-3xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">
                     {InstructorData?.title}
                   </div>
-                  <div className=" px-[18px] py-3  bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center">
+                  <div className="rounded-[28px] border-2 border-white bg-[#2970fe] px-[18px] py-3 shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)]">
                     <div className="px-0.5 justify-center items-center flex">
                       <Link href={InstructorData?.button?.href} className="text-white text-base font-semibold font-['Inter'] leading-normal">
                         {InstructorData?.button?.label}</Link>
                     </div>
                   </div>
                 </div>
-                <div className="self-stretch text-left text-[#475467] text-xl font-normal font-['Inter'] leading-[30px]">
+                <div className="w-full text-left text-lg font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">
                   Hear from some of our amazing customers who are automating their finances.</div>
               </div>
             </div>
-          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
             {
               homepagefacultymembers.data.length > 0 && homepagefacultymembers.data.slice(0, 3).map((faculty: any, index: number) => (
-                <div key={index} className="self-stretch h-96 min-w-80 relative" style={
+                <div key={index} className="relative h-96 min-w-0" style={
                   {
                     backgroundImage: `url(${imageUrl + faculty.attributes.image.data.attributes.url})`,
                     backgroundSize: "cover",
@@ -248,13 +244,13 @@ export default async function page() {
         </div>
       </section>
 
-      <section className="w-[90%] mx-auto">
-        <div className="h-[704px] py-24 bg-white flex-col justify-center items-center gap-16 inline-flex overflow-hidden">
-          <div className="self-stretch px-8 justify-center items-center gap-16 inline-flex overflow-hidden">
-            <div className="grow shrink basis-0 flex-col justify-start items-start gap-12 inline-flex">
-              <div className="self-stretch h-[174px] flex-col justify-start items-start gap-6 flex">
-                <div className="self-stretch text-[#101828] text-5xl font-semibold font-['Inter'] leading-[60px]">{getInTouch.title}</div>
-                <div className="self-stretch text-[#475467] text-xl font-normal font-['Inter'] leading-[30px]">{getInTouch.sub_title}</div>
+      <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+        <div className="flex flex-col items-center justify-center gap-10 overflow-hidden bg-white py-12 sm:gap-16 sm:py-24">
+          <div className="flex w-full flex-col items-center gap-10 px-0 sm:px-8 lg:flex-row lg:gap-16">
+            <div className="flex flex-1 flex-col items-start gap-8 sm:gap-12">
+              <div className="flex flex-col items-start gap-6">
+                <div className="text-3xl font-semibold leading-tight text-[#101828] sm:text-5xl sm:leading-[60px]">{getInTouch.title}</div>
+                <div className="text-lg font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">{getInTouch.sub_title}</div>
               </div>
               <div className="self-stretch justify-start items-start gap-4 inline-flex">
                 <div className="px-[18px] py-3 bg-[#2970fe] rounded-[28px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
@@ -266,7 +262,7 @@ export default async function page() {
                 </div>
               </div>
             </div>
-            <img className="h-[512px] relative" src={imageUrl + getInTouch.image.data.attributes.url} />
+            <img className="h-auto max-h-[420px] w-full max-w-[512px] object-contain" src={imageUrl + getInTouch.image.data.attributes.url} alt="" />
           </div>
         </div>
       </section>
