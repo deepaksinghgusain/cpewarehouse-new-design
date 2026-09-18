@@ -63,8 +63,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                         && (item.attributes?.category?.data?.attributes?.title == courseCategory)
                 })
 
+
                 filteredResult?.forEach((element: any) => {
-                    const facultyname = getInstructorName(element?.attributes?.instructors)
                     relatedCourses.push({
                         attributes: {
                             'title': element?.attributes?.title,
@@ -106,25 +106,25 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
         return (
             <>
-                <section className="w-[90%] mx-auto">
+                <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
                     <AddToCardComponent courseData={{...courseData, id: courseId}} instructor={instructor} />
                 </section >
 
-                <section className="mt-20 ">
+                <section className="mt-10 sm:mt-20">
                     <div
-                        className="w-[90%] mx-auto self-stretch border-b border-[#dee1e9] flex flex-col justify-start items-start gap-2">
+                        className="mx-auto flex w-[calc(100%-2rem)] max-w-7xl flex-col items-start gap-2 self-stretch border-b border-[#dee1e9] sm:w-[90%]">
                         <Tabs defaultValue="Course Outline" className="w-full bg-transparent border-b border-[#dee1e9]">
-                            <TabsList variant="line" className='w-full bg-transparent border-b border-[#dee1e9]'>
-                                <TabsTrigger value="Course Outline" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Course Outline</TabsTrigger>
-                                <TabsTrigger value="CPE Info" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">CPE Info</TabsTrigger>
-                                <TabsTrigger value="FAQ" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">FAQ</TabsTrigger>
-                                <TabsTrigger value="Review" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Review</TabsTrigger>
-                                <TabsTrigger value="Faculty" className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Faculty</TabsTrigger>
+                            <TabsList variant="line" className='w-full justify-start overflow-x-auto bg-transparent border-b border-[#dee1e9] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+                                <TabsTrigger value="Course Outline" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">Course Outline</TabsTrigger>
+                                <TabsTrigger value="CPE Info" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">CPE Info</TabsTrigger>
+                                <TabsTrigger value="FAQ" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">FAQ</TabsTrigger>
+                                <TabsTrigger value="Review" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">Review</TabsTrigger>
+                                <TabsTrigger value="Faculty" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">Faculty</TabsTrigger>
                             </TabsList>
                             <TabsContent value="Course Outline">
                                 <div className="">
-                                    <div className="mt-6 flex-col justify-start items-center gap-16 inline-flex overflow-hidden">
-                                        <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex">
+                                    <div className="mt-6 flex w-full flex-col items-center gap-10 overflow-hidden sm:gap-16">
+                                        <div className="w-full px-0 sm:px-8">
                                             <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
                                                 <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
                                                     <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
@@ -134,7 +134,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="self-stretch px-8 justify-start items-start gap-8 inline-flex">
+                                        <div className="w-full px-0 sm:px-8">
                                             <div className="w-full flex-col justify-start items-start gap-8 inline-flex">
                                                 <div className="self-stretch flex-col justify-start items-start gap-5 flex">
                                                     <div className="self-stretch flex-col justify-start items-center gap-2 flex">
@@ -145,11 +145,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="px-8 mt-8 rounded-xl justify-start gap-8 inline-flex border-b border-[#e4e7ec]">
+                                    <div className="mt-8 grid w-full grid-cols-1 gap-6 rounded-xl border-b border-[#e4e7ec] px-0 sm:px-8 lg:grid-cols-2">
 
                                         {
                                             coursesDetail?.data[0]?.attributes?.outline && coursesDetail?.data[0]?.attributes?.outline.length > 0 && coursesDetail?.data[0]?.attributes?.outline.map((outline: any, index: number) => (
-                                                <div className="w-[592px] rounded-2xl flex-col justify-start items-start inline-flex overflow-hidden" key={index}>
+                                                <div className="w-full min-w-0 overflow-hidden rounded-2xl" key={index}>
                                                     <div
                                                         className="self-stretch h-[88px] px-8 pt-8 pb-6 border-b border-[#e4e7ec] flex-col justify-start items-start gap-8 flex">
                                                         <div className="self-stretch justify-start items-start gap-8 inline-flex">
@@ -160,7 +160,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="w-[592px] px-8 pt-8 pb-10  flex-col justify-start items-start gap-6 flex">
+                                                    <div className="w-full px-4 pb-8 pt-6 sm:px-8 sm:pt-8">
                                                         <div className="self-stretch  justify-start items-start gap-8">
                                                             {
                                                                 outline.list.length > 0 && outline.list.map((item: any, index: number) => (
@@ -195,8 +195,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             <TabsContent value="CPE Info">
                                 <div className="">
                                     <div
-                                        className="w-full py-8 bg-Colors-Background-bg-primary inline-flex flex-col justify-start items-center gap-16 overflow-hidden text-[#475467]">
-                                        <div className="w-full  px-8 inline-flex justify-start items-start gap-16 flex-wrap content-start">
+                                        className="w-full overflow-hidden bg-Colors-Background-bg-primary py-8 text-[#475467] sm:py-12">
+                                        <div className="w-full px-0 sm:px-8">
                                             <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
                                                 <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content }} >
                                                 </div>
@@ -206,7 +206,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 </div >
                                 <section>
                                     <div
-                                        className="h-auto w-full py-12  bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
+                                        className="flex h-auto w-full flex-col items-center gap-8 overflow-hidden bg-white py-8 sm:gap-[38px] sm:py-12">
 
                                         {
                                             accreditedPartners && <div className="w-full py-12  bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
@@ -227,13 +227,13 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                         backgroundImage: `url('${imageUrl + accreditedPartners?.bg_image?.data?.attributes?.url}')`,
                                                         backgroundSize: "cover"
                                                     }}>
-                                                    <div className="h-80 w-full px-1 flex-col justify-start items-center gap-16 flex">
-                                                        <div className="self-stretch h-80 p-16 justify-center items-start gap-8 inline-flex">
+                                                    <div className="w-full px-4 py-8 sm:px-8 sm:py-12">
+                                                        <div className="grid w-full grid-cols-2 items-center justify-items-center gap-4 sm:grid-cols-3 sm:gap-8 lg:flex lg:justify-center">
                                                             {accreditedPartners?.list && accreditedPartners?.list.map((l: any, index: number) => (
                                                                 <div
                                                                     key={index}
-                                                                    className="w-[180px] h-[142px] px-6 py-8 bg-white/30 rounded-2xl border border-white/30 backdrop-blur-xl flex-col justify-start items-center gap-5 inline-flex">
-                                                                    <img className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down"
+                                                                    className="flex h-28 w-full max-w-[180px] items-center justify-center rounded-2xl border border-white/30 bg-white/30 p-4 backdrop-blur-xl sm:h-[142px] sm:p-6">
+                                                                    <img className="h-full w-full object-contain"
                                                                         src={imageUrl + l?.image?.data?.attributes?.url} />
                                                                 </div>
                                                             ))
@@ -244,19 +244,19 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                             </div>
                                         }
 
-                                        <div className="w-[90%] mx-auto">
-                                            <div className="self-stretch px-8 justify-between items-start gap-8 inline-flex">
-                                                <div className="w-[771px] py-5 flex-col justify-between items-start gap-8 inline-flex">
+                                        <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
+                                            <div className="flex flex-col items-start gap-8 lg:flex-row">
+                                                <div className="w-full py-5 lg:w-2/3">
                                                     <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
                                                         {sponsorship.title}</div>
-                                                    <div className="self-stretch h-20 px-1 flex-col justify-start items-start gap-8 flex">
-                                                        <div className="w-[794px] justify-start items-start inline-flex">
+                                                    <div className="w-full px-1">
+                                                        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
 
                                                             {
                                                                 sponsorship.list.length > 0 && sponsorship.list.map((list: any, index: number) => (
-                                                                    <div className="grow shrink basis-0 px-4 pt-6 flex-col justify-start items-center gap-5 inline-flex" key={index}>
-                                                                        <div className="self-stretch justify-start items-start gap-3 inline-flex">
-                                                                            <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
+                                                                    <div className="min-w-0 px-1 pt-4 sm:px-4 sm:pt-6" key={index}>
+                                                                        <div className="flex items-start gap-3">
+                                                                            <div className="h-7 w-7 shrink-0 rounded-full">
                                                                                 <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
                                                                                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                                         <g id="check-circle">
@@ -278,25 +278,24 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                                                         </div>
                                                     </div>
-                                                    <div className="self-stretch h-[200px] py-4 flex-col justify-start items-start gap-5 flex">
-                                                        <div className="self-stretch h-[168px] flex-col justify-start items-center gap-2 flex">
-                                                            <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
+                                                    <div className="w-full py-6">
+                                                        <div className="w-full">
+                                                            <div className="w-full text-base font-normal leading-7 text-[#475467] sm:text-lg">
                                                                 {sponsorship.description}</div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 {sponsorship.features.length > 0 &&
-                                                    <div className="w-[446px] self-stretch px-8 flex-col justify-start items-start gap-8 inline-flex">
+                                                    <div className="w-full px-0 lg:w-1/3 lg:px-8">
                                                         <div className="self-stretch justify-center items-start gap-8 inline-flex">
-                                                            <div
-                                                                className="grow shrink basis-0 bg-white rounded-2xl  shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex">
-                                                                <div className="self-stretch h-[284px] px-8 pt-8 pb-10 flex-col justify-start items-start gap-6 flex">
-                                                                    <div className="self-stretch h-[212px] flex-col justify-start items-start gap-4 flex">
+                                                            <div className="flex w-full flex-col items-start rounded-2xl border border-[#e4e7ec] bg-white shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]">
+                                                                        <div className="w-full px-5 py-6 sm:px-8 sm:py-8">
+                                                                            <div className="flex w-full flex-col items-start gap-4">
 
                                                                         {
                                                                             sponsorship.features.map((list: any, index: number) => (
-                                                                                <div className="self-stretch justify-start items-start gap-3 inline-flex" key={index}>
-                                                                                    <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
+                                                                                <div className="flex w-full items-start gap-3" key={index}>
+                                                                                    <div className="relative h-6 w-6 shrink-0 rounded-full bg-[#dbf9e6]">
                                                                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                                             <g id="Check icon">
                                                                                                 <path
@@ -309,8 +308,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                                                         </svg>
 
                                                                                     </div>
-                                                                                    <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
-                                                                                        <div className="self-stretch text-[#344054] text-lg font-semibold font-['Inter'] leading-7">2 hours
+                                                                                    <div className="min-w-0 flex-1">
+                                                                                        <div className="text-base font-semibold leading-7 text-[#344054] sm:text-lg">2 hours
                                                                                             {list.value}
                                                                                         </div>
                                                                                     </div>
@@ -320,7 +319,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                                                                     </div>
                                                                 </div>
-                                                                <div className="self-stretch h-20 px-8 pb-8"></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -333,8 +331,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             <TabsContent value="FAQ">
                                 <div className="">
                                     <div
-                                        className="w-full py-24 bg-Colors-Background-bg-primary inline-flex flex-col justify-start items-center gap-16 overflow-hidden text-[#475467]">
-                                        <div className="w-full  px-8 inline-flex justify-start items-start gap-16 flex-wrap content-start">
+                                        className="w-full overflow-hidden bg-Colors-Background-bg-primary px-0 py-12 text-[#475467] sm:px-8 sm:py-24">
+                                        <div className="w-full">
                                             <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
                                                 <div className="w-full flex flex-col justify-start items-start gap-5">
                                                     <div className="self-stretch flex flex-col justify-start items-start gap-3">
@@ -357,7 +355,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                             type="single"
                                                             collapsible
                                                             defaultValue="shipping"
-                                                            className="max-w-lg"
+                                                            className="w-full max-w-lg"
                                                         >
                                                             {
                                                                 coursesDetail?.data[0]?.attributes?.faqs?.list.length > 0 && coursesDetail?.data[0]?.attributes?.faqs?.list.map((faq: any, index: number) => (
@@ -381,7 +379,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 <div className="">
                                     <div className="self-stretch py-24 inline-flex flex-col justify-start items-center gap-16 overflow-hidden">
                                         <div className="py-4 bg-Colors-Background-bg-primary flex flex-col justify-start items-center gap-16 overflow-hidden">
-                                            <div className="w-full max-w-[1280px] px-8 flex flex-col justify-start items-start gap-8">
+                                            <div className="w-full max-w-[1280px] px-0 sm:px-8">
                                                 <div className="self-stretch flex flex-col justify-start items-start gap-8">
                                                     <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-5">
                                                         <div className="self-stretch flex flex-col justify-start items-start gap-3">
@@ -399,10 +397,10 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                                             {
                                                 coursesDetail.data[0]?.attributes.reviews?.reviews.length > 0 && coursesDetail.data[0]?.attributes.reviews?.reviews.map((review: any, index: number) => (
-                                                    <div className="w-full max-w-[1280px] px-8 border-b border-teal-500 flex flex-col justify-start items-start gap-8" key={index}>
-                                                        <div className="self-stretch inline-flex justify-start items-start gap-24">
-                                                            <div className="flex-1 pl-16 flex justify-end items-start">
-                                                                <div className="w-[1216px] inline-flex flex-col justify-start items-start gap-4">
+                                                    <div className="w-full max-w-[1280px] border-b border-teal-500 px-0 sm:px-8" key={index}>
+                                                        <div className="w-full">
+                                                            <div className="w-full sm:pl-16">
+                                                                <div className="flex w-full flex-col items-start gap-4">
                                                                     <div className="self-stretch flex flex-col justify-start items-start gap-6">
                                                                         <div className="self-stretch inline-flex justify-start items-start gap-3">
                                                                             <div className="flex justify-start items-center gap-1">
@@ -436,20 +434,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             </TabsContent>
                             <TabsContent value="Faculty">
                                 <div className="">
-                                    <div className="h-[749px] py-12 justify-end items-center gap-16 inline-flex">
-                                        <div className="h-[642px] px-8 justify-start items-start flex">
-                                            <div className="grow shrink basis-0 pr-8 flex-col justify-start items-start gap-10 inline-flex">
-                                                <div className="self-stretch justify-start items-start gap-3 inline-flex">
-                                                    <div className="grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
-                                                        <div className="self-stretch text-[#101828] text-3xl font-semibold font-['Inter'] leading-[38px]"> Faculty
-                                                        </div>
-                                                        <div className="self-stretch justify-start items-center gap-5 inline-flex">
-
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                    <div className="flex w-full flex-col items-center gap-10 py-12 lg:flex-row lg:items-start lg:justify-end lg:gap-16">
+                                        <div className="w-full px-0 sm:px-8 lg:w-1/2">
+                                            <div className="flex flex-col items-start gap-10 lg:pr-8">
                                                 <div
-                                                    className="w-[560px] h-[536px] pt-[335.50px] pb-[24.50px] justify-center items-center bg-no-repeat bg-cover inline-flex"
+                                                    className="flex aspect-[560/536] w-full max-w-[560px] items-end justify-center bg-cover bg-no-repeat"
                                                     style={{ backgroundImage: `url('${imageUrl + instructor?.image?.data?.attributes?.url}')` }}>
                                                     <div
                                                         className="grow shrink basis-0 h-44 px-8 pt-24 pb-8 bg-gradient-to-b flex-col justify-center items-center inline-flex">
@@ -472,8 +461,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="grow shrink basis-0 h-[540px] px-8 justify-start items-start flex">
-                                            <div className="grow shrink basis-0 pr-8 flex-col justify-start items-start gap-10 inline-flex">
+                                        <div className="w-full px-0 sm:px-8 lg:w-1/2">
+                                            <div className="flex flex-col items-start gap-10 lg:pr-8">
                                                 <div className="self-stretch text-[#475467] font-normal font-['Inter'] leading-[30px]"
                                                     dangerouslySetInnerHTML={{ __html: instructor?.bioData }}></div>
                                             </div>
@@ -486,18 +475,18 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                 </section>
 
-                <section className="border-b border-[#45a7c5] mt-8">
-                    <div className="w-[90%] mx-auto">
+                <section className="mt-8 border-b border-[#45a7c5]">
+                    <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
                         <div className="">
 
-                            <div className="grid grid-cols-6 gap-30">
-                                <div className='col-span-3'>
+                            <div className="grid grid-cols-1 gap-8 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,384px)] lg:gap-12">
+                                <div className="min-w-0">
                                     {
                                         coursesDetail?.data[0]?.attributes?.includes && <div className=" mt-8">
                                             <div className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 my-8">
                                                 {coursesDetail?.data[0]?.attributes?.includes.title}
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                                 {
                                                     coursesDetail?.data[0]?.attributes?.includes.list.length > 0 && coursesDetail?.data[0]?.attributes?.includes.list.map((list: any, index: number) => (
                                                         <div key={index}>
@@ -525,7 +514,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                     {coursesDetail?.data[0]?.attributes?.attend.title}
                                                 </div>
                                                 {
-                                                    coursesDetail?.data[0]?.attributes?.attend.list.length > 0 && <div className="grid grid-cols-3 gap-4">
+                                                    coursesDetail?.data[0]?.attributes?.attend.list.length > 0 && <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                                         {
                                                             coursesDetail?.data[0]?.attributes?.attend.list.map((list: any, index: number) => (
                                                                 <div className="text-center" key={index}>
@@ -543,9 +532,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                         }
                                     </div>
                                 </div>
-                                <div className='col-span-1'></div>
-                                <div className="py-8 col-span-2">
-                                    <div className="w-96 bg-white rounded-xl shadow-lg flex flex-col overflow-hidden">
+                                <div className="py-4 lg:py-8">
+                                    <div className="mx-auto flex w-full max-w-[384px] flex-col overflow-hidden rounded-xl bg-white shadow-lg">
 
 
                                         <div className="px-6 pt-6">
@@ -558,7 +546,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                             </div>
                                         </div>
 
-                                        <div className="px-6 pt-6 text-center flex flex-col gap-4">
+                                        <div className="flex flex-col gap-4 px-6 pt-6 text-center">
 
                                             <h3 className="text-lg font-semibold text-gray-900">
                                                 Explore Our Unlimited CPE Package
@@ -600,7 +588,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-4 gap-4 border-b border-[#e4e7ec] pb-14">
+                        <div className="grid grid-cols-1 gap-4 border-b border-[#e4e7ec] pb-14 sm:grid-cols-2 lg:grid-cols-4">
                             {
                                 relatedCourses.length > 0 && relatedCourses.map((course: any, index: number) => (
                                     <CourseCard course={course} key={index} />

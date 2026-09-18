@@ -80,8 +80,8 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
   };
 
   return (
-    <div className="w-full mt-10 pb-8 bg-white grid grid-cols-6 gap-2">
-      <div className="col-span-4 grid grid-cols-2 flex-col justify-start items-start gap-12 inline-flex w-full">
+    <div className="mt-6 grid w-full grid-cols-1 gap-8 bg-white pb-8 sm:mt-10 lg:grid-cols-6 lg:gap-2">
+      <div className="flex w-full flex-col items-start gap-8 lg:col-span-4 lg:gap-12">
         <div className="flex-col justify-start items-start gap-6 flex">
           <div className="self-stretch  flex-col justify-start items-start gap-4 flex">
             <div className="justify-start items-center gap-3 inline-flex">
@@ -112,7 +112,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                 </div>
               </div>
             </div>
-            <div className="self-stretch text-[#101828] text-3xl font-semibold font-['Inter'] leading-[38px]">
+            <div className="self-stretch text-2xl font-semibold leading-8 text-[#101828] sm:text-3xl sm:leading-[38px]">
               {courseData?.title}
             </div>
             <div className="pl-1 pr-2.5 py-1 rounded-full justify-start items-center gap-3 inline-flex">
@@ -125,17 +125,17 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
             </div>
           </div>
         </div>
-        <div className="relative self-stretch h-6 flex-col justify-start items-start gap-5 flex">
-          <div className="self-stretch h-6 flex-col justify-start items-start gap-8 flex">
-            <div className="self-stretch justify-start items-center gap-5 inline-flex">
+        <div className="relative w-full">
+          <div className="w-full">
+            <div className="flex w-full items-center gap-3 sm:gap-5">
               <div className="justify-start items-center gap-2 flex">
-                <div className="w-24 h-24 relative  overflow-hidden rounded-[50%]">
-                  <img
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full sm:h-16 sm:w-16">
+                  <img className="h-full w-full object-cover"
                     src={imageUrl + instructor?.image?.data?.attributes?.url}
                     alt=""
                   />
                 </div>
-                <div className="text-[#344054] text-base font-semibold font-['Inter'] leading-normal">
+                <div className="text-sm font-semibold leading-normal text-[#344054] sm:text-base">
                   {instructor?.firstName + " " + instructor?.lastName}
                 </div>
               </div>
@@ -145,14 +145,14 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
 
         <div className="self-stretch h-[30px]"></div>
       </div>
-      <div className="col-span-2 justify-start items-start gap-4 inline-flex">
-        <div className="h-[412px] w-full rounded-xl  shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] flex-col justify-start items-end flex overflow-hidden">
+      <div className="flex w-full items-start justify-start gap-4 lg:col-span-2">
+        <div className="flex min-h-[360px] w-full flex-col items-end overflow-hidden rounded-xl bg-white shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] sm:min-h-[412px]">
           <div className="w-full flex justify-between p-2">
-            <div className="self-stretch h-12 px-6 pt-8 flex-col justify-start items-start gap-5 flex">
+            <div className="self-stretch px-4 pt-5 sm:px-6 sm:pt-8">
               {courseData?.category?.data?.attributes?.title !== "Recorded" &&
                 courseData?.category?.data?.attributes?.title !== "eBook" && (
                   <div className="self-stretch h-7 flex-col justify-start items-start gap-1 flex">
-                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
+                    <div className="self-stretch text-base font-semibold leading-7 text-[#101828] sm:text-lg">
                       Available Date(s)
                     </div>
                   </div>
@@ -164,7 +164,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
               courseData?.category?.data?.attributes?.title !== "eBook" && (
                 <div className="self-stretch pt-2 flex-col justify-center items-end flex">
                   <div className="self-stretch pb-6 flex-col justify-start items-start flex"></div>
-                  <div className="self-stretch px-6 pb-6 justify-start items-center gap-3">
+                  <div className="self-stretch px-4 pb-5 sm:px-6 sm:pb-6">
                     <div className="w-full self-stretch flex-col justify-start items-start gap-5">
                       <div className="self-stretch flex-col justify-start items-start gap-4 flex">
                         <div className="h-6 flex-col justify-start items-start gap-[11px] flex">
@@ -204,9 +204,9 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
             <div className="self-stretch w-full bg-white rounded-xl pt-2 flex-col justify-start items-center flex overflow-hidden">
               {courseData?.category?.data?.attributes?.title !== "Recorded" &&
                 courseData?.category?.data?.attributes?.title !== "eBook" && (
-                  <div className="self-stretch h-[69px] px-6 pt-3 flex-col justify-start items-start gap-5 flex">
+                  <div className="self-stretch px-4 pt-3 sm:px-6">
                     <div className="self-stretch flex-col justify-start items-start gap-3 flex">
-                      <div className="self-stretch justify-center items-center gap-6 inline-flex">
+                      <div className="flex w-full items-center justify-center gap-4 sm:gap-6">
                         <div
                           onClick={() => setSeats(seats - 1)}
                           className="p-3 bg-white cursor-pointer rounded-lg  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#d0d5dd] justify-center items-center gap-2 flex overflow-hidden"
@@ -273,7 +273,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                   </div>
                 )}
 
-              <div className="flex justify-between items-center w-full">
+              <div className="flex w-full flex-col items-stretch gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <EnrollNowCart course={selectedCourse} quantity={seats} />
                 <AddToCart
                   course={selectedCourse}
@@ -282,17 +282,17 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                 />
               </div>
 
-              <div className="w-full px-[22px] py-4 rounded-[10px]  justify-center items-center gap-2.5 inline-flex overflow-hidden">
+              <div className="w-full px-4 py-4 text-center sm:px-[22px]">
                 <div className="px-0.5 justify-start items-center flex">
                   <div>
-                    <span className="text-[#475467] text-xl font-normal font-['Inter'] leading-[30px] mr-2">
+                    <span className="mr-2 text-base font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">
                       For Group Enrollments
                     </span>
                     <span className="text-[#18212f] text-xl font-['Inter'] leading-[30px]"></span>
                     <Link
                       href="/contact-us"
                       target="_blank"
-                      className="text-[#db6803] text-xl font-bold font-['Inter'] leading-[30px]"
+                      className="text-base font-bold leading-7 text-[#db6803] sm:text-xl sm:leading-[30px]"
                     >
                       Contact us
                     </Link>
