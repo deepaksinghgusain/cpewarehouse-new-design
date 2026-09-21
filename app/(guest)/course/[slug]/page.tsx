@@ -57,7 +57,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
         if (keywords) {
             keywords?.forEach((element: any) => {
                 const filteredResult = coursesArray?.filter((item: any) => {
-
                     return (item?.attributes?.title?.toString().toLowerCase().includes(element.toString().toLowerCase()))
                         && (item.attributes?.category?.data?.attributes?.title == courseCategory)
                 })
@@ -65,6 +64,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                 filteredResult?.forEach((element: any) => {
                     relatedCourses.push({
+                        id: element?.id,
                         attributes: {
                             'title': element?.attributes?.title,
                             'startDate': element?.attributes?.startDate,

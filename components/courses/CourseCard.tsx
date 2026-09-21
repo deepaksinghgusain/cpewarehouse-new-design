@@ -9,7 +9,7 @@ import AddToCart from './add-to-cart';
 
 const CourseCard = ({ course }: { course: any }) => {
 
-    // use toUserTZ when rendering dates
+    console.log('course', course)
 
     return (
         <div className="w-full">

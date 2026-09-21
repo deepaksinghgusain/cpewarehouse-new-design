@@ -364,21 +364,13 @@ function getCoursesGql(fortaxLaw: boolean, isActive: boolean) {
         filters : {
           isActive: { eq: ${isActive}}, 
           forTaxLaw: { eq: ${fortaxLaw} },
-            or:  [{
-                      and: [{
-                              endDate:   { gte:  "${currentDate}"}
-                              ,
-                              category: {
-                                  title: {eq: "Live"}
-                              }
-                          }]
+          and: [{
+                    endDate:   { gte:  "${currentDate}"
                     },
-                    {
-                        category: {
-                            title: {eq: "Live"}
-                        }
-                    }],
-  
+                    category: {
+                        title: {eq: "Live"}
+                    }
+                }]
          }
       )
     {
