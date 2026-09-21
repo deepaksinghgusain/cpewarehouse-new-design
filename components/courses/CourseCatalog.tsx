@@ -22,7 +22,6 @@ const CourseCatalog = () => {
         }
     )
 
-
     const [filterValue, setFilterValue] = useState<any>({})
 
     function setFilterValues(values: any) {
@@ -58,6 +57,8 @@ const CourseCatalog = () => {
                 freeCourse.push(element)
             }
         });
+
+        console.log('liveCourse', liveCourse)
 
         resCourse = await getAllCoursesForRecorded();
         selfStudy = resCourse.data

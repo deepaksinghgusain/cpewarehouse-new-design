@@ -160,6 +160,8 @@ export async function getAllCoursesForLive() {
 
   if (!data) return {};
 
+  console.log('data', data)
+
   return data?.courses;
 }
 
@@ -175,7 +177,7 @@ export async function getAllCoursesForRecorded() {
 }
 
 
-export async function getAllCourseForEbook(title?: any) {
+export async function getAllCourseForEbook() {
   const { data }: { data: any } = await client.query({
     query: getCourseBookTitleGql(true, true),
     fetchPolicy: "network-only",
@@ -824,24 +826,14 @@ function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
   return gql`query {
         courses(
             pagination: { limit: -1 },
-             sort: ["startDate:desc"],
+            sort: ["startDate:desc"],
             filters: {
             isActive: { eq: ${isActive} }
             forTaxLaw: { eq: ${fortaxLaw} }
-            or:  [{
-                      and: [{
-                              endDate:   { gte:  "${currentDate}"}
-                              ,
-                              category: {
-                                  title: {eq: "Live"}
-                              }
-                          }]
-                    },
-                    {
-                        category: {
-                            title: {ne: "Live"}
+            endDate:   { gte:  "${currentDate}"},
+            category: {
+                            title: {eq: "Live"}
                         }
-                    }],
             }
         ) {
             data {
@@ -917,7 +909,7 @@ function getCoursesRecordedTitleGql(fortaxLaw: boolean, isActive: boolean) {
       courses( 
         
         pagination: { limit: -1 }, 
-         sort: ["startDate:desc"],
+        sort: ["startDate:desc"],
         filters : {
           isActive: { eq: ${isActive}}, 
           forTaxLaw: { eq: ${fortaxLaw} },
