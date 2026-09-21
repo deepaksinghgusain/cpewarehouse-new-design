@@ -98,18 +98,18 @@ function CertificateCard({ data }: any) {
           {data?.course?.title}
         </td>
 
-        <td className="px-6 py-4 text-sm text-gray-600">
+        <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
           {data?.completedOn}
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-6 py-4 whitespace-nowrap">
           <span
-            className={`px-2 py-1 text-xs font-medium rounded-full border ${data?.course?.category === "Live"
+            className={`inline-block whitespace-nowrap px-2 py-1 text-xs font-medium rounded-full border ${data?.course?.category === "Live"
               ? "bg-blue-50 text-blue-700 border-blue-200"
               : "bg-pink-50 text-pink-700 border-pink-200"
               }`}
           >
-            {data?.category}
+            {data?.category === "Live" ? "Live Webinar" : data?.category === "Recorded" ? "Self-Study" : data?.category}
           </span>
         </td>
 
