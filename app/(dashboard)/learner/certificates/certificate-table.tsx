@@ -2,31 +2,19 @@
 
 import { GetUserSubscribedCourses } from "@/services/course"
 import { useEffect, useState } from "react"
-import jsPDF from "jspdf";
 import moment from "moment";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader } from "lucide-react";
+import { downloadCertificatePdf } from "@/lib/certificate";
 
 function CertificateCard({ data }: any) {
   const [err, setErr] = useState("");
   const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
   const [courseCompletedOn, setCourseCompletedOn] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user.user as any) || {};
-
-  const formatCompletedDate = (completedOn: string | null) => {
-    if (!completedOn) return "";
-    const date = new Date(completedOn);
-    if (Number.isNaN(date.getTime())) return "";
-
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "2-digit",
-      year: "numeric",
-    });
-  };
 
   const downloadCertificate = async () => {
 
@@ -41,47 +29,11 @@ function CertificateCard({ data }: any) {
         return;
       }
 
-      const templatePath = course?.certificateTemplate?.data?.attributes?.url;
-      if (!templatePath) {
-        setErr("Certificate template is not configured for this course.");
-        return;
-      }
-
-      const title = course?.title || "course";
-      const credit = String(course?.credit || "");
-      const medium = course?.medium || "";
-      const fieldStudy = course?.fieldOfStudy || "";
-      const program = course?.programNumber || "";
       const usernameFromStorage = localStorage.getItem("username") || "";
       const firstName = user?.firstName || "";
       const lastName = user?.lastName || "";
       const fullName = `${firstName} ${lastName}`.trim() || usernameFromStorage;
-      const datecompleted = formatCompletedDate(completedOn);
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-      const templateUrl = `${baseUrl}${templatePath}`;
-
-      const response = await fetch(templateUrl);
-      const templateHtml = await response.text();
-
-      let html = templateHtml
-        .replace(/{{username}}/g, fullName)
-        .replace(/{{course}}/g, title)
-        .replace(/{{credit}}/g, credit)
-        .replace(/{{medium}}/g, medium)
-        .replace(/{{fieldStudy}}/g, fieldStudy)
-        .replace(/{{completedOn}}/g, datecompleted)
-        .replace(/{{program}}/g, program);
-
-      if (usernameFromStorage) {
-        html = html.replace(/{{username_alt}}/g, usernameFromStorage);
-      }
-
-      const doc = new jsPDF('p', 'pt', [745, 745]);
-      doc.html(html, {
-        callback: function (pdfDoc: any) {
-          pdfDoc.save(`certificate_${title}.pdf`);
-        },
-      });
+      await downloadCertificatePdf(course, completedOn, fullName);
     } catch (error) {
       console.error("Certificate download failed", error);
       setErr("Unable to download certificate right now. Please try again.");
@@ -161,17 +113,13 @@ function CertificateCard({ data }: any) {
 
 export default function CertificateDataTable() {
   const [loading, setLoading] = useState(true)
-
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
-
   const [availableYears, setAvailableYears] = useState<any>([])
   const [certificates, setCertificates] = useState<any>([])
-
   const [filteredCertificates, setFilteredCertificates] = useState<any>([])
   const [itemsPerPage, setItemsPerPage] = useState(5)
   let [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
-  const user = useSelector((state: RootState) => state.user.user as any) || {};
 
   const getEventlist = async () => {
     setLoading(true)
@@ -180,6 +128,7 @@ export default function CertificateDataTable() {
     let selectedYear;
 
     let res = await GetUserSubscribedCourses(email)
+
 
     const coursesPurchased: any[] = [];
     res.data.forEach((element: any) => {
@@ -225,34 +174,29 @@ export default function CertificateDataTable() {
 
     setCertificates(certificates)
 
-    extractYears(); // Extract available years
-
-    // Select the latest year if availableYears has elements
-    if (availableYears.length > 0) {
-      selectedYear = availableYears[0];
-    } else {
-      selectedYear = new Date().getFullYear(); // Fallback to current year if no certificates
-    }
-
+    const years: number[] = extractYears(certificates);
+    selectedYear = years[0] || new Date().getFullYear();
     setSelectedYear(selectedYear)
-
-    filterCertificates(); // Initial filtering
     setLoading(false)
   }
 
-  const extractYears = () => {
-    let availableYears = Array.from(new Set(certificates.map((cert: any) => {
-      return new Date(cert.completedOn).getFullYear()
-    })));
-    availableYears.sort((a: any, b: any) => b - a);
+  const extractYears = (certificateList = certificates): number[] => {
+    const availableYears: number[] = Array.from(new Set(
+      certificateList
+        .filter((cert: any) => cert?.completedOn && !Number.isNaN(new Date(cert.completedOn).getTime()))
+        .map((cert: any) => new Date(cert.completedOn).getFullYear())
+    ));
+    availableYears.sort((a, b) => b - a);
 
     setAvailableYears(availableYears)
+    return availableYears;
   }
 
-  const filterCertificates = () => {
-    let filteredCertificates = certificates.filter((cert: any) => {
+  const filterCertificates = (certificateList = certificates, year = selectedYear) => {
+    let filteredCertificates = certificateList.filter((cert: any) => {
+      if (!cert?.completedOn || Number.isNaN(new Date(cert.completedOn).getTime())) return false;
       const certificateYear = moment(cert.completedOn).year();
-      return certificateYear === Number(selectedYear);
+      return certificateYear === Number(year);
     });
 
     setFilteredCertificates(filteredCertificates)
@@ -273,7 +217,11 @@ export default function CertificateDataTable() {
 
   useEffect(() => {
     getEventlist();
-  }, [certificates.length, filteredCertificates.length, selectedYear])
+  }, [])
+
+  useEffect(() => {
+    filterCertificates();
+  }, [certificates, selectedYear])
 
   return (
     <>

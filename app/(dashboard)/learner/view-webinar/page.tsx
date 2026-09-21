@@ -7,7 +7,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from 'react-icons/
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
-import { jsPDF } from 'jspdf';
+import { downloadCertificatePdf } from '@/lib/certificate';
 import { FinalExam } from '@/components/self-study/final-exam';
 import { ReviewExam } from '@/components/self-study/review-exam';
 import { VideoPlayer } from '@/components/self-study/video-player';
@@ -184,21 +184,10 @@ const ViewWebinar = () => {
         return null;
     };
 
-    const formatCompletedDate = (completedOn: string | null) => {
-        if (!completedOn) return "";
-        const date = new Date(completedOn);
-        if (Number.isNaN(date.getTime())) return "";
-
-        return date.toLocaleDateString("en-US", {
-            month: "long",
-            day: "2-digit",
-            year: "numeric",
-        });
-    };
-
     const downloadCertificate = async () => {
         setIsDownloadingCertificate(true);
         try {
+            await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
             const courseResult = await getUserCourse(slug);
             const course = courseResult?.course || selectedCourse;
             const completedOn = courseResult?.completedOn || courseCompletedOn;
@@ -208,44 +197,8 @@ const ViewWebinar = () => {
                 return;
             }
 
-            const templatePath = course?.certificateTemplate?.data?.attributes?.url;
-            if (!templatePath) {
-                setErr("Certificate template is not configured for this course.");
-                return;
-            }
-
-            const title = course?.title || "course";
-            const credit = String(course?.credit || "");
-            const medium = course?.medium || "";
-            const fieldStudy = course?.fieldOfStudy || "";
-            const program = course?.programNumber || "";
             const usernameFromStorage = localStorage.getItem("username") || "";
-            const datecompleted = formatCompletedDate(completedOn);
-            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-            const templateUrl = `${baseUrl}${templatePath}`;
-
-            const response = await fetch(templateUrl);
-            const templateHtml = await response.text();
-
-            let html = templateHtml
-                .replace(/{{username}}/g, usernameFromStorage)
-                .replace(/{{course}}/g, title)
-                .replace(/{{credit}}/g, credit)
-                .replace(/{{medium}}/g, medium)
-                .replace(/{{fieldStudy}}/g, fieldStudy)
-                .replace(/{{completedOn}}/g, datecompleted)
-                .replace(/{{program}}/g, program);
-
-            if (usernameFromStorage) {
-                html = html.replace(/{{username_alt}}/g, usernameFromStorage);
-            }
-
-            const doc = new jsPDF('p', 'pt', [745, 745]);
-            doc.html(html, {
-                callback: function (pdfDoc: any) {
-                    pdfDoc.save(`certificate_${title}.pdf`);
-                },
-            });
+            await downloadCertificatePdf(course, completedOn, usernameFromStorage);
         } catch (error) {
             console.error("Certificate download failed", error);
             setErr("Unable to download certificate right now. Please try again.");
@@ -419,7 +372,7 @@ const ViewWebinar = () => {
                                     <div className="h-full rounded-xl bg-black/80 p-0.5">
                                         <div className="grid h-full grid-cols-1">
                                             <div className="relative overflow-hidden bg-slate-900 p-4">
-                                                {playbackSource.src && (
+                                                {playbackSource.src && !isDownloadingCertificate && (
                                                     <VideoPlayer
                                                         key={`${slug}-${lastVideoViewed}`}
                                                         ref={videoRef}
