@@ -693,6 +693,47 @@ function getCoursesDetail(slug: string) {
           discount
           videoUrl
           webinarId
+
+          course_outline_header {
+            title
+            description
+          }
+
+          Accreditedpartners {
+          id
+          title
+          description
+          bg_image {
+            data {
+              attributes {
+                url
+              }
+            }
+          }
+          list {
+            image {
+              data {
+                attributes {
+                  url
+                }
+              }
+            }
+          }
+        }
+
+        sponsorship {
+          id
+          title
+          description
+          list {
+            value
+          }
+
+          features {
+            value
+          }
+        }
+
           image {
             data  
             { 

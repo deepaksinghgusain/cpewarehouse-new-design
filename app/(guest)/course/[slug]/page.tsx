@@ -4,7 +4,6 @@ import { imageUrl } from '@/lib/constants';
 import { getAllCourses, getCourseDetailPage, getcoursesBySlug } from '@/services/course';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import CourseCard from '@/components/courses/CourseCard';
-import { getPageContent } from '@/services/common';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AddToCardComponent from './add-to-cart';
 
@@ -16,11 +15,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
     let apiSection: any;
     let backGroundImageUrl: any;
     let relatedBlock: any;
-    let accreditedPartners: any;
-    let sponsorship: any;
     let relatedCourses: any = [];
-
-    let seats = 1;
 
     let res = await getCourseDetailPage()
 
@@ -40,13 +35,10 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
     let creditAndInfo = courseTabs?.find((item: any) => item?.index === "Other") || {};
     let keywords = courseData?.keywords === null ? '' : courseData?.keywords?.split(',') || '';
     let courseCategory = coursesDetail?.data[0]?.attributes?.category?.data?.attributes?.title;
+    let accreditedPartners = coursesDetail?.data[0]?.attributes?.Accreditedpartners;
+    let sponsorship = coursesDetail?.data[0]?.attributes?.sponsorship;
+    let courseOutlineHeader = coursesDetail?.data[0]?.attributes?.course_outline_header;
 
-    res = await getPageContent('course-detail');
-
-    if (res) {
-        accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
-        sponsorship = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.sponsorship')[0];
-    }
 
     const allCourses = await getAllCourses();
 
@@ -116,8 +108,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                             <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
                                                 <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
                                                     <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">About this
-                                                            course</div>
+                                                        <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]" dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.title }} ></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -127,7 +118,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                 <div className="self-stretch flex-col justify-start items-start gap-5 flex">
                                                     <div className="self-stretch flex-col justify-start items-center gap-2 flex">
                                                         <div className="self-stretch text-[#475467] font-normal font-['Inter'] leading-[30px]"
-                                                            dangerouslySetInnerHTML={{ __html: courseData?.shortDesc }} ></div>
+                                                            dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.description }} ></div>
                                                     </div>
                                                 </div>
                                             </div>

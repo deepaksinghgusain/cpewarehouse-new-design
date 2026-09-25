@@ -95,9 +95,12 @@ export async function downloadCertificatePdf(
 
   const doc = new jsPDF("p", "pt", [745, 745]);
   await new Promise<void>((resolve) => {
+    const timeoutId = window.setTimeout(resolve, 20000);
+
     doc.html(html, {
       html2canvas: { useCORS: true, allowTaint: false, imageTimeout: 15000 },
       callback: (pdfDoc) => {
+        window.clearTimeout(timeoutId);
         pdfDoc.save(`certificate_${title}.pdf`);
         resolve();
       },
