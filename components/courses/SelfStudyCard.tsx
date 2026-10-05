@@ -184,9 +184,6 @@ const SelfStudyCard = ({ courses, filterValue }: { courses: any, filterValue: an
                                         <AddToCart course={course} quantity={1} />
                                     </div>
                                 </div>
-                                <div className="add-to-card mt-4 flex flex-col items-center gap-2 overflow-hidden px-2 pb-3">
-                                    <img className="max-w-full" src="/assets/images/bar-code-image.png" alt="" />
-                                </div>
                             </div>
                         )) : <div>No Record</div>
                     }
