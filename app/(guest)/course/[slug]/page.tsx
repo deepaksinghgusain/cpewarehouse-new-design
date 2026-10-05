@@ -108,7 +108,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                             <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
                                                 <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
                                                     <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]" dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.title }} ></div>
+                                                        <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]" dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.title || "" }} ></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -118,7 +118,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                 <div className="self-stretch flex-col justify-start items-start gap-5 flex">
                                                     <div className="self-stretch flex-col justify-start items-center gap-2 flex">
                                                         <div className="self-stretch text-[#475467] font-normal font-['Inter'] leading-[30px]"
-                                                            dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.description }} ></div>
+                                                            dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.description || "" }} ></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -227,12 +227,12 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                             <div className="flex flex-col items-start gap-8 lg:flex-row">
                                                 <div className="w-full py-5 lg:w-2/3">
                                                     <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
-                                                        {sponsorship.title}</div>
+                                                        {sponsorship?.title}</div>
                                                     <div className="w-full px-1">
                                                         <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
 
                                                             {
-                                                                sponsorship.list.length > 0 && sponsorship.list.map((list: any, index: number) => (
+                                                                sponsorship?.list.length > 0 && sponsorship?.list.map((list: any, index: number) => (
                                                                     <div className="min-w-0 px-1 pt-4 sm:px-4 sm:pt-6" key={index}>
                                                                         <div className="flex items-start gap-3">
                                                                             <div className="h-7 w-7 shrink-0 rounded-full">
@@ -248,7 +248,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                                             </div>
                                                                             <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
                                                                                 <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
-                                                                                    {list.value}</div>
+                                                                                    {list?.value}</div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -260,11 +260,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                     <div className="w-full py-6">
                                                         <div className="w-full">
                                                             <div className="w-full text-base font-normal leading-7 text-[#475467] sm:text-lg">
-                                                                {sponsorship.description}</div>
+                                                                {sponsorship?.description}</div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {sponsorship.features.length > 0 &&
+                                                {sponsorship?.features?.length > 0 &&
                                                     <div className="w-full px-0 lg:w-1/3 lg:px-8">
                                                         <div className="self-stretch justify-center items-start gap-8 inline-flex">
                                                             <div className="flex w-full flex-col items-start rounded-2xl border border-[#e4e7ec] bg-white shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]">
@@ -272,7 +272,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                                             <div className="flex w-full flex-col items-start gap-4">
 
                                                                         {
-                                                                            sponsorship.features.map((list: any, index: number) => (
+                                                                            sponsorship?.features?.map((list: any, index: number) => (
                                                                                 <div className="flex w-full items-start gap-3" key={index}>
                                                                                     <div className="relative h-6 w-6 shrink-0 rounded-full bg-[#dbf9e6]">
                                                                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -289,7 +289,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                                                     </div>
                                                                                     <div className="min-w-0 flex-1">
                                                                                         <div className="text-base font-semibold leading-7 text-[#344054] sm:text-lg">2 hours
-                                                                                            {list.value}
+                                                                                            {list?.value}
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
