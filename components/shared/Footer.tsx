@@ -16,6 +16,8 @@ export const Footer = () => {
   const getFooterData = async () => {
     const response: any = await getCommonData()
 
+    console.log("footer data", response)
+
     if (response) {
       setFooterTop(response.data.attributes.footer_top)
       setFooterMiddle(response.data.attributes.footer_middle)

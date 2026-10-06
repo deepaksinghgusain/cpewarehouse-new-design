@@ -71,9 +71,9 @@ const LearnerNavBar = () => {
                 </div>
 
                 <div className="px-3 py-2 rounded-md flex items-center gap-2">
-                    <span className="text-base font-semibold text-gray-600">
+                    <Link href="/course-catalog?tab=self" className="text-base font-semibold text-gray-600">
                         Self-Study
-                    </span>
+                    </Link>
                 </div>
 
                 {/* <div className="px-3 py-2 rounded-md flex items-center gap-2">

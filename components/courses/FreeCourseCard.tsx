@@ -166,7 +166,7 @@ const FreeCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                         </div>
 
                                     </div>
-                                    <div className="flex min-h-24 flex-col items-start gap-2 max-[500px]:min-h-20 sm:min-h-56">
+                                    <div className="flex min-h-24 flex-col items-start gap-2 max-[500px]:min-h-20 sm:min-h-32">
                                         <Link href={`/course/${course.attributes?.slug}`}>
                                             <div className="self-stretch text-base font-semibold leading-6 text-[#101828] sm:text-lg sm:leading-7">{course.attributes?.title}</div>
                                         </Link>

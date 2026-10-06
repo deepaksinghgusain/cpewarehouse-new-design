@@ -125,7 +125,7 @@ const EbookCard = ({ courses, filterValue }: { courses: any, filterValue: any })
                                     </div>
                                 </div>
 
-                                <div className="mt-2 flex min-h-24 flex-col items-start gap-3 px-3 pb-4 sm:mt-4 sm:min-h-56 sm:gap-[18px] sm:px-5 sm:pb-6">
+                                <div className="mt-2 flex min-h-24 flex-col items-start gap-3 px-3 pb-4 sm:mt-4 sm:min-h-32 sm:gap-[18px] sm:px-5 sm:pb-6">
                                     <div className="flex w-full flex-wrap items-start justify-start gap-2">
 
                                         <div

@@ -13,9 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default async function page() {
-  const res: any = await getHomePageSection()
-
-  const homepagefacultymembers = await getInstructorsForHome()
+  const [res, homepagefacultymembers]: [any, any] = await Promise.all([
+    getHomePageSection(),
+    getInstructorsForHome(),
+  ])
 
   let partners: any;
   let latestnews: any;

@@ -6,17 +6,30 @@ import { ToastContainer } from 'react-toastify';
 import CookieConsent from '@/components/shared/CookieConsent';
 
 import { Inter } from 'next/font/google';
+import { getCommonData } from "@/services/common";
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: {
-    template: '%s | CPEWarehouse',
-    default: 'CPEWarehouse',
-  },
-  description: 'The official Next.js Course Dashboard',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL as string),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const response: any = await getCommonData()
+
+  let logo = `${process.env.NEXT_PUBLIC_IMAGE_END_POINT}` + response?.data?.attributes?.headerLogo?.data?.attributes?.url;
+
+  return {
+    title: "CPE Warehouse",
+
+    icons: {
+      icon: logo
+        ? [
+          {
+            url: logo,
+            type: "image/png",
+          },
+        ]
+        : "/favicon.ico",
+    },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -33,8 +46,8 @@ export default function RootLayout({
           </>
         </ApolloWrapper>
 
-        <ToastContainer 
-          position="top-center" 
+        <ToastContainer
+          position="top-center"
           autoClose={3000}
           className="custom-toast-container"
           toastClassName="custom-toast" />

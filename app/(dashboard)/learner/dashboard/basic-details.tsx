@@ -564,12 +564,12 @@ const BasicDetails = () => {
             d.attributes?.user?.data?.attributes?.email === email
         );
 
-       if(subscriptions.length === 0) {
-           setSubscriptionExpiredDate("");
-           setIsSubscriptionRenewalDue(false);
-           setIsSubscriptionExpired(true);
-           return;
-       }
+        if (subscriptions.length === 0) {
+            setSubscriptionExpiredDate("");
+            setIsSubscriptionRenewalDue(false);
+            setIsSubscriptionExpired(true);
+            return;
+        }
 
         const today = new Date();
         const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -583,7 +583,7 @@ const BasicDetails = () => {
         }).filter((endDate: Date | null): endDate is Date => endDate !== null);
 
         const latestActiveEndDate = activeSubscriptionEndDates.length > 0
-            ? new Date(Math.max(...activeSubscriptionEndDates.map((endDate : any) => endDate.getTime())))
+            ? new Date(Math.max(...activeSubscriptionEndDates.map((endDate: any) => endDate.getTime())))
             : null;
 
         if (latestActiveEndDate) {
@@ -1024,10 +1024,35 @@ const BasicDetails = () => {
                 {/* Tabs */}
                 <div className="borde-b border-gray-200  text-lg font-semibold w-full">
                     <Tabs defaultValue="registered-event" className=" bg-transparent w-full">
-                        <TabsList variant="line" className='ml-0 w-full max-w-full justify-start overflow-x-auto bg-transparent border-b border-gray-200 lg:ml-24 lg:w-[400px]'>
-                            <TabsTrigger value="registered-event" className="text-xl  font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Registered Event(s)</TabsTrigger>
-                            <TabsTrigger value="past-event" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Past Event(s)</TabsTrigger>
-                            <TabsTrigger value="recommended-events" className="text-xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500">Recommended Events</TabsTrigger>
+                        <TabsList variant="line" className='ml-0 w-full max-w-full justify-start overflow-x-auto bg-transparent border-b border-gray-200'>
+                            <TabsTrigger
+                                value="registered-event"
+                                className="relative text-[14px] font-bold cursor-pointer font-['Inter'] leading-loose pb-2
+                                    hover:text-blue-500 
+                                    data-[state=active]:text-blue-500 
+                                    after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom after:scale-x-0 after:transition-transform after:duration-300
+                                    hover:after:scale-x-100 hover:after:bg-blue-500
+                                    data-[state=active]:after:scale-x-100 data-[state=active]:after:bg-blue-500"
+                            >
+                                Registered Event(s)
+                            </TabsTrigger>
+                            <TabsTrigger value="past-event"
+                                className="relative text-[14px] font-bold cursor-pointer font-['Inter'] leading-loose pb-2
+                                    hover:text-blue-500 
+                                    data-[state=active]:text-blue-500 
+                                    after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom after:scale-x-0 after:transition-transform after:duration-300
+                                    hover:after:scale-x-100 hover:after:bg-blue-500
+                                    data-[state=active]:after:scale-x-100 data-[state=active]:after:bg-blue-500"
+                            >Past Event(s)</TabsTrigger>
+                            <TabsTrigger 
+                                value="recommended-events" 
+                                className="relative text-[14px] font-bold cursor-pointer font-['Inter'] leading-loose pb-2
+                                    hover:text-blue-500 
+                                    data-[state=active]:text-blue-500 
+                                    after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom after:scale-x-0 after:transition-transform after:duration-300
+                                    hover:after:scale-x-100 hover:after:bg-blue-500
+                                    data-[state=active]:after:scale-x-100 data-[state=active]:after:bg-blue-500"
+                            >Recommended Events</TabsTrigger>
                         </TabsList>
                         <TabsContent value="registered-event">
                             <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
