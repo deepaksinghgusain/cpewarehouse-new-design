@@ -487,6 +487,7 @@ const BasicDetails = () => {
     const [mounted, setMounted] = useState(false)
     const [isPageLoading, setIsPageLoading] = useState(true)
     const user = useSelector((state: RootState) => state.user.user as any) || {};
+    
     let [certificates, setCertificates] = useState<any>([]);
     let [totalCreditEarned, settTotalCreditEarned] = useState(0);
     let [availableYears, setAvailableYears] = useState<number[]>([]);
@@ -495,17 +496,23 @@ const BasicDetails = () => {
     let [regEvent, setRegEvent] = useState([]);
     let [upcommingEvent, setUpcommingEvent] = useState([]);
     let [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+
     const [isSubscriptionExpired, setIsSubscriptionExpired] = useState(false);
     const [subscriptionExpiredDate, setSubscriptionExpiredDate] = useState("");
     const [isSubscriptionRenewalDue, setIsSubscriptionRenewalDue] = useState(false);
-    const registeredEventsForSelectedYear = regEvent.filter((event: any) => {
-        const eventDate = new Date(event.startDate);
-        return !Number.isNaN(eventDate.getTime()) && eventDate.getFullYear() === selectedYear;
-    });
-    const pastEventsForSelectedYear = pastEvents.filter((event: any) => {
-        const eventDate = new Date(event.startDate);
-        return !Number.isNaN(eventDate.getTime()) && eventDate.getFullYear() === selectedYear;
-    });
+
+    const getEventYear = (date?: string) => {
+        const eventDate = toUserTZ(date);
+        return eventDate?.isValid() ? eventDate.year() : null;
+    };
+
+    const registeredEventsForSelectedYear = regEvent.filter((event: any) =>
+        getEventYear(event.startDate) === selectedYear
+    );
+
+    const pastEventsForSelectedYear = pastEvents.filter((event: any) =>
+        getEventYear(event.startDate) === selectedYear
+    );
 
     const gotowebinar = (webinarId?: string, joinUrl?: string) => {
         const webinarLink = joinUrl || (webinarId ? `https://global.gotowebinar.com/join/${webinarId}` : "");
@@ -528,7 +535,6 @@ const BasicDetails = () => {
             params.append('slug', slug);
         }
 
-        // Add image if provided
         if (eventImage) {
             const absoluteImageUrl = eventImage.startsWith("http") ? eventImage : `${imageUrl}${eventImage}`;
             params.append('image', absoluteImageUrl);
@@ -616,6 +622,7 @@ const BasicDetails = () => {
         let res = await GetUserSubscribedCourses(email);
 
         const fieldCreditMapByYear: { [year: number]: Map<string, number> } = {};
+        const eventYears = new Set<number>();
 
         const subscribedCourseIds: number[] = [];
 
@@ -628,24 +635,25 @@ const BasicDetails = () => {
             }
 
             if (course !== undefined) {
-                if (course != undefined) {
-                    coursesPurchased.push({
-                        'course': course,
-                        'startDate': course?.startDate,
-                        'image': course?.image?.data?.attributes?.url,
-                        'category': course?.category?.data?.attributes?.title,
-                        'instructors': course?.instructors?.data?.[0]?.attributes,
-                        'webinarId': course?.webinarId || '',
-                        'joinUrl': usercourse?.joinUrl,
-                        'status': usercourse?.status,
-                        'completedOn': usercourse?.completedOn,
-                        'watchRecording': course?.category?.data?.attributes?.title.toLowerCase() == 'recorded',
-                        'purchasedOn': usercourse?.purchasedOn,
-                        'courseType': course?.category?.data?.attributes?.title.toLowerCase() == 'recorded'
-                            ? 'Self-Study'
-                            : 'Live Webinar' // Determine course type
-                    })
-                }
+                const eventYear = getEventYear(course?.startDate);
+                if (eventYear !== null) eventYears.add(eventYear);
+
+                coursesPurchased.push({
+                    'course': course,
+                    'startDate': course?.startDate,
+                    'image': course?.image?.data?.attributes?.url,
+                    'category': course?.category?.data?.attributes?.title,
+                    'instructors': course?.instructors?.data?.[0]?.attributes,
+                    'webinarId': course?.webinarId || '',
+                    'joinUrl': usercourse?.joinUrl,
+                    'status': usercourse?.status,
+                    'completedOn': usercourse?.completedOn,
+                    'watchRecording': course?.category?.data?.attributes?.title.toLowerCase() == 'recorded',
+                    'purchasedOn': usercourse?.purchasedOn,
+                    'courseType': course?.category?.data?.attributes?.title.toLowerCase() == 'recorded'
+                        ? 'Self-Study'
+                        : 'Live Webinar' // Determine course type
+                })
 
 
                 let creditValue = parseFloat(course?.credit) || 0;
@@ -672,16 +680,6 @@ const BasicDetails = () => {
 
         regEvent = coursesPurchased;
 
-        // regEvent.sort((a: any, b: any) => {
-        //     if (a.courseType === 'Live Webinar' && b.courseType !== 'Live Webinar') {
-        //         return -1;
-        //     }
-        //     if (a.courseType !== 'Live Webinar' && b.courseType === 'Live Webinar') {
-        //         return 1;
-        //     }
-        //     return (Date.parse(a.startDate) < Date.parse(b.startDate)) ? -1 : 1;
-        // });
-
         setRegEvent(regEvent);
 
         let pastEvents = coursesPurchased.filter((element: any) => (element.category.toLowerCase() === "live")
@@ -692,10 +690,20 @@ const BasicDetails = () => {
 
         setPastEvents(pastEvents)
 
-        availableYears = Object.keys(fieldCreditMapByYear).map(Number).sort((a, b) => b - a);
+        availableYears = [...new Set([
+            ...Object.keys(fieldCreditMapByYear).map(Number),
+            ...eventYears,
+        ])].sort((a, b) => b - a);
         setAvailableYears(availableYears);
 
-        const initialYear = availableYears.length > 0 ? availableYears[0] : new Date().getFullYear();
+        const currentYear = new Date().getFullYear();
+        const sortedEventYears = [...eventYears].sort((a, b) => a - b);
+        const initialYear = eventYears.has(currentYear)
+            ? currentYear
+            : sortedEventYears.find((year) => year >= currentYear)
+                ?? sortedEventYears[sortedEventYears.length - 1]
+                ?? availableYears[0]
+                ?? currentYear;
         setSelectedYear(initialYear);
 
         const nextCertificatesByYear: { [year: number]: { fieldOfStudy: string, credit: number }[] } = {};
@@ -727,7 +735,7 @@ const BasicDetails = () => {
         };
 
         loadDashboardData();
-    }, [])
+    }, []);
 
     if (isPageLoading) {
         return (
@@ -1044,8 +1052,8 @@ const BasicDetails = () => {
                                     hover:after:scale-x-100 hover:after:bg-blue-500
                                     data-[state=active]:after:scale-x-100 data-[state=active]:after:bg-blue-500"
                             >Past Event(s)</TabsTrigger>
-                            <TabsTrigger 
-                                value="recommended-events" 
+                            <TabsTrigger
+                                value="recommended-events"
                                 className="relative text-[14px] font-bold cursor-pointer font-['Inter'] leading-loose pb-2
                                     hover:text-blue-500 
                                     data-[state=active]:text-blue-500 

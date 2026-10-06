@@ -579,12 +579,6 @@ const CheckoutPage = () => {
                 },
             };
 
-
-            console.log('ORDER DATA', orderData);
-            console.log('lengthOfCartItems', lengthOfCartItems);
-            console.log('freeEvents', freeEvents);
-            console.log('checkoutData', checkoutData);
-
             // PAID EVENTS
             if (lengthOfCartItems !== freeEvents) {
 
@@ -642,8 +636,10 @@ const CheckoutPage = () => {
                     const eventData = {
                         type: 'payment_intent.succeeded',
                         data: {
+                            price: finalPrice,
                             object: {
                                 id: uniqueStripeId,
+                                
                             },
                         },
                     };
