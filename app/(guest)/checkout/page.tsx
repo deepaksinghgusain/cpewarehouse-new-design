@@ -13,6 +13,7 @@ import { Minus, Plus, Trash2 } from 'lucide-react'
 import { imageUrl as imageUrlConstant } from '@/lib/constants'
 import { addOrderApi, applyCouponApi, getCheckoutUrl, updateOrderStatus } from '@/services/cart';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 
 const CheckoutPage = () => {
     const [mounted, setMounted] = useState(false)
@@ -63,6 +64,8 @@ const CheckoutPage = () => {
 
     const displayedTotal = couponRes ? Number(finalPrice) : Number(cart?.total ?? subtotal);
     const couponLabel = couponType === 'amountOff' ? `- $ ${Number(couponValueOFF ?? 0).toFixed(2)}` : couponType === 'percentOff' ? `- ${Number(couponValueOFF ?? 0)}%` : '';
+
+    const router = useRouter();
 
     React.useEffect(() => {
         const itemsArr = cart.items || [];
@@ -577,6 +580,11 @@ const CheckoutPage = () => {
             };
 
 
+            console.log('ORDER DATA', orderData);
+            console.log('lengthOfCartItems', lengthOfCartItems);
+            console.log('freeEvents', freeEvents);
+            console.log('checkoutData', checkoutData);
+
             // PAID EVENTS
             if (lengthOfCartItems !== freeEvents) {
 
@@ -615,16 +623,13 @@ const CheckoutPage = () => {
             } else {
 
                 // FREE EVENT FLOW
-                const uniqueStripeId =
-                    Date.now().toString();
+                const uniqueStripeId = Date.now().toString();
 
                 orderData.data.orderStatus = 'succeeded';
 
-                orderData.data.stripeOrderId =
-                    uniqueStripeId;
+                orderData.data.stripeOrderId = uniqueStripeId;
 
                 let od: any = await addOrderApi(orderData);
-
 
                 if (
                     od &&
@@ -643,14 +648,10 @@ const CheckoutPage = () => {
                         },
                     };
 
-                    let res =
-                        await updateOrderStatus(eventData);
+                    let res = await updateOrderStatus(eventData);
 
                     if (res) {
-
-                        window.location.href = '/success';
-
-                        window.location.reload();
+                        router.push(`/success?orderId=${res.id}`);
                     }
                 }
             }

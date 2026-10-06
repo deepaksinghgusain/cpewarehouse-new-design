@@ -70,7 +70,7 @@ function getOrdersBySeesionIdGql(sessionId: string) {
 }
 
 
-const SuccessMessage = ({ session_id }: { session_id: any }) => {
+const SuccessMessage = ({ session_id, orderFreeId }: { session_id: any; orderFreeId: any }) => {
 
     const [orderId, setOrderId] = useState("")
     const dispatch = useDispatch();
@@ -104,7 +104,12 @@ const SuccessMessage = ({ session_id }: { session_id: any }) => {
     }
 
     useEffect(() => {
-        getOrderDetail()
+        if (session_id) {
+            getOrderDetail()
+        } else {
+            dispatch(clearCartRequest())
+            localStorage.removeItem("cartId")
+        }
     }, [session_id])
 
     return (
@@ -141,7 +146,7 @@ const SuccessMessage = ({ session_id }: { session_id: any }) => {
                 {/* Order Info */}
                 <div className="mt-8 rounded-lg bg-gray-100 p-4 flex justify-between items-center">
                     <p className="text-sm text-gray-500">Order Number</p>
-                    <p className="text-lg font-semibold">{orderId}</p>
+                    <p className="text-lg font-semibold">{orderId || orderFreeId}</p>
                 </div>
 
                 {/* Buttons */}

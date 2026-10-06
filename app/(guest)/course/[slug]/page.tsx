@@ -53,7 +53,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                         && (item.attributes?.category?.data?.attributes?.title == courseCategory)
                 })
 
-
                 filteredResult?.forEach((element: any) => {
                     relatedCourses.push({
                         id: element?.id,
@@ -87,7 +86,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
         return (
             <>
                 <section className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
-                    <AddToCardComponent courseData={{...courseData, id: courseId}} instructor={instructor} />
+                    <AddToCardComponent courseData={{ ...courseData, id: courseId }} instructor={instructor} />
                 </section >
 
                 <section className="mt-10 sm:mt-20">
@@ -268,8 +267,8 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                     <div className="w-full px-0 lg:w-1/3 lg:px-8">
                                                         <div className="self-stretch justify-center items-start gap-8 inline-flex">
                                                             <div className="flex w-full flex-col items-start rounded-2xl border border-[#e4e7ec] bg-white shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]">
-                                                                        <div className="w-full px-5 py-6 sm:px-8 sm:py-8">
-                                                                            <div className="flex w-full flex-col items-start gap-4">
+                                                                <div className="w-full px-5 py-6 sm:px-8 sm:py-8">
+                                                                    <div className="flex w-full flex-col items-start gap-4">
 
                                                                         {
                                                                             sponsorship?.features?.map((list: any, index: number) => (
