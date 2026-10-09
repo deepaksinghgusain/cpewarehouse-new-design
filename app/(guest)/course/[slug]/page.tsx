@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import CourseCard from '@/components/courses/CourseCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AddToCardComponent from './add-to-cart';
+import Link from 'next/link';
 
 const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
 
@@ -93,11 +94,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                         className="mx-auto flex w-[calc(100%-1rem)] flex-col items-start gap-2 self-stretch border-b border-[#dee1e9] sm:w-[90%]">
                         <Tabs defaultValue="Course Outline" className="w-full bg-transparent border-b border-[#dee1e9]">
                             <TabsList variant="line" className='w-full justify-start overflow-x-auto bg-transparent border-b border-[#dee1e9] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
-                                <TabsTrigger value="Course Outline" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">Course Outline</TabsTrigger>
-                                <TabsTrigger value="CPE Info" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">CPE Info</TabsTrigger>
-                                <TabsTrigger value="FAQ" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">FAQ</TabsTrigger>
-                                <TabsTrigger value="Review" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">Review</TabsTrigger>
-                                <TabsTrigger value="Faculty" className="shrink-0 px-3 text-sm font-bold leading-loose sm:px-4 sm:text-2xl">Faculty</TabsTrigger>
+                                <TabsTrigger value="Course Outline" className="shrink-0 px-3 text-sm font-semibold leading-loose sm:px-4 sm:text-2xl">Course Outline</TabsTrigger>
+                                <TabsTrigger value="CPE Info" className="shrink-0 px-3 text-sm font-semibold leading-loose sm:px-4 sm:text-2xl">CPE Info</TabsTrigger>
+                                <TabsTrigger value="FAQ" className="shrink-0 px-3 text-sm font-semibold leading-loose sm:px-4 sm:text-2xl">FAQ</TabsTrigger>
+                                <TabsTrigger value="Review" className="shrink-0 px-3 text-sm font-semibold leading-loose sm:px-4 sm:text-2xl">Review</TabsTrigger>
+                                <TabsTrigger value="Faculty" className="shrink-0 px-3 text-sm font-semibold leading-loose sm:px-4 sm:text-2xl">Faculty</TabsTrigger>
                             </TabsList>
                             <TabsContent value="Course Outline">
                                 <div className="">
@@ -306,11 +307,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 </section>
                             </TabsContent>
                             <TabsContent value="FAQ">
-                                <div className="">
+                                <div className="w-full">
                                     <div
                                         className="w-full overflow-hidden bg-Colors-Background-bg-primary px-0 py-12 text-[#475467] sm:px-8 sm:py-24">
                                         <div className="w-full">
-                                            <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
+                                            <div className="w-full flex-1 inline-flex flex-col justify-start items-start gap-8">
                                                 <div className="w-full flex flex-col justify-start items-start gap-5">
                                                     <div className="self-stretch flex flex-col justify-start items-start gap-3">
                                                         <div
@@ -319,27 +320,27 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                         </div>
                                                     </div>
                                                     {
-                                                        coursesDetail?.data[0]?.attributes?.faqs?.description && <div className="self-stretch justify-start"><span
+                                                        coursesDetail?.data[0]?.attributes?.faqs?.description && <div className=" justify-start"><div
                                                             className="text-Colors-Text-text-tertiary-(600) text-lg font-normal font-['Inter'] leading-7"
-                                                            dangerouslySetInnerHTML={{ __html: coursesDetail?.data[0]?.attributes?.faqs?.description }}></span></div>
+                                                            dangerouslySetInnerHTML={{ __html: coursesDetail?.data[0]?.attributes?.faqs?.description }}></div></div>
                                                     }
 
                                                 </div>
-                                                <div className="self-stretch min-w-80 flex flex-col justify-start items-center">
+                                                <div className="self-stretch flex flex-col justify-start items-center w-full">
                                                     <div className="self-stretch inline-flex justify-start items-start gap-6">
 
                                                         <Accordion
                                                             type="single"
                                                             collapsible
                                                             defaultValue="shipping"
-                                                            className="w-full max-w-lg"
+                                                            className="w-full"
                                                         >
                                                             {
                                                                 coursesDetail?.data[0]?.attributes?.faqs?.list.length > 0 && coursesDetail?.data[0]?.attributes?.faqs?.list.map((faq: any, index: number) => (
                                                                     <AccordionItem value={faq?.question} key={index}>
-                                                                        <AccordionTrigger>{faq?.question}</AccordionTrigger>
+                                                                        <AccordionTrigger className="flex w-full min-w-0 items-center justify-between">{faq?.question}</AccordionTrigger>
                                                                         <AccordionContent>
-                                                                            {faq?.answer}
+                                                                            <div dangerouslySetInnerHTML={{ __html: faq?.answer }}></div>
                                                                         </AccordionContent>
                                                                     </AccordionItem>
                                                                 ))}
@@ -538,9 +539,9 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                         </div>
 
                                         <div className="px-6 py-8">
-                                            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-full transition">
+                                            <Link href="/package/cpe-warehouse-annual-live-webinar-pass" className="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-full transition">
                                                 Explore now
-                                            </button>
+                                            </Link>
                                         </div>
 
                                     </div>

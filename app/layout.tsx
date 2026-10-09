@@ -7,6 +7,7 @@ import CookieConsent from '@/components/shared/CookieConsent';
 
 import { Inter } from 'next/font/google';
 import { getCommonData } from "@/services/common";
+import DisableDevTools from "@/components/shared/DisableDevTools";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -45,6 +46,8 @@ export default function RootLayout({
             <CookieConsent />
           </>
         </ApolloWrapper>
+
+        <DisableDevTools />
 
         <ToastContainer
           position="top-center"

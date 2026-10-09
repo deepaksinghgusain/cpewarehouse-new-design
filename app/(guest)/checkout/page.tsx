@@ -303,8 +303,7 @@ const CheckoutPage = () => {
         try {
 
             const originalCartItems: any[] = cart.items || [];
-
-            // CLONE ITEMS TO AVOID IMMUTABLE OBJECT ERRORS
+            
             const cartItems: any[] = buildCartItemsWithParticipantEnrolls(originalCartItems).map((item: any) => ({
                 ...item,
                 course: { ...item.course },
