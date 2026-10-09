@@ -287,7 +287,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                                                                                     </div>
                                                                                     <div className="min-w-0 flex-1">
-                                                                                        <div className="text-base font-semibold leading-7 text-[#344054] sm:text-lg">2 hours
+                                                                                        <div className="text-base font-semibold leading-7 text-[#344054] sm:text-lg">
                                                                                             {list?.value}
                                                                                         </div>
                                                                                     </div>
