@@ -159,9 +159,7 @@ export async function getAllCoursesForLive() {
   });
 
   if (!data) return {};
-
-  console.log('data', data)
-
+  
   return data?.courses;
 }
 

@@ -625,6 +625,8 @@ const CheckoutPage = () => {
 
                 let od: any = await addOrderApi(orderData);
 
+                console.log('FREE EVENT ORDER RESPONSE', od);
+
                 if (
                     od &&
                     od.data &&
@@ -636,10 +638,10 @@ const CheckoutPage = () => {
                     const eventData = {
                         type: 'payment_intent.succeeded',
                         data: {
-                            price: finalPrice,
+                            totalPrice: finalPrice,
                             object: {
+                                orderId: od.data.id,
                                 id: uniqueStripeId,
-                                
                             },
                         },
                     };
