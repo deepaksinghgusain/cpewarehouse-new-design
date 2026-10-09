@@ -39,7 +39,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
     let sponsorship = coursesDetail?.data[0]?.attributes?.sponsorship;
     let courseOutlineHeader = coursesDetail?.data[0]?.attributes?.course_outline_header;
 
-
     const allCourses = await getAllCourses();
 
     relatedCourses = []
