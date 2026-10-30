@@ -9,9 +9,11 @@ import {
   CheckCircle2,
   Clock3,
   Download,
+  FileText,
   Search,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import jsPDF from "jspdf";
 import { userInfo } from "@/services/auth";
 import { GetUserSubscribedCourses } from "@/services/course";
 import { downloadCertificatePdf } from "@/lib/certificate";
@@ -80,6 +82,8 @@ function CpeTracker() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [certificateError, setCertificateError] = useState("");
+  const [exportError, setExportError] = useState("");
+  const [exporting, setExporting] = useState(false);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -207,6 +211,161 @@ function CpeTracker() {
     }
   };
 
+  const handleExportPdf = async () => {
+    setExporting(true);
+    setExportError("");
+
+    try {
+      const currentUser = await userInfo();
+      const fullName = [currentUser?.firstName, currentUser?.lastName]
+        .filter((name): name is string => typeof name === "string" && !!name.trim())
+        .join(" ") || currentUser?.username || "Learner";
+      const pdf = new jsPDF({ unit: "pt", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 44;
+      const contentWidth = pageWidth - margin * 2;
+      let y = margin;
+
+      const ensureSpace = (height: number) => {
+        if (y + height > pageHeight - margin) {
+          pdf.addPage();
+          y = margin;
+        }
+      };
+
+      const addSectionTitle = (title: string) => {
+        ensureSpace(32);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(13);
+        pdf.setTextColor(49, 46, 129);
+        pdf.text(title, margin, y);
+        y += 22;
+      };
+
+      const addCourse = (item: TrackerCourse, index: number) => {
+        const title = item.course.title || "Untitled course";
+        const lines = pdf.splitTextToSize(title, contentWidth);
+        ensureSpace(Math.max(80, lines.length * 15 + 62));
+
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(10);
+        pdf.setTextColor(30, 41, 59);
+        pdf.text(`${index + 1}. ${lines[0]}`, margin, y);
+        if (lines.length > 1) {
+          pdf.setFont("helvetica", "bold");
+          pdf.text(lines.slice(1), margin + 14, y + 14);
+        }
+        y += lines.length * 14 + 5;
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9);
+        pdf.setTextColor(71, 85, 105);
+        const details = [
+          `Type: ${item.category}`,
+          `Status: ${item.status}`,
+          `Progress: ${item.progress}%`,
+          `CPE credits: ${Number(item.course.credit) || 0}`,
+        ];
+        pdf.text(details.join("  |  "), margin + 14, y);
+        y += 14;
+
+        const subjectLines = pdf.splitTextToSize(
+          `Field of study: ${item.course.fieldOfStudy || "Not specified"}`,
+          contentWidth - 14,
+        );
+        pdf.text(subjectLines, margin + 14, y);
+        y += subjectLines.length * 12 + 2;
+        pdf.text(
+          `Completed: ${formatDate(item.completedOn)}  |  Added: ${formatDate(item.purchasedOn)}  |  Certificate: ${
+            isCertificateEligible(item)
+              ? item.course.certificateTemplate?.data?.attributes?.url
+                ? "Available"
+                : "Template unavailable"
+              : "Not available"
+          }`,
+          margin + 14,
+          y,
+        );
+        y += 18;
+
+        pdf.setDrawColor(226, 232, 240);
+        pdf.line(margin, y, pageWidth - margin, y);
+        y += 14;
+      };
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(20);
+      pdf.setTextColor(30, 41, 59);
+      pdf.text("CPE Tracker Report", margin, y);
+      y += 24;
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.setTextColor(71, 85, 105);
+      pdf.text(`Learner: ${fullName}`, margin, y);
+      y += 14;
+      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, margin, y);
+      y += 24;
+
+      addSectionTitle("Summary");
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.setTextColor(30, 41, 59);
+      pdf.text(`Courses tracked: ${courses.length}`, margin, y);
+      y += 15;
+      pdf.text(`CPE credits earned: ${earnedCredits}`, margin, y);
+      y += 15;
+      pdf.text(`Completed courses: ${completedCourses.length}`, margin, y);
+      y += 15;
+      pdf.text(`In progress: ${inProgressCourses.length}`, margin, y);
+      y += 15;
+      pdf.text(`Certificates available: ${certificateCourses.length}`, margin, y);
+      y += 24;
+
+      addSectionTitle("Complete Course History");
+      if (courses.length === 0) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        pdf.setTextColor(71, 85, 105);
+        pdf.text("No courses found.", margin, y);
+        y += 18;
+      } else {
+        courses.forEach(addCourse);
+      }
+
+      addSectionTitle("CPE Credit History");
+      if (completedCourses.length === 0) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        pdf.setTextColor(71, 85, 105);
+        pdf.text("No completed courses have CPE credits recorded.", margin, y);
+      } else {
+        completedCourses.forEach((item, index) => {
+          ensureSpace(34);
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(9);
+          pdf.setTextColor(30, 41, 59);
+          const label = `${index + 1}. ${item.course.title || "Untitled course"} | ${
+            item.course.fieldOfStudy || "Subject not specified"
+          } | ${Number(item.course.credit) || 0} CPE | ${formatDate(item.completedOn)}`;
+          const lines = pdf.splitTextToSize(label, contentWidth);
+          pdf.text(lines, margin, y);
+          y += lines.length * 13 + 5;
+        });
+      }
+
+      pdf.save("cpe-tracker-report.pdf");
+    } catch (pdfError) {
+      setExportError(
+        pdfError instanceof Error
+          ? pdfError.message
+          : "Unable to export the CPE report. Please try again.",
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -222,9 +381,20 @@ function CpeTracker() {
             one place.
           </p>
         </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700">
-          <Award className="h-4 w-4" />
-          Personal CPE record
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700">
+            <Award className="h-4 w-4" />
+            Personal CPE record
+          </div>
+          <button
+            type="button"
+            onClick={() => void handleExportPdf()}
+            disabled={loading || exporting}
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <FileText className="h-4 w-4" />
+            {exporting ? "Preparing PDF…" : "Export all data (PDF)"}
+          </button>
         </div>
       </header>
 
@@ -391,6 +561,19 @@ function CpeTracker() {
             type="button"
             className="ml-auto font-semibold underline"
             onClick={() => setCertificateError("")}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+      {exportError && (
+        <div role="alert" className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+          <p>{exportError}</p>
+          <button
+            type="button"
+            className="ml-auto font-semibold underline"
+            onClick={() => setExportError("")}
           >
             Dismiss
           </button>
