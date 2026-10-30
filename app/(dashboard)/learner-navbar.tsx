@@ -138,6 +138,9 @@ const LearnerNavBar = () => {
                             <Link href="/learner/dashboard" prefetch={false}>Dashboard</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer" asChild>
+                            <Link href="/cpe-tracker" prefetch={false}>CPE Tracker</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" asChild>
                             <Link href="/learner/certificates" prefetch={false}>Certificates</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer" asChild>

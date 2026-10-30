@@ -2,6 +2,7 @@
 
 import { getCommonData } from "@/services/common";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { Award } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,6 +12,10 @@ const menuItems = [
     {
         name: "Dashboard",
         href: "/learner/dashboard",
+    },
+    {
+        name: "CPE Tracker",
+        href: "/learner/cpe-tracker",
     },
     {
         name: "Certificates",
@@ -149,6 +154,10 @@ export default function LearnerSidebar() {
                                     strokeLinejoin="round"
                                 />
                             </svg>
+                        }
+
+                        if (item.name === "CPE Tracker") {
+                            icon = <Award className="h-6 w-6" />;
                         }
 
                         if (item.name === "Invoices") {

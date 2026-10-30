@@ -698,17 +698,22 @@ const BasicDetails = () => {
 
         const currentYear = new Date().getFullYear();
         const sortedEventYears = [...eventYears].sort((a, b) => a - b);
-        const initialYear = eventYears.has(currentYear)
+        const creditYears = Object.keys(fieldCreditMapByYear)
+            .map(Number)
+            .sort((a, b) => b - a);
+        const initialYear = creditYears[0]
+            ?? (eventYears.has(currentYear)
             ? currentYear
             : sortedEventYears.find((year) => year >= currentYear)
                 ?? sortedEventYears[sortedEventYears.length - 1]
                 ?? availableYears[0]
-                ?? currentYear;
+                ?? currentYear);
         setSelectedYear(initialYear);
 
         const nextCertificatesByYear: { [year: number]: { fieldOfStudy: string, credit: number }[] } = {};
         for (const year of availableYears) {
-            nextCertificatesByYear[year] = Array.from(fieldCreditMapByYear[year], ([fieldOfStudy, credit]) => ({
+            const creditsForYear = fieldCreditMapByYear[year] ?? new Map<string, number>();
+            nextCertificatesByYear[year] = Array.from(creditsForYear, ([fieldOfStudy, credit]) => ({
                 fieldOfStudy,
                 credit
             }));
@@ -992,7 +997,7 @@ const BasicDetails = () => {
                                 </span>
 
                                 <span className="text-sm font-medium text-slate-600">
-                                    CPE Earned
+                                    CPE Earned in {selectedYear}
                                 </span>
                             </div>
                         </div>

@@ -47,7 +47,7 @@ export default function RootLayout({
           </>
         </ApolloWrapper>
 
-        <DisableDevTools />
+        {/* <DisableDevTools /> */}
 
         <ToastContainer
           position="top-center"
