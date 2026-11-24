@@ -865,7 +865,7 @@ function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
   return gql`query {
         courses(
             pagination: { limit: -1 },
-            sort: ["startDate:desc"],
+            sort: ["startDate:asc"],
             filters: {
             isActive: { eq: ${isActive} }
             forTaxLaw: { eq: ${fortaxLaw} }

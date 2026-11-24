@@ -51,6 +51,8 @@ export default async function page() {
     getInTouch = res?.data?.attributes?.blocks.filter((x: { __component: string; }) => x.__component === 'blocks.get-in-touch')[0];
   }
 
+  const frontPageBannerImageUrl = frontPageBanner?.image?.data?.attributes?.url;
+
   return (
     <>
       <section className="mx-auto w-[calc(100%-1rem)] h-auto mt-4 sm:mt-[-60px] sm:w-[90%]">
@@ -81,14 +83,14 @@ export default async function page() {
             <div className="justify-start items-start gap-3 inline-flex">
               <div className="px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                 <div className="px-0.5 justify-center items-center flex">
-                  <Link href={frontPageBanner.catalog_button.href ?? ""} className="text-white text-base font-semibold font-['Inter'] leading-normal">
-                    {frontPageBanner.catalog_button.label}</Link>
+                  <Link href={frontPageBanner?.catalog_button?.href ?? ""} className="text-white text-base font-semibold font-['Inter'] leading-normal">
+                    {frontPageBanner?.catalog_button?.label}</Link>
                 </div>
               </div>
             </div>
           </div>
           <div className="relative aspect-square h-full">
-            <Image alt='' src={imageUrl + frontPageBanner?.image?.data?.attributes?.url} fill sizes="(max-width: 900px) 100vw, 50vw" className="object-contain" loading="eager" />
+            {frontPageBannerImageUrl && <Image alt='' src={imageUrl + frontPageBannerImageUrl} fill sizes="(max-width: 900px) 100vw, 50vw" className="object-contain" loading="eager" />}
           </div>
         </div>
       </section>
@@ -100,7 +102,7 @@ export default async function page() {
         </div>
         <div className="grow shrink basis-0 flex-col justify-start items-start gap-12 inline-flex">
           {
-            highlightsimple?.list.length > 0 && highlightsimple.list.map((list: any, index: number) => (
+            highlightsimple?.list?.length > 0 && highlightsimple?.list.map((list: any, index: number) => (
               <div className="flex justify-start items-start gap-4" key={index}>
                 <div className="w-12 h-12 p-3 bg-[#6071f3] rounded-[10px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-white justify-center items-center flex overflow-hidden">
                   <div dangerouslySetInnerHTML={{ __html: list?.icon }} className="w-6 h-6 relative flex-col justify-start items-start flex overflow-hidden">
@@ -123,7 +125,7 @@ export default async function page() {
       </div>
 
       <div className="relative mx-auto mt-12 h-[240px] w-[calc(100%-1rem)] sm:mt-16 sm:h-[400px] sm:w-[90%] lg:h-[600px]">
-        <Image src={imageUrl + highlightsimple?.image?.data?.attributes?.url} alt="" fill sizes="(max-width: 768px) 100vw, 90vw" className="object-cover" />
+        {highlightsimple?.image?.data?.attributes?.url && <Image src={imageUrl + highlightsimple.image.data.attributes.url} alt="" fill sizes="(max-width: 768px) 100vw, 90vw" className="object-cover" />}
       </div>
 
       <section className="bg-[#eef4ff] mt-10">
@@ -139,15 +141,15 @@ export default async function page() {
                   <div className="justify-start items-start gap-3 inline-flex">
                     <div className="px-[22px] py-4 bg-white rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-2.5 flex overflow-hidden">
                       <div className="px-0.5 justify-center items-center flex">
-                        <Link href={liveWebinarPass.button.href} className="text-[#18212f] text-lg font-semibold font-['Inter'] leading-7">
-                          {liveWebinarPass.button.label}
+                        <Link href={liveWebinarPass?.button?.href} className="text-[#18212f] text-lg font-semibold font-['Inter'] leading-7">
+                          {liveWebinarPass?.button?.label}
                         </Link>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="relative h-[260px] w-full shrink-0 sm:h-[360px] lg:h-[400px] lg:w-[480px]">
-                  <Image fill alt='' sizes="(max-width: 768px) 100vw, 480px" src={imageUrl + liveWebinarPass.image.data.attributes.url} />
+                  {liveWebinarPass?.image?.data?.attributes?.url && <Image fill alt='' sizes="(max-width: 768px) 100vw, 480px" src={imageUrl + liveWebinarPass.image.data.attributes.url} />}
                 </div>
               </div>
             </div>
@@ -174,7 +176,7 @@ export default async function page() {
                   <div key={index} className="flex min-w-0 flex-col overflow-hidden rounded-[10px] border border-[#dadee3]">
                     <div className="relative h-50 w-full rounded-t-[10px] bg-gradient-to-b from-Colors-Cyan-25 to-gray-300">
                       <div className="absolute h-25 mt-5 inset-0 p-3 sm:p-4">
-                        <Image alt={list.title || "Approval logo"} className="object-contain" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" src={imageUrl + list.image.data.attributes.url} />
+                        {list?.image?.data?.attributes?.url && <Image alt={list.title || "Approval logo"} className="object-contain" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" src={imageUrl + list.image.data.attributes.url} />}
                       </div>
                     </div>
                     <div className="flex h-full flex-col items-start gap-6 p-4">
@@ -250,20 +252,20 @@ export default async function page() {
           <div className="flex w-full flex-col items-center gap-10 px-0 sm:px-8 lg:flex-row lg:gap-16">
             <div className="flex flex-1 flex-col items-start gap-8 sm:gap-12">
               <div className="flex flex-col items-start gap-6">
-                <div className="text-3xl font-semibold leading-tight text-[#101828] sm:text-5xl sm:leading-[60px]">{getInTouch.title}</div>
-                <div className="text-lg font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">{getInTouch.sub_title}</div>
+                <div className="text-3xl font-semibold leading-tight text-[#101828] sm:text-5xl sm:leading-[60px]">{getInTouch?.title}</div>
+                <div className="text-lg font-normal leading-7 text-[#475467] sm:text-xl sm:leading-[30px]">{getInTouch?.sub_title}</div>
               </div>
               <div className="self-stretch justify-start items-start gap-4 inline-flex">
                 <div className="px-[18px] py-3 bg-[#2970fe] rounded-[28px]  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden">
                   <div className="px-0.5 justify-center items-center flex">
-                    <Link href={getInTouch.button.href} className="text-white text-base font-semibold font-['Inter'] leading-normal">
-                      {getInTouch.button.label}
+                    <Link href={getInTouch?.button?.href} className="text-white text-base font-semibold font-['Inter'] leading-normal">
+                      {getInTouch?.button?.label}
                     </Link>
                   </div>
                 </div>
               </div>
             </div>
-            <img className="h-auto max-h-[420px] w-full max-w-[512px] object-contain" src={imageUrl + getInTouch.image.data.attributes.url} alt="" />
+            <img className="h-auto max-h-[420px] w-full max-w-[512px] object-contain" src={imageUrl + getInTouch?.image?.data?.attributes?.url} alt="" />
           </div>
         </div>
       </section>

@@ -109,7 +109,6 @@ function getPackageDetailGql(slug: string) {
         }
         faqs {
           title
-          sub_title
           faq {
             answer
             question
@@ -126,7 +125,6 @@ function getPackageDetailGql(slug: string) {
         inclusion {
           heading
           title
-          sub_title
           image {
             data {
               attributes {

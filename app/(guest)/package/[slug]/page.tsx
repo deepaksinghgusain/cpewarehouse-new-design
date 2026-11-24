@@ -228,8 +228,8 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                         <div className="flex w-full flex-col items-end overflow-hidden rounded-xl bg-white shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)]">
                             <div className="w-full px-4 pt-4 sm:px-6 sm:pt-6">
                                 <div className="pr-[9px] pb-1 justify-start items-center inline-flex overflow-hidden">
-                                    <div className="h-auto w-full max-w-[343px] border border-[#175cd3]">
-                                        <img className="h-auto w-full object-contain" src={imageUrl + heroImageSection?.backgroundImage?.data?.attributes.url} alt="Package" />
+                                    <div className="h-auto w-full border border-[#175cd3]">
+                                        <img className="h-auto w-full object-contain" src={imageUrl + packageData?.image?.data?.attributes.url} alt="Package" />
                                     </div>
                                 </div>
                             </div>

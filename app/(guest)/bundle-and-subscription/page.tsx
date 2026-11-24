@@ -35,14 +35,14 @@ const page = async () => {
                         <div className="flex w-full flex-col items-start gap-6">
                             <div className="flex w-full flex-col items-start gap-4">
                                 <div className="w-full text-3xl font-semibold leading-tight text-[#101828] sm:text-6xl sm:leading-[72px]">
-                                    {heroImageSection.title}
+                                    {heroImageSection?.title}
                                 </div>
                                 <div className="w-full text-lg font-medium leading-7 text-[#0f1728] sm:text-xl sm:leading-[30px]">
-                                    {heroImageSection.subtititle}
+                                    {heroImageSection?.subtititle}
                                 </div>
                             </div>
                             <div className="w-full text-lg font-normal leading-7 text-[#667085] sm:text-xl">
-                                {heroImageSection.description}
+                                {heroImageSection?.description}
                             </div>
                         </div>
                     </div>
@@ -114,13 +114,13 @@ const page = async () => {
 
                                         </div>
                                         <div className="self-stretch flex-col justify-start items-start gap-2 mb-0 flex">
-                                            <Link href={`/package/${course.attributes.slug}`}
+                                            <Link href={`/package/${course?.attributes?.slug}`}
                                                 className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
-                                                {course.attributes.title}
+                                                {course?.attributes?.title}
                                             </Link>
                                         </div>
                                         <div className="text-[#667085] text-base mt-0 font-normal font-['Inter'] leading-normal">
-                                            {course.attributes.valid_till}
+                                            {course?.attributes?.valid_till}
                                         </div>
 
                                     </div>

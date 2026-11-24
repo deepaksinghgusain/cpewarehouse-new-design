@@ -5,16 +5,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "admin.cpewarehouse.us",
+        hostname: "admin.cpewarehouse.com",
         pathname: "/upload/**",
       },
       {
         protocol: "https",
-        hostname: "admin.cpewarehouse.us",
+        hostname: "admin.cpewarehouse.com",
         pathname: "/**",
       },
     ],
-      dangerouslyAllowLocalIP: true,
+    dangerouslyAllowLocalIP: true,
   },
 };
 

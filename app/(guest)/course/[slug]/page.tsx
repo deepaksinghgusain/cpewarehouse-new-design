@@ -102,27 +102,32 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             </TabsList>
                             <TabsContent value="Course Outline">
                                 <div className="">
-                                    <div className="mt-6 flex w-full flex-col items-center gap-10 overflow-hidden sm:gap-16">
-                                        <div className="w-full px-0 sm:px-8">
-                                            <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
-                                                <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
-                                                    <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
-                                                        <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]" dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.title || "" }} ></div>
+                                    {
+                                        courseOutlineHeader?.description && (
+                                            <div className="mt-6 flex w-full flex-col items-center gap-5 overflow-hidden sm:gap-10">
+                                                {/* <div className="w-full px-0 sm:px-8">
+                                                    <div className="self-stretch h-auto flex-col justify-start items-start gap-8 flex">
+                                                        <div className="self-stretch h-auto flex-col justify-start items-start gap-5 flex">
+                                                            <div className="self-stretch h-auto flex-col justify-start items-start gap-3 flex">
+                                                                <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]" dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.title || "" }} ></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> */}
+                                                <div className="w-full px-0 sm:px-8">
+                                                    <div className="w-full flex-col justify-start items-start gap-8 inline-flex">
+                                                        <div className="self-stretch flex-col justify-start items-start gap-5 flex">
+                                                            <div className="self-stretch flex-col justify-start items-center gap-2 flex">
+                                                                <div className="self-stretch text-[#475467] font-normal font-['Inter'] leading-[30px]"
+                                                                    dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.description || "" }} ></div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="w-full px-0 sm:px-8">
-                                            <div className="w-full flex-col justify-start items-start gap-8 inline-flex">
-                                                <div className="self-stretch flex-col justify-start items-start gap-5 flex">
-                                                    <div className="self-stretch flex-col justify-start items-center gap-2 flex">
-                                                        <div className="self-stretch text-[#475467] font-normal font-['Inter'] leading-[30px]"
-                                                            dangerouslySetInnerHTML={{ __html: courseOutlineHeader?.description || "" }} ></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        )
+                                    }
+
                                     <div className="mt-8 grid w-full grid-cols-1 gap-6 rounded-xl border-b border-[#e4e7ec] px-0 sm:px-8 lg:grid-cols-2">
 
                                         {
@@ -264,7 +269,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                     </div>
                                                 </div>
                                                 {sponsorship?.features?.length > 0 &&
-                                                    <div className="w-full px-0 lg:w-1/3 lg:px-8">
+                                                    <div className="w-full px-0 lg:w-1/2 lg:px-8">
                                                         <div className="self-stretch justify-center items-start gap-8 inline-flex">
                                                             <div className="flex w-full flex-col items-start rounded-2xl border border-[#e4e7ec] bg-white shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]">
                                                                 <div className="w-full px-5 py-6 sm:px-8 sm:py-8">
@@ -309,7 +314,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             <TabsContent value="FAQ">
                                 <div className="w-full">
                                     <div
-                                        className="w-full overflow-hidden bg-Colors-Background-bg-primary px-0 py-12 text-[#475467] sm:px-8 sm:py-24">
+                                        className="w-full overflow-hidden bg-Colors-Background-bg-primary px-0 py-8 text-[#475467] sm:px-8 sm:py-10">
                                         <div className="w-full">
                                             <div className="w-full flex-1 inline-flex flex-col justify-start items-start gap-8">
                                                 <div className="w-full flex flex-col justify-start items-start gap-5">
@@ -337,8 +342,12 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                         >
                                                             {
                                                                 coursesDetail?.data[0]?.attributes?.faqs?.list.length > 0 && coursesDetail?.data[0]?.attributes?.faqs?.list.map((faq: any, index: number) => (
-                                                                    <AccordionItem value={faq?.question} key={index}>
-                                                                        <AccordionTrigger className="flex w-full min-w-0 items-center justify-between">{faq?.question}</AccordionTrigger>
+                                                                    <AccordionItem value={faq?.question} key={index} className="border-b-0">
+                                                                        <AccordionTrigger className="group cursor-pointer flex w-full min-w-0 items-center justify-between hover:no-underline [&>svg]:hidden">
+                                                                            <span>{faq?.question}</span>
+                                                                            <span aria-hidden="true" className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#D0D5DD] text-[12px] font-medium leading-none text-[#667085] group-data-[state=open]:hidden">+</span>
+                                                                            <span aria-hidden="true" className="hidden h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#D0D5DD] text-[12px] font-medium leading-none text-[#667085] group-data-[state=open]:flex group-data-[state=open]:border-[#175CD3] group-data-[state=open]:text-[#175CD3]">−</span>
+                                                                        </AccordionTrigger>
                                                                         <AccordionContent>
                                                                             <div dangerouslySetInnerHTML={{ __html: faq?.answer }}></div>
                                                                         </AccordionContent>
@@ -355,7 +364,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                             </TabsContent>
                             <TabsContent value="Review">
                                 <div className="">
-                                    <div className="self-stretch py-24 inline-flex flex-col justify-start items-center gap-16 overflow-hidden">
+                                    <div className="self-stretch py-6 inline-flex flex-col justify-start items-center gap-16 overflow-hidden">
                                         <div className="py-4 bg-Colors-Background-bg-primary flex flex-col justify-start items-center gap-16 overflow-hidden">
                                             <div className="w-full max-w-[1280px] px-0 sm:px-8">
                                                 <div className="self-stretch flex flex-col justify-start items-start gap-8">
@@ -557,11 +566,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 <div className="self-stretch h-[94px] flex-col justify-start items-center gap-5 flex">
                                     <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
                                         <div className="self-stretch text-left text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">
-                                            {relatedBlock.title}
+                                            {relatedBlock?.title}
                                         </div>
                                     </div>
                                     <div className="self-stretch text-left text-[#475467] text-xl font-normal font-['Inter'] leading-[30px]">
-                                        {relatedBlock.sub_title}</div>
+                                        {relatedBlock?.sub_title}</div>
                                 </div>
                             </div>
                         </div>
