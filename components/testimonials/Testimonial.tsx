@@ -79,6 +79,7 @@ const Testimonial = () => {
 
     useEffect(() => {
         getTestimonial().then((data) => {
+            console.log("data", data.data);
             setTestimonial(data.data);
         });
 

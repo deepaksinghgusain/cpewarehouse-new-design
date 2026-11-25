@@ -15,6 +15,8 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
         if (res) {
             const filters = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.filters')[0];
 
+            console.log("filters", filters);
+
             // initialize showChildren for accordion and initial filter values
             const mappedList = (filters.list || []).map((l: any, i: number) => ({ ...l, showChildren: i === 0 }));
 

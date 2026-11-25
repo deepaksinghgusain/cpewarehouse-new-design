@@ -25,6 +25,6 @@ export async function getAboutus() {
 }
 
 export async function getPageContent(slug: string) {
-    const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/pages?filters[slug][$eq]=${slug}&populate=deep,10`;
+    const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/pages?filters[slug][$eq]=${slug}&populate=deep,15`;
     return await apiFetch(url)
 }

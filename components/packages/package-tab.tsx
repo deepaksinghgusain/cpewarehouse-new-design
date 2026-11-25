@@ -580,7 +580,7 @@ const PackageTabs = ({
               </div>
             </div> */}
 
-            <div className="self-stretch w-[70%] mx-auto px-8 flex-col justify-start items-center gap-16 flex">
+            <div className="self-stretch w-full mx-auto px-8 flex-col justify-start items-center gap-16 flex">
               <div className="self-stretch w-full flex-col justify-start items-start gap-8 flex">
                 <Accordion
                   type="single"

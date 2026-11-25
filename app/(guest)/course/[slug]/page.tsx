@@ -7,6 +7,8 @@ import CourseCard from '@/components/courses/CourseCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AddToCardComponent from './add-to-cart';
 import Link from 'next/link';
+import { MinusCircle, PlusCircle } from 'lucide-react';
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
 
 const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
 
@@ -337,23 +339,38 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                         <Accordion
                                                             type="single"
                                                             collapsible
-                                                            defaultValue="shipping"
-                                                            className="w-full"
+                                                            className="w-full overflow-hidden px-4"
                                                         >
-                                                            {
-                                                                coursesDetail?.data[0]?.attributes?.faqs?.list.length > 0 && coursesDetail?.data[0]?.attributes?.faqs?.list.map((faq: any, index: number) => (
-                                                                    <AccordionItem value={faq?.question} key={index} className="border-b-0">
-                                                                        <AccordionTrigger className="group cursor-pointer flex w-full min-w-0 items-center justify-between hover:no-underline [&>svg]:hidden">
-                                                                            <span>{faq?.question}</span>
-                                                                            <span aria-hidden="true" className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#D0D5DD] text-[12px] font-medium leading-none text-[#667085] group-data-[state=open]:hidden">+</span>
-                                                                            <span aria-hidden="true" className="hidden h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#D0D5DD] text-[12px] font-medium leading-none text-[#667085] group-data-[state=open]:flex group-data-[state=open]:border-[#175CD3] group-data-[state=open]:text-[#175CD3]">−</span>
-                                                                        </AccordionTrigger>
-                                                                        <AccordionContent>
-                                                                            <div dangerouslySetInnerHTML={{ __html: faq?.answer }}></div>
-                                                                        </AccordionContent>
-                                                                    </AccordionItem>
-                                                                ))}
+                                                            {coursesDetail?.data[0]?.attributes?.faqs?.list.length > 0 && coursesDetail?.data[0]?.attributes?.faqs?.list.map((faq: any, index: number) => (
+                                                                <AccordionPrimitive.Item
+                                                                    key={index}
+                                                                    value={`item-${index}`}
+                                                                    className="border-b border-gray-200 last:border-b-0"
+                                                                >
+                                                                    <AccordionPrimitive.Header className="w-full">
+                                                                        <AccordionPrimitive.Trigger className="group flex w-full items-center justify-between  py-2 text-left hover:no-underline">
+                                                                            <span className="text-[#101828] text-lg font-medium leading-7">
+                                                                                {faq?.question}
+                                                                            </span>
 
+                                                                            <div className="shrink-0">
+                                                                                <PlusCircle className="h-6 w-6 text-[#98A2B3] group-data-[state=open]:hidden" />
+
+                                                                                <MinusCircle className="hidden h-6 w-6 text-[#155EEF] group-data-[state=open]:block" />
+                                                                            </div>
+                                                                        </AccordionPrimitive.Trigger>
+                                                                    </AccordionPrimitive.Header>
+
+                                                                    <AccordionPrimitive.Content className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                                                                        <div
+                                                                            className="pb-2 text-base font-normal leading-normal text-gray-600"
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: faq?.answer,
+                                                                            }}
+                                                                        />
+                                                                    </AccordionPrimitive.Content>
+                                                                </AccordionPrimitive.Item>
+                                                            ))}
                                                         </Accordion>
                                                     </div>
                                                 </div>
