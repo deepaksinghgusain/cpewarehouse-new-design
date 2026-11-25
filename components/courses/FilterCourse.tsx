@@ -20,6 +20,8 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
             // initialize showChildren for accordion and initial filter values
             const mappedList = (filters.list || []).map((l: any, i: number) => ({ ...l, showChildren: i === 0 }));
 
+            console.log("mappedList", mappedList);
+
             const initialValues: any = {};
             for (let l of mappedList) {
                 initialValues[l.name] = null;

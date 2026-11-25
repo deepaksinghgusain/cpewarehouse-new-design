@@ -70,7 +70,7 @@ export const Header = () => {
                                         <DropdownMenu modal={false}>
                                             <DropdownMenuTrigger asChild>
                                                 <button className="px-4 py-2.5 cursor-pointer bg-white rounded-lg border border-gray-300 shadow-sm flex items-center gap-2">
-                                                        <span className="max-w-[120px] truncate text-base font-semibold text-slate-700 sm:max-w-none">
+                                                    <span className="max-w-[120px] truncate text-base font-semibold text-slate-700 sm:max-w-none">
                                                         {user?.firstName || user?.username || 'My Account'}
                                                     </span>
                                                     <ChevronDown className="w-4 h-4" />
@@ -80,6 +80,9 @@ export const Header = () => {
                                             <DropdownMenuContent align="end" className="w-44 z-50 bg-white rounded-md border border-gray-200 shadow-lg">
                                                 <DropdownMenuItem className="cursor-pointer" asChild>
                                                     <Link href="/learner/dashboard" prefetch={false}>Dashboard</Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="cursor-pointer" asChild>
+                                                    <Link href="/learner/cpe-tracker" prefetch={false}>CPE Tracker</Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem className="cursor-pointer" asChild>
                                                     <Link href="/learner/certificates" prefetch={false}>Certificates</Link>

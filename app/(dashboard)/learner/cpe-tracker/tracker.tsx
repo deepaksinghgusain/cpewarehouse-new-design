@@ -62,6 +62,9 @@ const isCertificateEligible = (course: TrackerCourse) =>
   isCompleted(course) ||
   (course.category.toLowerCase() === "recorded" && course.progress >= 70);
 
+const getCategoryLabel = (category: string) =>
+  category.toLowerCase() === "recorded" ? "Self Study" : category;
+
 function formatDate(value: string | null | undefined) {
   if (!value) return "Not recorded";
   const date = new Date(value);
@@ -262,7 +265,7 @@ function CpeTracker() {
         pdf.setFontSize(9);
         pdf.setTextColor(71, 85, 105);
         const details = [
-          `Type: ${item.category}`,
+          `Type: ${getCategoryLabel(item.category)}`,
           `Status: ${item.status}`,
           `Progress: ${item.progress}%`,
           `CPE credits: ${Number(item.course.credit) || 0}`,
@@ -473,7 +476,7 @@ function CpeTracker() {
             <option value="all">All course types</option>
             {categories.map((category) => (
               <option key={category} value={category}>
-                {category}
+                {getCategoryLabel(category)}
               </option>
             ))}
           </select>
@@ -631,7 +634,7 @@ function CourseCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-              {item.category}
+              {getCategoryLabel(item.category)}
             </span>
             <span
               className={`rounded-full px-2.5 py-1 text-xs font-medium ${

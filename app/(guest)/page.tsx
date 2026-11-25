@@ -63,7 +63,7 @@ export default async function page() {
               <div className="flex flex-col items-start gap-3 pl-0 sm:pl-2">
 
                 {
-                  frontPageBanner.list.length > 0 && frontPageBanner.list.map((item: any, index: number) => (
+                  frontPageBanner?.list?.length > 0 && frontPageBanner?.list?.map((item: any, index: number) => (
                     <div className="self-stretch justify-start items-start gap-3 inline-flex" key={index}>
                       <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
                         <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
@@ -135,8 +135,8 @@ export default async function page() {
               <div className="flex w-full flex-col items-stretch overflow-hidden rounded-3xl bg-[#6071f3] shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)] lg:flex-row">
                 <div className="flex flex-1 flex-col items-start justify-center gap-8 p-6 sm:gap-12 sm:p-16">
                   <div className="flex flex-col items-start gap-5">
-                    <div className="self-stretch text-white text-3xl font-semibold font-['Inter'] leading-[38px]">{liveWebinarPass.title}</div>
-                    <div className="self-stretch text-white text-xl font-normal font-['Inter'] leading-[30px]">{liveWebinarPass.sub_title}</div>
+                    <div className="self-stretch text-white text-3xl font-semibold font-['Inter'] leading-[38px]">{liveWebinarPass?.title}</div>
+                    <div className="self-stretch text-white text-xl font-normal font-['Inter'] leading-[30px]">{liveWebinarPass?.sub_title}</div>
                   </div>
                   <div className="justify-start items-start gap-3 inline-flex">
                     <div className="px-[22px] py-4 bg-white rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-2.5 flex overflow-hidden">
@@ -163,16 +163,16 @@ export default async function page() {
             <div className="flex flex-col items-center gap-8">
               <div className="flex w-full max-w-[768px] flex-col items-center gap-5">
                 <div className="flex w-full flex-col items-start gap-3">
-                  <div className="w-full text-center text-3xl font-semibold leading-tight text-Colors-Text-text-primary-(900) sm:text-4xl sm:leading-10">{approval.title}</div>
+                  <div className="w-full text-center text-3xl font-semibold leading-tight text-Colors-Text-text-primary-(900) sm:text-4xl sm:leading-10">{approval?.title}</div>
                 </div>
-                <div className="w-full text-center text-lg font-normal leading-7 text-Colors-Text-text-tertiary-(600) sm:text-xl sm:leading-loose">{approval.sub_title}</div>
+                <div className="w-full text-center text-lg font-normal leading-7 text-Colors-Text-text-tertiary-(600) sm:text-xl sm:leading-loose">{approval?.sub_title}</div>
               </div>
             </div>
           </div>
           <div className="w-full px-0 sm:px-8">
             <div className="grid w-full grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {
-                approval.list.length > 0 && approval.list.map((list: any, index: number) => (
+                approval?.list?.length > 0 && approval?.list?.map((list: any, index: number) => (
                   <div key={index} className="flex min-w-0 flex-col overflow-hidden rounded-[10px] border border-[#dadee3]">
                     <div className="relative h-50 w-full rounded-t-[10px] bg-gradient-to-b from-Colors-Cyan-25 to-gray-300">
                       <div className="absolute h-25 mt-5 inset-0 p-3 sm:p-4">
@@ -181,8 +181,8 @@ export default async function page() {
                     </div>
                     <div className="flex h-full flex-col items-start gap-6 p-4">
                       <div className="flex w-full flex-col items-start gap-2">
-                        <div className="w-full text-xl font-semibold leading-8 text-Colors-Text-text-primary-(900) sm:text-2xl sm:leading-loose">{list.title}</div>
-                        <div className="w-full text-base font-normal leading-normal text-[#475467]" dangerouslySetInnerHTML={{ __html: list.description }}></div>
+                        <div className="w-full text-xl font-semibold leading-8 text-Colors-Text-text-primary-(900) sm:text-2xl sm:leading-loose">{list?.title}</div>
+                        <div className="w-full text-base font-normal leading-normal text-[#475467]" dangerouslySetInnerHTML={{ __html: list?.description }}></div>
                       </div>
                     </div>
                   </div>

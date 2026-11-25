@@ -437,38 +437,61 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 </div>
                             </TabsContent>
                             <TabsContent value="Faculty">
-                                <div className="">
-                                    <div className="flex w-full flex-col items-center gap-10 py-12 lg:flex-row lg:items-start lg:justify-end lg:gap-16">
-                                        <div className="w-full px-0 sm:px-8 lg:w-1/2">
-                                            <div className="flex flex-col items-start gap-10 lg:pr-8">
-                                                <div
-                                                    className="flex aspect-[560/536] w-full max-w-[560px] items-end justify-center bg-cover bg-no-repeat"
-                                                    style={{ backgroundImage: `url('${imageUrl + instructor?.image?.data?.attributes?.url}')` }}>
-                                                    <div
-                                                        className="grow shrink basis-0 h-44 px-8 pt-24 pb-8 bg-gradient-to-b flex-col justify-center items-center inline-flex">
-                                                        <div
-                                                            className="self-stretch h-[158px] px-5 py-6 bg-white/30 border border-white/30 backdrop-blur-xl flex-col justify-start items-start gap-3 flex">
-                                                            <div className="self-stretch justify-start items-start gap-4 inline-flex">
-                                                                <div className="grow shrink basis-0 text-white text-4xl font-semibold font-['Inter'] leading-[44px]">
-                                                                    {instructor?.firstName + " " + instructor?.lastName}
-                                                                </div>
+                                <div className="relative overflow-hidden py-12 lg:py-16">
+                                    <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-[#155dee]/10 blur-3xl" />
+                                    <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-[#45a7c5]/10 blur-3xl" />
+
+                                    <div className="relative flex w-full flex-col items-center gap-10 lg:flex-row lg:items-stretch lg:gap-14">
+                                        <div className="w-full lg:w-[46%]">
+                                            <div className="group relative mx-auto w-full max-w-[560px]">
+                                                
+                                                <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white p-3  ring-1 ring-[#101828]/5">
+                                                    <div className="relative aspect-[4/2.6] overflow-hidden rounded-[1.5rem] bg-[#f2f4f7]">
+                                                        {instructor?.image?.data?.attributes?.url ? (
+                                                            <img
+                                                                src={imageUrl + instructor.image.data.attributes.url}
+                                                                alt={`${instructor?.firstName ?? ""} ${instructor?.lastName ?? ""}`.trim() || "Instructor"}
+                                                                className="h-full w-full object-contain object-center transition duration-700 group-hover:scale-[1.03]"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#155dee]/15 to-[#45a7c5]/15 text-5xl font-semibold text-[#155dee]">
+                                                                {(instructor?.firstName?.[0] ?? "I") + (instructor?.lastName?.[0] ?? "")}
                                                             </div>
-                                                            <div className="self-stretch h-[54px] flex-col justify-start items-start gap-0.5 flex">
-                                                                <div
-                                                                    className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-xl font-normal font-['Inter'] leading-loose">
-                                                                    {instructor?.shortDesc}
-                                                                </div>
-                                                                <div className="self-stretch"></div>
-                                                            </div>
+                                                        )}
+                                                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#101828]/10 to-transparent" />
+                                                    </div>
+
+                                                    <div className="px-3 pb-3 pt-5 sm:px-4 sm:pb-4">
+                                                        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#eff8ff] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#175cd3]">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-[#155dee]" />
+                                                            Faculty
                                                         </div>
+                                                        <h3 className="text-3xl font-semibold leading-tight text-[#101828] sm:text-4xl">
+                                                            {`${instructor?.firstName ?? ""} ${instructor?.lastName ?? ""}`.trim()}
+                                                        </h3>
+                                                        {instructor?.shortDesc && (
+                                                            <p className="mt-2 text-base leading-7 text-[#475467] sm:text-lg">
+                                                                {instructor.shortDesc}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="w-full px-0 sm:px-8 lg:w-1/2">
-                                            <div className="flex flex-col items-start gap-10 lg:pr-8">
-                                                <div className="self-stretch text-[#475467] font-normal font-['Inter'] leading-[30px]"
-                                                    dangerouslySetInnerHTML={{ __html: instructor?.bioData }}></div>
+
+                                        <div className="w-full lg:w-[54%]">
+                                            <div className="flex h-full flex-col justify-center rounded-[2rem] border border-[#e4e7ec] bg-white/80 p-7 shadow-[0_20px_60px_-32px_rgba(16,24,40,0.25)] backdrop-blur-sm sm:p-10">
+                                                <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full bg-[#eff8ff] px-4 py-2 text-sm font-semibold text-[#175cd3]">
+                                                    <span className="h-2 w-2 rounded-full bg-[#155dee]" />
+                                                    About the Instructor
+                                                </div>
+                                                <div className="relative">
+                                                    <div className="pointer-events-none absolute -left-1 -top-8 text-7xl font-serif leading-none text-[#155dee]/15">“</div>
+                                                    <div
+                                                        className="prose prose-lg max-w-none text-[#475467] prose-p:leading-8 prose-p:text-[#475467] prose-headings:text-[#101828] prose-strong:text-[#101828] prose-a:text-[#155dee]"
+                                                        dangerouslySetInnerHTML={{ __html: instructor?.bioData ?? "" }}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
