@@ -709,7 +709,7 @@ const CheckoutPage = () => {
                                 </div>
                                 <div className="self-stretch h-6 flex-col justify-start items-center gap-0.5 flex">
                                     <div className="self-stretch text-center text-[#344054] text-base font-semibold font-['Inter'] leading-normal">
-                                        Participants details</div>
+                                        Learners details</div>
                                 </div>
                             </div>
 
@@ -795,6 +795,16 @@ const CheckoutPage = () => {
                                                 const rawTitle = item.course?.data?.attributes?.title || item.course?.data?.attributes?.name || item.course?.attributes?.title || item.title || item.name || item.course?.title;
                                                 const title = resolveText(rawTitle) || 'Untitled Course';
                                                 const date = item.course?.data?.attributes?.date || item.date || '';
+                                                const category =
+                                                    resolveText(item.course?.category) ||
+                                                    resolveText(item.course?.data?.attributes?.category) ||
+                                                    resolveText(item.course?.attributes?.category) ||
+                                                    resolveText(item.category);
+                                                const categoryLabel = category === 'Recorded'
+                                                    ? 'Self Study'
+                                                    : category === 'Live'
+                                                        ? 'Live Webinar'
+                                                        : category || 'Live Webinar';
                                                 const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
                                                 const lineTotal = price * qty;
 
@@ -820,12 +830,12 @@ const CheckoutPage = () => {
                                                                                 <Image src="/assets/images/cart.gif" alt={title} width={96} height={96} className="w-full h-full object-cover" />
                                                                             )}
                                                                         </div>
-                                                                        <div className={"pl-2 pr-2.5 py-0.5 rounded-full justify-start items-center gap-1.5 flex " + (item.type === 'Self Study' ? 'bg-[#fdf1f9] border border-[#fbceee]' : 'bg-[#ecfcf2] border border-[#aaefc6]')}
+                                                                        <div className={"pl-2 pr-2.5 py-0.5 rounded-full justify-start items-center gap-1.5 flex " + (category === 'Recorded' ? 'bg-[#fdf1f9] border border-[#fbceee]' : 'bg-[#ecfcf2] border border-[#aaefc6]')}
                                                                         >
                                                                             <div className="w-2 h-2 relative">
                                                                                 <div className="w-1.5 h-1.5 left-[1px] top-[1px] absolute bg-[#17b169] rounded-full"></div>
                                                                             </div>
-                                                                            <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">{item.type || 'Live webinar'}</div>
+                                                                            <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">{categoryLabel}</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1002,7 +1012,7 @@ const CheckoutPage = () => {
                                                     <div className="flex-1 min-w-80 inline-flex flex-col justify-start items-start gap-1">
                                                         <div className="self-stretch justify-start"><span
                                                             className="text-Colors-Text-text-primary-(900) text-lg font-bold font-['Inter'] leading-7">Add
-                                                            participants details </span><span
+                                                            learners details </span><span
                                                                 className="text-Colors-Text-text-primary-(900) text-lg font-medium font-['Inter'] leading-7">(Enrollments {enrollments})</span></div>
                                                         <div
                                                             className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-base font-normal font-['Inter'] leading-normal">
@@ -1023,7 +1033,7 @@ const CheckoutPage = () => {
                                                     return (
                                                         <div key={enrollIndex} className="self-stretch h-52 p-6 flex flex-col justify-start items-start gap-6">
                                                             <div className="w-full flex flex-col gap-1">
-                                                                <div className="text-blue-700 text-sm font-medium">Participant {enrollIndex + 1}</div>
+                                                                <div className="text-blue-700 text-sm font-medium">Learner {enrollIndex + 1}</div>
                                                             </div>
                                                             <div className="grid grid-cols-2 h-11 w-full gap-6 mb-4">
                                                                 <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
