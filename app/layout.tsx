@@ -50,7 +50,7 @@ export default function RootLayout({
               </div>
             </main>
             {children}
-            <CookieConsent />
+            {/* <CookieConsent /> */}
           </>
         </ApolloWrapper>
 
