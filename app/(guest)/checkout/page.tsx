@@ -779,7 +779,7 @@ const CheckoutPage = () => {
                                             <th
                                                 className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 text-left w-[60%] border-r-4 border-white pl-4">
                                                 Order Summary</th>
-                                            <th className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 text-left pl-4">Enrollments</th>
+                                            <th className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 text-left pl-4">Enrollment(s)</th>
                                             <th className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 text-left pl-4">Price</th>
 
                                         </tr>
@@ -1012,8 +1012,8 @@ const CheckoutPage = () => {
                                                     <div className="flex-1 min-w-80 inline-flex flex-col justify-start items-start gap-1">
                                                         <div className="self-stretch justify-start"><span
                                                             className="text-Colors-Text-text-primary-(900) text-lg font-bold font-['Inter'] leading-7">Add
-                                                            learner(s) details </span><span
-                                                                className="text-Colors-Text-text-primary-(900) text-lg font-medium font-['Inter'] leading-7">(Enrollments {enrollments})</span></div>
+                                                            learner details </span><span
+                                                                className="text-Colors-Text-text-primary-(900) text-lg font-medium font-['Inter'] leading-7">(Enrollment(s) {enrollments})</span></div>
                                                         <div
                                                             className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-base font-normal font-['Inter'] leading-normal">
                                                             First & last name will appear on CPE certificate.</div>
