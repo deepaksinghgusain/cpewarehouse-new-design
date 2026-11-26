@@ -9,6 +9,8 @@ import AddToCart from './add-to-cart';
 
 const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: any }) => {
 
+    console.log('courses', courses)
+
     const [filterCourse, setFilterCourse] = useState<any>([]);
 
     const itemsPerPage = 9;
@@ -112,7 +114,7 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                                 <div className="flex-col justify-start items-center inline-flex mt-2">
                                                     <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">Credits:
                                                         {course.attributes?.credit} |
-                                                        {course.attributes?.sub_title}
+                                                        {course.attributes?.creditsInfo}
                                                     </div>
                                                 </div>
                                             </div>
