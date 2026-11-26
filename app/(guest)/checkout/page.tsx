@@ -418,7 +418,7 @@ const CheckoutPage = () => {
                     coupon: '',
                     orderId: 0,
                     discountCoupon:
-                        hasAppliedCoupon
+                        hasAppliedCoupon && eachPrice > 0
                             ? {
                                 name: appliedCouponCode,
                                 value: (couponRes ? couponValueOFF : cart.discountPrice) || '',
