@@ -920,7 +920,7 @@ const CheckoutPage = () => {
                                     <div className="self-stretch py-2 border-b border-[#e4e7ec] justify-start items-center gap-4 inline-flex">
                                         <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
                                             <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex">
-                                                <div className="self-stretch text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">Sub Total</div>
+                                                <div className="self-stretch text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">Total</div>
                                             </div>
                                         </div>
                                         <div className="justify-end items-center gap-4 flex">
@@ -946,7 +946,7 @@ const CheckoutPage = () => {
                                     <div className="self-stretch py-2 border-b border-[#e4e7ec] justify-start items-center gap-4 inline-flex">
                                         <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
                                             <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex">
-                                                <div className="self-stretch text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">Total</div>
+                                                <div className="self-stretch text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">Grand Total</div>
                                             </div>
                                         </div>
                                         <div className="justify-start items-center gap-4 flex">
@@ -1023,7 +1023,7 @@ const CheckoutPage = () => {
                                                     return (
                                                         <div key={enrollIndex} className="self-stretch h-52 p-6 flex flex-col justify-start items-start gap-6">
                                                             <div className="w-full flex flex-col gap-1">
-                                                                <div className="text-[#344054] text-sm font-medium">Participant {enrollIndex + 1}</div>
+                                                                <div className="text-blue-700 text-sm font-medium">Participant {enrollIndex + 1}</div>
                                                             </div>
                                                             <div className="grid grid-cols-2 h-11 w-full gap-6 mb-4">
                                                                 <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
