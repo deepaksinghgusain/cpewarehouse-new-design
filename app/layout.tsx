@@ -42,7 +42,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ApolloWrapper>
           <>
-            <main className="h-6 fixed mb-2 top-0 z-20 bg-red-500 w-full text-center">
+            <main className="h-6 fixed mb-2 top-0 z-200 bg-red-500 w-full text-center">
               <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
                 <h1 className="font-semibold text-white">
                   This site is under maintenance for 48 hours

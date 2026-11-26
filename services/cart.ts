@@ -18,7 +18,7 @@ export async function createCart(cartData: any) {
 
 export async function getCheckoutUrl(data: any) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/api/checkout`;
-  return await apiFetch(url, { method: "POST", body: normalizeCartPayload(data) });
+  return await apiFetch(url, { method: "POST", body: data });
 }
 
 export async function updateOrderStatus(data: any) {

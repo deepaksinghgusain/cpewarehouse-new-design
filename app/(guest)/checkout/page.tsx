@@ -604,7 +604,7 @@ const CheckoutPage = () => {
                     cd.orderId = orderId;
 
                     cd.customerid =
-                        localStorage.getItem('cid') || '';
+                        localStorage.getItem('cid') || 'undefined';
 
                     cd.email =
                         localStorage.getItem('email') || '';
