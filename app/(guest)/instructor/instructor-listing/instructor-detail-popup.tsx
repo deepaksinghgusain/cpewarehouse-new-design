@@ -4,11 +4,8 @@ import { useState } from "react";
 import {
     Dialog,
     DialogContent,
-    DialogHeader,
     DialogTitle,
-    DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { imageUrl } from "@/lib/constants";
 
 export default function FacultySection({ res }: any) {
@@ -66,28 +63,33 @@ export default function FacultySection({ res }: any) {
 
             {/* ===== Dialog ===== */}
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="bg-white !fixed !inset-[0px] !max-w-none rounded-2xl !translate-x-0 !translate-y-0 top-0 left-0 rounded-none z-100 overflow-y-auto">
-                    <div className="">
-                        <div className="w-full p-8 inline-flex flex-col justify-start items-start gap-6">
-                            <div className="self-stretch inline-flex justify-start items-start gap-6">
-                                <div className="w-40 h-40 relative rounded-full">
+                <DialogContent className="!fixed !inset-0 !max-w-none !translate-x-0 !translate-y-0 z-100 overflow-y-auto rounded-none border-0 bg-white p-0 sm:!inset-auto sm:!left-1/2 sm:!top-1/2 sm:!-translate-x-1/2 sm:!-translate-y-1/2 sm:!max-w-4xl sm:w-[calc(100%-2rem)] sm:max-h-[90dvh] sm:rounded-2xl">
+                    <DialogTitle className="sr-only">
+                        {selectedFaculty
+                            ? `${selectedFaculty.attributes.firstName} ${selectedFaculty.attributes.lastName} faculty profile`
+                            : "Faculty profile"}
+                    </DialogTitle>
+                    <div className="w-full p-4 sm:p-8">
+                        <div className="inline-flex w-full flex-col items-start justify-start gap-6">
+                            <div className="inline-flex w-full flex-col items-center justify-start gap-4 text-center sm:flex-row sm:items-start sm:gap-6 sm:text-left">
+                                <div className="relative size-24 shrink-0 rounded-full sm:size-40">
                                     <div
-                                        className="w-40 h-40 left-0 top-0 absolute rounded-full shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]  outline-4 overflow-hidden">
+                                        className="absolute left-0 top-0 size-full overflow-hidden rounded-full shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)] outline-4">
                                         <div
-                                            className="w-40 h-40 left-0 top-0 absolute rounded-full border border-Component-colors-Components-Avatars-avatar-contrast-border/10">
-                                            <img src={imageUrl + selectedFaculty?.attributes?.image?.data?.attributes?.url} alt="" />
+                                            className="absolute left-0 top-0 size-full rounded-full border border-Component-colors-Components-Avatars-avatar-contrast-border/10">
+                                            <img className="size-full object-cover" src={imageUrl + selectedFaculty?.attributes?.image?.data?.attributes?.url} alt="" />
 
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex-1 py-8 inline-flex flex-col justify-start items-start gap-5">
+                                <div className="inline-flex w-full min-w-0 flex-1 flex-col items-center justify-start gap-5 sm:items-start sm:py-8">
                                     <div className="self-stretch inline-flex justify-start items-start gap-4 flex-wrap content-start">
-                                        <div className="flex-1 min-w-60 inline-flex flex-col justify-start items-start gap-1">
+                                        <div className="inline-flex min-w-0 flex-1 flex-col items-center justify-start gap-1 sm:items-start">
                                             <div
-                                                className="self-stretch justify-start text-Colors-Text-text-primary-(900) text-3xl font-semibold font-['Inter'] leading-9">
+                                                className="self-stretch break-words text-2xl font-semibold leading-8 text-Colors-Text-text-primary-(900) sm:text-3xl sm:leading-9">
                                                 {selectedFaculty?.attributes?.firstName} {selectedFaculty?.attributes?.lastName}</div>
                                             <div
-                                                className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-base font-normal font-['Inter'] leading-normal">
+                                                className="self-stretch break-words text-base font-normal leading-normal text-Colors-Text-text-tertiary-(600)">
                                                 {selectedFaculty?.attributes?.shortDesc}</div>
 
                                         </div>
@@ -95,7 +97,7 @@ export default function FacultySection({ res }: any) {
                                 </div>
                             </div>
 
-                            <div className="w-full">
+                            <div className="w-full break-words">
                                 <div className="self-stretch inline-flex flex-col justify-start items-start gap-5 border-b w-full">
                                     <div className="self-stretch inline-flex justify-start items-start gap-4 w-full">
                                         <div className="flex-1 self-stretch inline-flex flex-col justify-center items-start gap-1">
