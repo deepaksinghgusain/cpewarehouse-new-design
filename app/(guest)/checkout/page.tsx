@@ -733,7 +733,7 @@ const CheckoutPage = () => {
                                 </div>
                                 <div className="self-stretch h-6 flex-col justify-start items-center gap-0.5 flex">
                                     <div className="self-stretch text-center text-[#344054] text-base font-semibold font-['Inter'] leading-normal">
-                                        Paymment</div>
+                                        Payment</div>
                                 </div>
                             </div>
 
@@ -1012,7 +1012,7 @@ const CheckoutPage = () => {
                                                     <div className="flex-1 min-w-80 inline-flex flex-col justify-start items-start gap-1">
                                                         <div className="self-stretch justify-start"><span
                                                             className="text-Colors-Text-text-primary-(900) text-lg font-bold font-['Inter'] leading-7">Add
-                                                            learners details </span><span
+                                                            learner(s) details </span><span
                                                                 className="text-Colors-Text-text-primary-(900) text-lg font-medium font-['Inter'] leading-7">(Enrollments {enrollments})</span></div>
                                                         <div
                                                             className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-base font-normal font-['Inter'] leading-normal">
