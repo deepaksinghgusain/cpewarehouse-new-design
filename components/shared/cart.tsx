@@ -168,7 +168,7 @@ export function CartComponent() {
                                                                 )}
                                                             </h3>
                                                             <p className="text-gray-500 text-sm">
-                                                                $ {Number(price ?? 0).toFixed(2)} x {qty} qty = $ {(Number(price ?? 0) * Number(qty ?? 0)).toFixed(2)}
+                                                                $ {Number(price ?? 0).toFixed(2)} x {qty} Enrollment(s) = $ {(Number(price ?? 0) * Number(qty ?? 0)).toFixed(2)}
                                                             </p>
                                                         </div>
 
