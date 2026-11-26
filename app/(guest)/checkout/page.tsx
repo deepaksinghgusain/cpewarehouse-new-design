@@ -97,7 +97,6 @@ const CheckoutPage = () => {
     }, [cart.items, currentUser.firstName, currentUser.lastName, currentUser.email, (currentUser as any).ptin]);
 
     // participantCourseTitles can be derived from cart.items when rendering
-
     const updateParticipantDetail = (itemIndex: number, enrollIndex: number, field: string, value: string) => {
         setParticipantDetailsByItem((current) =>
             current.map((it, idx) => {
