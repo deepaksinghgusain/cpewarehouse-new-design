@@ -34,14 +34,19 @@ const CheckoutPage = () => {
     }
     const items = cart?.items || [];
     const enrollments = items.reduce((acc: number, it: any) => acc + (it.qty || it.quantity || 1), 0);
-    const subtotal = items.reduce((acc: number, it: any) => acc + ((it.course?.price || 0) * (it.qty || 1)), 0);
+    const subtotal = items.reduce((acc: number, it: any) => {
+        const price = Number(it.course?.data?.attributes?.price ?? it.course?.price ?? it.price ?? 0);
+        const quantity = Number(it.qty ?? it.quantity ?? 1);
+        return acc + price * quantity;
+    }, 0);
+    const baseTotal = Number(cart?.total) || subtotal;
     const [agreeTerms, setAgreeTerms] = React.useState(false);
     const [couponValue, setCouponValue] = React.useState('');
     const [couponErrMsg, setCouponErrMsg] = React.useState('');
     const [couponRes, setCouponRes] = React.useState(false);
     const [couponType, setCouponType] = React.useState('');
     const [couponValueOFF, setCouponValueOFF] = React.useState<number>(0);
-    const [finalPrice, setFinalPrice] = React.useState<number | string>(Number(cart?.total ?? subtotal) || 0);
+    const [finalPrice, setFinalPrice] = React.useState<number | string>(baseTotal);
     const [formSubmitError, setFormSubmitError] = React.useState('');
     const [participantDetailsByItem, setParticipantDetailsByItem] = React.useState<{
         enrolls: {
@@ -62,7 +67,7 @@ const CheckoutPage = () => {
         }[]
     }[]>([])
 
-    const displayedTotal = couponRes ? Number(finalPrice) : Number(cart?.total ?? subtotal);
+    const displayedTotal = couponRes ? Number(finalPrice) : baseTotal;
     const couponLabel = couponType === 'amountOff' ? `- $ ${Number(couponValueOFF ?? 0).toFixed(2)}` : couponType === 'percentOff' ? `- ${Number(couponValueOFF ?? 0)}%` : '';
 
     const router = useRouter();
@@ -244,56 +249,68 @@ const CheckoutPage = () => {
 
     const applyCoupon = async () => {
         const trimmedCoupon = couponValue.trim();
-        if (!trimmedCoupon) {
-            setCouponErrMsg('Please enter a coupon code.');
+        const rejectCoupon = (message: string) => {
+            setCouponErrMsg(message);
             setCouponRes(false);
+            setCouponType('');
+            setCouponValueOFF(0);
+            setFinalPrice(baseTotal);
+        };
+
+        if (!trimmedCoupon) {
+            rejectCoupon('Please enter a coupon code.');
             return;
         }
 
         setCouponErrMsg('');
         try {
             const couponResp = await applyCouponApi(trimmedCoupon);
-            const fp = Number(cart?.finalPrice ?? subtotal) || 0;
+            const fp = baseTotal;
 
             if (couponResp?.statusCode !== 200) {
-                setCouponErrMsg(couponResp?.message || 'Invalid Coupon.');
-                setCouponRes(false);
+                rejectCoupon(couponResp?.message || 'Invalid Coupon.');
                 return;
             }
 
-            if (couponResp.amount_off != null) {
-                if (couponResp.amount_off >= fp) {
-                    setCouponErrMsg('Invalid Coupon.');
-                    setCouponRes(false);
+            if (couponResp.amount_off != null && Number(couponResp.amount_off) > 0) {
+                const amountOff = Number(couponResp.amount_off);
+                if (!Number.isFinite(amountOff) || amountOff <= 0 || amountOff >= fp) {
+                    rejectCoupon('Invalid Coupon.');
                     return;
                 }
 
-                const updatedPrice = Number((Number(fp) - Number(couponResp.amount_off)).toFixed(2));
+                const updatedPrice = Number((fp - amountOff).toFixed(2));
+                setCouponValue(trimmedCoupon);
                 setCouponType('amountOff');
-                setCouponValueOFF(couponResp.amount_off);
+                setCouponValueOFF(amountOff);
                 setFinalPrice(updatedPrice);
                 setCouponRes(true);
-                dispatch(updateCartRequest({ discountCode: trimmedCoupon, discountPrice: couponResp.amount_off, finalPrice: updatedPrice }));
+                dispatch(updateCartRequest({ discountCode: trimmedCoupon, discountPrice: amountOff, finalPrice: updatedPrice }));
                 return;
             }
 
             if (couponResp.percent_off != null) {
-                const discountAmount = Number(((Number(fp) * Number(couponResp.percent_off)) / 100).toFixed(2));
-                const updatedPrice = Number((Number(fp) - discountAmount).toFixed(2));
+                const percentOff = Number(couponResp.percent_off);
+                if (!Number.isFinite(percentOff) || percentOff <= 0 || percentOff > 100 || fp <= 0) {
+                    rejectCoupon('Invalid Coupon.');
+                    return;
+                }
+
+                const discountAmount = Number(((fp * percentOff) / 100).toFixed(2));
+                const updatedPrice = Number((fp - discountAmount).toFixed(2));
+                setCouponValue(trimmedCoupon);
                 setCouponType('percentOff');
-                setCouponValueOFF(couponResp.percent_off);
+                setCouponValueOFF(percentOff);
                 setFinalPrice(updatedPrice);
                 setCouponRes(true);
-                dispatch(updateCartRequest({ discountCode: trimmedCoupon, discountPrice: couponResp.percent_off, finalPrice: updatedPrice }));
+                dispatch(updateCartRequest({ discountCode: trimmedCoupon, discountPrice: percentOff, finalPrice: updatedPrice }));
                 return;
             }
 
-            setCouponErrMsg('Invalid Coupon.');
-            setCouponRes(false);
+            rejectCoupon('Invalid Coupon.');
         } catch (error) {
             console.error('applyCoupon error', error);
-            setCouponErrMsg('Failed to validate coupon. Please try again.');
-            setCouponRes(false);
+            rejectCoupon('Failed to validate coupon. Please try again.');
         }
     }
 
@@ -311,15 +328,8 @@ const CheckoutPage = () => {
             }));
 
             const cartData: any = cart;
-
-            const couponType: string = cart.discountCode;
-
-            const couponValue: string =
-                Number(cart.discountPrice) > 0
-                    ? cart.discountCode
-                    : '';
-
-            const finalPrice: number = cart.finalPrice;
+            const appliedCouponCode = couponRes ? couponValue.trim() : '';
+            const orderFinalPrice = displayedTotal;
 
             const gtagData: any[] = [];
             const checkoutData: any[] = [];
@@ -378,13 +388,13 @@ const CheckoutPage = () => {
 
                 let couponDiscountedPrice: any = eachPrice;
 
-                if (couponType == 'percentOff') {
+                if (couponRes && couponType == 'percentOff') {
 
                     const discountedAmount: any = Number(((Number(eachPrice) * Number(couponValueOFF)) / 100).toFixed(2));
 
                     couponDiscountedPrice = Number((Number(eachPrice) - discountedAmount).toFixed(2));
 
-                } else if (couponType == 'amountOff') {
+                } else if (couponRes && couponType == 'amountOff') {
 
                     const discountedAmount: any = Number((Number(couponValueOFF) / (lengthOfCartItems * (data.qty || 1))).toFixed(2));
 
@@ -410,7 +420,7 @@ const CheckoutPage = () => {
                     discountCoupon:
                         couponRes == true
                             ? {
-                                name: couponValue || '',
+                                name: appliedCouponCode,
                                 value: couponValueOFF || '',
                                 type: couponType || '',
                                 email: localStorage.getItem('email'),
@@ -478,28 +488,20 @@ const CheckoutPage = () => {
 
                 cartItems[index]['price'] = particularPrice;
 
-                let noOfEnroll =
-                    cartItems[index]?.Enrolls?.length || 1;
+                let noOfEnroll = cartItems[index]?.Enrolls?.length || 1;
 
                 // FINAL PRICE
-                if (
-                    couponValue != null &&
-                    couponType == 'amountOff'
-                ) {
+                if (couponRes && couponType == 'amountOff') {
 
                     cartItems[index]['finalPrice'] = Number((Number(particularPrice) - (Number(couponValueOFF) / (lengthOfCartItems * noOfEnroll))).toFixed(2));
 
-                } else if (
-                    couponValue != null &&
-                    couponType == 'percentOff'
-                ) {
+                } else if (couponRes && couponType == 'percentOff') {
 
                     cartItems[index]['finalPrice'] = Number((Number(particularPrice) - ((Number(couponValueOFF) * Number(particularPrice)) / 100)).toFixed(2));
 
                 } else {
 
-                    cartItems[index]['finalPrice'] =
-                        particularPrice;
+                    cartItems[index]['finalPrice'] =  particularPrice;
                 }
 
                 cartItems[index]['category'] =
@@ -561,12 +563,10 @@ const CheckoutPage = () => {
                 data: {
                     OrderItems: cartItems,
                     userId: user?.user?.id,
-                    totalPrice: cart?.finalPrice,
-                    discountCode:
-                        couponRes == true ? couponValue : '',
-                    discountPrice:
-                        couponRes == true ? couponValueOFF : 0,
-                    finalPrice,
+                    totalPrice: baseTotal,
+                    discountCode: appliedCouponCode,
+                    discountPrice: couponRes == true ? couponValueOFF : 0,
+                    finalPrice: orderFinalPrice,
                     stripeOrderId: '',
                     orderStatus: 'pending',
                     discountType:
@@ -610,6 +610,8 @@ const CheckoutPage = () => {
                         localStorage.getItem('email') || '';
                 });
 
+                console.log('CHECKOUT DATA', checkoutData);
+
                 checkoutUrl(checkoutData);
 
             } else {
@@ -636,7 +638,7 @@ const CheckoutPage = () => {
                     const eventData = {
                         type: 'payment_intent.succeeded',
                         data: {
-                            totalPrice: finalPrice,
+                            totalPrice: orderFinalPrice,
                             object: {
                                 orderId: od.data.id,
                                 id: uniqueStripeId,
@@ -935,20 +937,20 @@ const CheckoutPage = () => {
                                         </div>
                                         <div className="justify-end items-center gap-4 flex">
                                             <div className="justify-end items-center gap-1.5 flex overflow-hidden">
-                                                <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${Number(subtotal ?? 0).toFixed(2)}`}</div>
+                                                <div className="text-right text-[#0d9383] text-lg font-medium font-['Inter']  leading-7">{`$ ${Number(baseTotal).toFixed(2)}`}</div>
                                             </div>
                                         </div>
                                     </div>
-                                    {(couponRes || cart.discountCode) && (
+                                    {couponRes && (
                                         <div className="self-stretch py-2 border-b border-[#e4e7ec] justify-start flex items-center gap-4">
                                             <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
                                                 <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex">
-                                                    <div className="self-stretch text-[#101828] text-base font-medium font-['Inter'] leading-5">Coupon: {couponValue || cart.discountCode}</div>
+                                                    <div className="self-stretch text-[#101828] text-base font-medium font-['Inter'] leading-5">Coupon: {couponValue}</div>
                                                 </div>
                                             </div>
                                             <div className="justify-start items-center gap-4 flex">
                                                 <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                                    <div className="text-[#ef4444] text-base font-semibold font-['Inter'] leading-6">{couponLabel || cart.discountPrice ? `$ ${Number(cart.discountPrice ?? 0).toFixed(2)}` : ''}</div>
+                                                    <div className="text-[#ef4444] text-base font-semibold font-['Inter'] leading-6">{couponLabel}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -961,7 +963,7 @@ const CheckoutPage = () => {
                                         </div>
                                         <div className="justify-start items-center gap-4 flex">
                                             <div className="justify-center items-center gap-1.5 flex overflow-hidden">
-                                                <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$ ${Number(cart.finalPrice ?? 0).toFixed(2)}`}</div>
+                                                <div className="text-[#101828] text-3xl font-bold font-['Inter'] leading-[38px]">{`$ ${Number(displayedTotal).toFixed(2)}`}</div>
                                             </div>
                                         </div>
                                     </div>
