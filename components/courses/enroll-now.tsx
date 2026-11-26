@@ -194,9 +194,7 @@ const EnrollNowCart = ({
 
       toast.error(`Please Login first`);
       localStorage.setItem("cartData", JSON.stringify(payload));
-      // After login/register redirect user to checkout so they can complete enrollment
-      const postLogin = `/checkout`;
-      router.push(`/login?callbackUrl=${encodeURIComponent(postLogin)}`);
+      router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 
     }
   }
