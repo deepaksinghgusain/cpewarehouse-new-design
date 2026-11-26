@@ -149,7 +149,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                         <div className="self-stretch  justify-start items-start gap-8">
                                                             {
                                                                 outline.list.length > 0 && outline.list.map((item: any, index: number) => (
-                                                                    <div className="grow shrink basis-0 h-12 justify-start items-start gap-3 flex mb-4" key={index}>
+                                                                    <div className="grow shrink basis-0 h-full justify-start items-start gap-3 flex mb-4" key={index}>
                                                                         <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
                                                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                                 <g id="Check icon">
