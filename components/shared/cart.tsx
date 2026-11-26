@@ -167,16 +167,8 @@ export function CartComponent() {
                                                                     title
                                                                 )}
                                                             </h3>
-                                                            {category && (
-                                                                <p className="text-gray-500 text-sm">
-                                                                    Category: {category}
-                                                                </p>
-                                                            )}
                                                             <p className="text-gray-500 text-sm">
-                                                                $ {Number(price ?? 0).toFixed(2)} each
-                                                            </p>
-                                                            <p className="text-gray-700 text-sm mt-1">
-                                                                $ {(Number(price ?? 0) * Number(qty ?? 0)).toFixed(2)} total
+                                                                $ {Number(price ?? 0).toFixed(2)} x {qty} qty = $ {(Number(price ?? 0) * Number(qty ?? 0)).toFixed(2)}
                                                             </p>
                                                         </div>
 
@@ -220,24 +212,25 @@ export function CartComponent() {
                                     <div className="p-5 border-t border-gray-200">
                                         <Separator className="my-4" />
 
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between text-lg font-semibold">
-                                                <span>Sub Total</span>
-                                                <span>$ {Number(subtotal ?? 0).toFixed(2)}</span>
-                                            </div>
-                                        </div>
-
                                         {cart.discountCode && (
-                                            <div className="space-y-3">
-                                                <div className="flex items-center justify-between text-lg font-semibold">
-                                                    <span>Discount Code</span>
-                                                    <span>{cart.discountCode}</span>
+                                            <>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center justify-between text-lg font-semibold">
+                                                        <span>Sub Total</span>
+                                                        <span>$ {Number(subtotal ?? 0).toFixed(2)}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center text-red-500 justify-between text-lg font-semibold">
-                                                    <span>Discount Price</span>
-                                                    <span>- $ {Number(cart.discountPrice ?? 0).toFixed(2)}</span>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center justify-between text-lg font-semibold">
+                                                        <span>Discount Code</span>
+                                                        <span>{cart.discountCode}</span>
+                                                    </div>
+                                                    <div className="flex items-center text-red-500 justify-between text-lg font-semibold">
+                                                        <span>Discount Price</span>
+                                                        <span>- $ {Number(cart.discountPrice ?? 0).toFixed(2)}</span>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </>
                                         )}
 
                                         <div className="space-y-3">

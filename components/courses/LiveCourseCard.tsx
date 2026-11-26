@@ -112,8 +112,8 @@ const LiveCourseCard = ({ courses, filterValue }: { courses: any, filterValue: a
                                             className="flex h-12 w-full flex-col items-start justify-start gap-3 border-t border-white/30 bg-white/30 p-3 backdrop-blur-xl sm:h-14 sm:gap-6 sm:p-4">
                                             <div className="w-full justify-start items-start gap-6 inline-flex">
                                                 <div className="flex-col justify-start items-center inline-flex mt-2">
-                                                    <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">Credits:
-                                                        {course.attributes?.credit} |
+                                                    <div className="text-white text-[14px] text-base font-bold font-['Inter'] leading-normal">
+                                                        Credits:
                                                         {course.attributes?.creditsInfo}
                                                     </div>
                                                 </div>
