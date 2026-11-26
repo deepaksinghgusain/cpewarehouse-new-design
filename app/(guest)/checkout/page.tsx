@@ -32,14 +32,16 @@ const CheckoutPage = () => {
         }
         return '';
     }
+
+    console.log('cart', cart)
     const items = cart?.items || [];
     const enrollments = items.reduce((acc: number, it: any) => acc + (it.qty || it.quantity || 1), 0);
-    const subtotal = items.reduce((acc: number, it: any) => {
-        const price = Number(it.course?.data?.attributes?.price ?? it.course?.price ?? it.price ?? 0);
-        const quantity = Number(it.qty ?? it.quantity ?? 1);
-        return acc + price * quantity;
-    }, 0);
-    const baseTotal = Number(cart?.total) || subtotal;
+    const subtotal = items.reduce(
+        (acc: number, it: any) =>
+            acc + (Number(it.course?.price || 0) * Number(it.qty || it.quantity || 1)),
+        0
+    );
+    const baseTotal = subtotal;
     const [agreeTerms, setAgreeTerms] = React.useState(false);
     const [couponValue, setCouponValue] = React.useState('');
     const [couponErrMsg, setCouponErrMsg] = React.useState('');
@@ -67,8 +69,23 @@ const CheckoutPage = () => {
         }[]
     }[]>([])
 
-    const displayedTotal = couponRes ? Number(finalPrice) : baseTotal;
-    const couponLabel = couponType === 'amountOff' ? `- $ ${Number(couponValueOFF ?? 0).toFixed(2)}` : couponType === 'percentOff' ? `- ${Number(couponValueOFF ?? 0)}%` : '';
+    const hasCartCoupon = Boolean(cart?.discountCode);
+    const cartFinalPrice = Number(cart?.finalPrice);
+    const displayedTotal = couponRes
+        ? Number(finalPrice)
+        : hasCartCoupon && cart?.finalPrice != null && Number.isFinite(cartFinalPrice)
+            ? cartFinalPrice
+            : baseTotal;
+    const displayedCouponCode = couponRes ? couponValue.trim() : cart?.discountCode || '';
+    const couponLabel = couponRes
+        ? couponType === 'amountOff'
+            ? `- $ ${Number(couponValueOFF ?? 0).toFixed(2)}`
+            : couponType === 'percentOff'
+                ? `- ${Number(couponValueOFF ?? 0)}%`
+                : ''
+        : hasCartCoupon
+            ? `- $ ${Math.max(0, baseTotal - displayedTotal).toFixed(2)}`
+            : '';
 
     const router = useRouter();
 
@@ -321,15 +338,19 @@ const CheckoutPage = () => {
             const originalCartItems: any[] = cart.items || [];
             
             const cartItems: any[] = buildCartItemsWithParticipantEnrolls(originalCartItems).map((item: any) => ({
-                ...item,
+                ...item, 
                 course: { ...item.course },
                 Enrolls: item.Enrolls ? item.Enrolls.map((en: any) => ({ ...en })) : [],
                 Enrollment: item.Enrollment ? item.Enrollment.map((en: any) => ({ ...en })) : item.Enrolls ? item.Enrolls.map((en: any) => ({ ...en })) : [],
             }));
 
             const cartData: any = cart;
-            const appliedCouponCode = couponRes ? couponValue.trim() : '';
+            const appliedCouponCode = displayedCouponCode;
             const orderFinalPrice = displayedTotal;
+            const orderDiscountRatio = baseTotal > 0
+                ? Math.min(1, Math.max(0, (baseTotal - orderFinalPrice) / baseTotal))
+                : 0;
+            const hasAppliedCoupon = Boolean(appliedCouponCode);
 
             const gtagData: any[] = [];
             const checkoutData: any[] = [];
@@ -372,33 +393,12 @@ const CheckoutPage = () => {
                 }
 
                 // PRICE
-                const eachPrice: any =
-                    (data?.course?.discounted_price ||
-                        data?.course?.discount) > 0
-                        ? (
-                            data?.course?.discounted_price ||
-                            data?.course?.discount
-                        )
-                        : (
-                            data?.course?.price >= 0 &&
-                            data?.course?.price != null
-                        )
-                            ? data?.course?.price
-                            : data?.course?.includedCoursePrice;
+                const eachPrice = Number(data.course?.price || 0);
 
                 let couponDiscountedPrice: any = eachPrice;
 
-                if (couponRes && couponType == 'percentOff') {
-
-                    const discountedAmount: any = Number(((Number(eachPrice) * Number(couponValueOFF)) / 100).toFixed(2));
-
-                    couponDiscountedPrice = Number((Number(eachPrice) - discountedAmount).toFixed(2));
-
-                } else if (couponRes && couponType == 'amountOff') {
-
-                    const discountedAmount: any = Number((Number(couponValueOFF) / (lengthOfCartItems * (data.qty || 1))).toFixed(2));
-
-                    couponDiscountedPrice = Number((Number(eachPrice) - discountedAmount).toFixed(2));
+                if (hasAppliedCoupon) {
+                    couponDiscountedPrice = Number((Number(eachPrice) * (1 - orderDiscountRatio)).toFixed(2));
                 }
 
                 const priceIncents: any = Number((Number(couponDiscountedPrice || 0) * 100).toFixed(0));
@@ -414,15 +414,15 @@ const CheckoutPage = () => {
                                 : priceIncents,
                     },
                     images: [imageUrlConstant + data.course.url],
-                    qty: data.qty,
+                    qty: data.qty || data.quantity || 1,
                     coupon: '',
                     orderId: 0,
                     discountCoupon:
-                        couponRes == true
+                        hasAppliedCoupon
                             ? {
                                 name: appliedCouponCode,
-                                value: couponValueOFF || '',
-                                type: couponType || '',
+                                value: (couponRes ? couponValueOFF : cart.discountPrice) || '',
+                                type: couponRes ? couponType : '',
                                 email: localStorage.getItem('email'),
                             }
                             : {},
@@ -462,43 +462,13 @@ const CheckoutPage = () => {
                 delete cartItems[index]['id'];
 
                 // PARTICULAR PRICE
-                let particularPrice;
-
-                if (
-                    cartItems[index]['course']['discount'] > 0 ||
-                    cartItems[index]['course']['discounted_price'] > 0
-                ) {
-
-                    particularPrice =
-                        cartItems[index]['course']['discount'] ||
-                        cartItems[index]['course']['discounted_price'];
-
-                } else if (
-                    cartItems[index]['course']['price']
-                ) {
-
-                    particularPrice =
-                        cartItems[index]['course']['price'];
-
-                } else {
-
-                    particularPrice =
-                        cartItems[index]['course']['includedCoursePrice'];
-                }
+                const particularPrice = Number(cartItems[index].course?.price || 0);
 
                 cartItems[index]['price'] = particularPrice;
 
-                let noOfEnroll = cartItems[index]?.Enrolls?.length || 1;
-
                 // FINAL PRICE
-                if (couponRes && couponType == 'amountOff') {
-
-                    cartItems[index]['finalPrice'] = Number((Number(particularPrice) - (Number(couponValueOFF) / (lengthOfCartItems * noOfEnroll))).toFixed(2));
-
-                } else if (couponRes && couponType == 'percentOff') {
-
-                    cartItems[index]['finalPrice'] = Number((Number(particularPrice) - ((Number(couponValueOFF) * Number(particularPrice)) / 100)).toFixed(2));
-
+                if (hasAppliedCoupon) {
+                    cartItems[index]['finalPrice'] = Number((Number(particularPrice) * (1 - orderDiscountRatio)).toFixed(2));
                 } else {
 
                     cartItems[index]['finalPrice'] =  particularPrice;
@@ -557,6 +527,59 @@ const CheckoutPage = () => {
                 });
             });
 
+            const expectedStripeTotalCents = Math.round(orderFinalPrice * 100);
+            const calculateStripeTotalCents = () => checkoutData.reduce(
+                (total: number, item: any) =>
+                    total +
+                    Number(item.default_price_data.unit_amount_decimal || 0) *
+                    Number(item.qty || 1),
+                0
+            );
+            let stripeTotalCents = calculateStripeTotalCents();
+            const centsDifference = expectedStripeTotalCents - stripeTotalCents;
+
+            if (centsDifference !== 0 && checkoutData.length > 0) {
+                const adjustmentIndex = checkoutData.findIndex((item: any) =>
+                    Number(item.default_price_data.unit_amount_decimal || 0) + centsDifference >= 0
+                );
+
+                if (adjustmentIndex === -1) {
+                    setFormSubmitError('Unable to reconcile the checkout total. Please review your cart and try again.');
+                    return;
+                }
+
+                const lineItem = checkoutData[adjustmentIndex];
+                const adjustedUnitAmount =
+                    Number(lineItem.default_price_data.unit_amount_decimal || 0) + centsDifference;
+                const quantity = Number(lineItem.qty || 1);
+
+                if (quantity > 1) {
+                    checkoutData[adjustmentIndex] = { ...lineItem, qty: quantity - 1 };
+                    checkoutData.splice(adjustmentIndex + 1, 0, {
+                        ...lineItem,
+                        qty: 1,
+                        default_price_data: {
+                            ...lineItem.default_price_data,
+                            unit_amount_decimal: adjustedUnitAmount,
+                        },
+                    });
+                } else {
+                    checkoutData[adjustmentIndex] = {
+                        ...lineItem,
+                        default_price_data: {
+                            ...lineItem.default_price_data,
+                            unit_amount_decimal: adjustedUnitAmount,
+                        },
+                    };
+                }
+
+                stripeTotalCents = calculateStripeTotalCents();
+            }
+
+            if (stripeTotalCents !== expectedStripeTotalCents) {
+                setFormSubmitError('The Stripe total does not match your cart total. Please review your cart and try again.');
+                return;
+            }
 
             // ORDER DATA
             const orderData = {
@@ -565,12 +588,11 @@ const CheckoutPage = () => {
                     userId: user?.user?.id,
                     totalPrice: baseTotal,
                     discountCode: appliedCouponCode,
-                    discountPrice: couponRes == true ? couponValueOFF : 0,
+                    discountPrice: hasAppliedCoupon ? (couponRes ? couponValueOFF : cart.discountPrice) : 0,
                     finalPrice: orderFinalPrice,
                     stripeOrderId: '',
                     orderStatus: 'pending',
-                    discountType:
-                        couponRes == true ? couponType : '',
+                    discountType: hasAppliedCoupon && couponRes ? couponType : '',
                     userName: localStorage.getItem('username'),
                     email: localStorage.getItem('email'),
                     receiptUrl: '',
@@ -604,13 +626,11 @@ const CheckoutPage = () => {
                     cd.orderId = orderId;
 
                     cd.customerid =
-                        localStorage.getItem('cid') || 'undefined';
+                        localStorage.getItem('cid') || '';
 
                     cd.email =
                         localStorage.getItem('email') || '';
                 });
-
-                console.log('CHECKOUT DATA', checkoutData);
 
                 checkoutUrl(checkoutData);
 
@@ -941,11 +961,11 @@ const CheckoutPage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    {couponRes && (
+                                    {(couponRes || hasCartCoupon) && (
                                         <div className="self-stretch py-2 border-b border-[#e4e7ec] justify-start flex items-center gap-4">
                                             <div className="grow shrink basis-0 h-[38px] justify-start items-center gap-4 flex">
                                                 <div className="grow shrink basis-0 flex-col justify-start items-start gap-0.5 inline-flex">
-                                                    <div className="self-stretch text-[#101828] text-base font-medium font-['Inter'] leading-5">Coupon: {couponValue}</div>
+                                                    <div className="self-stretch text-[#101828] text-base font-medium font-['Inter'] leading-5">Coupon: {displayedCouponCode}</div>
                                                 </div>
                                             </div>
                                             <div className="justify-start items-center gap-4 flex">
