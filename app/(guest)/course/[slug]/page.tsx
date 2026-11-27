@@ -567,11 +567,11 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
 
                                         <div className="px-6 pt-6">
                                             <div className="h-32 overflow-hidden rounded-md">
-                                                <video
-                                                    src="/assets/images/package-image.mp4"
+                                                <img
+                                                    src="/assets/images/package-image.jpeg"
 
                                                     className="w-full h-full object-fill border border-blue-600"
-                                                ></video>
+                                                />
                                             </div>
                                         </div>
 

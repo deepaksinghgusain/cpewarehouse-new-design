@@ -167,10 +167,11 @@ const PackageTabs = ({
                   <div className="flex w-full max-w-96 flex-col overflow-hidden rounded-xl bg-white shadow-lg">
                     <div className="px-6 pt-6">
                       <div className="h-32 overflow-hidden rounded-md">
-                        <video
-                          src="/assets/images/package-image.mp4"
+                        <img
+                          src="/assets/images/package-image.jpeg"
+
                           className="w-full h-full object-fill border border-blue-600"
-                        ></video>
+                        />
                       </div>
                     </div>
 
@@ -277,15 +278,15 @@ const PackageTabs = ({
                         <div className="self-stretch justify-start items-start gap-2 inline-flex">
                           {course.attributes?.category?.data?.attributes
                             ?.title === "Live" && (
-                            <div className="pl-2 pr-2.5 py-0.5 bg-[#ecfcf2] rounded-full border border-[#aaefc6] justify-start items-center gap-1.5 flex">
-                              <div className="w-2 h-2 relative">
-                                <div className="w-1.5 h-1.5 left-[1px] top-[1px] absolute bg-[#17b169] rounded-full"></div>
+                              <div className="pl-2 pr-2.5 py-0.5 bg-[#ecfcf2] rounded-full border border-[#aaefc6] justify-start items-center gap-1.5 flex">
+                                <div className="w-2 h-2 relative">
+                                  <div className="w-1.5 h-1.5 left-[1px] top-[1px] absolute bg-[#17b169] rounded-full"></div>
+                                </div>
+                                <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">
+                                  Live webinar
+                                </div>
                               </div>
-                              <div className="text-center text-[#057647] text-sm font-medium font-['Inter'] leading-tight">
-                                Live webinar
-                              </div>
-                            </div>
-                          )}
+                            )}
 
                           <div className="px-2.5 py-0.5 bg-pink-50 rounded-full  outline-1 outline-offset-[-1px] outline-pink-200 inline-flex justify-start items-center">
                             <div className="text-center justify-start text-pink-700 text-sm font-medium font-['Inter'] leading-tight">
@@ -301,23 +302,23 @@ const PackageTabs = ({
                           </Link>
                           {course.attributes?.category?.data?.attributes
                             ?.title !== "Recorded" && (
-                            <div className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-sm font-normal font-['Inter'] leading-normal">
-                              {(() => {
-                                const s = toUserTZ(course.attributes?.startDate);
-                                const e = toUserTZ(course.attributes?.endDate);
-                                return (
-                                  <>
-                                    {s ? s.format('dddd MMM D YYYY') : ''} {' '}
-                                    |
-                                    {s ? ` ${s.format('h:mm a').toUpperCase()}` : ''} {' '}
-                                    -
-                                    {e ? ` ${e.format('h:mm a').toUpperCase()}` : ''} {' '}
-                                    {s ? ` ${s.format('z')}` : ''}
-                                  </>
-                                )
-                              })()}
-                            </div>
-                          )}
+                              <div className="self-stretch justify-start text-Colors-Text-text-tertiary-(600) text-sm font-normal font-['Inter'] leading-normal">
+                                {(() => {
+                                  const s = toUserTZ(course.attributes?.startDate);
+                                  const e = toUserTZ(course.attributes?.endDate);
+                                  return (
+                                    <>
+                                      {s ? s.format('dddd MMM D YYYY') : ''} {' '}
+                                      |
+                                      {s ? ` ${s.format('h:mm a').toUpperCase()}` : ''} {' '}
+                                      -
+                                      {e ? ` ${e.format('h:mm a').toUpperCase()}` : ''} {' '}
+                                      {s ? ` ${s.format('z')}` : ''}
+                                    </>
+                                  )
+                                })()}
+                              </div>
+                            )}
                         </div>
                       </div>
                     </div>
@@ -399,128 +400,128 @@ const PackageTabs = ({
         </div> */}
       </TabsContent>
       <TabsContent value="CPE Info">
-        { packageData.cpe_info && (
+        {packageData.cpe_info && (
           <div className="inline-flex w-full flex-col items-center justify-start gap-10 overflow-hidden bg-Colors-Background-bg-primary mt-4 text-[#475467] sm:gap-16 ">
             <div className="inline-flex w-full flex-wrap content-start items-start justify-start gap-8 px-4 sm:gap-16 sm:px-8">
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
                 <div
                   className="w-full flex flex-col justify-start items-start gap-5"
                   dangerouslySetInnerHTML={{ __html: packageData.cpe_info }}
-              ></div>
+                ></div>
+              </div>
             </div>
-          </div>
-        </div>)}
+          </div>)}
 
         {packageData?.accredited_partners && (
           <section>
             {packageData?.package_sponser && (
-                <div className="mx-auto mt-4">
-                  <div className="grid grid-cols-1 gap-6 px-4 sm:px-8 lg:grid-cols-6 lg:gap-4">
-                        <div className="min-w-0 py-5 lg:col-span-4 lg:gap-8">
-                      <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
-                        {packageData?.package_sponser.title}
+              <div className="mx-auto mt-4">
+                <div className="grid grid-cols-1 gap-6 px-4 sm:px-8 lg:grid-cols-6 lg:gap-4">
+                  <div className="min-w-0 py-5 lg:col-span-4 lg:gap-8">
+                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
+                      {packageData?.package_sponser.title}
+                    </div>
+                    <div className="flex flex-col items-start justify-start gap-4 px-1 sm:flex-row sm:flex-wrap sm:gap-8">
+                      <div className="flex w-full flex-wrap items-start justify-start sm:w-auto">
+                        {packageData?.package_sponser.list.length > 0 &&
+                          packageData?.package_sponser.list.map((list: any, index: number) => (
+                            <div
+                              className="inline-flex w-full grow shrink basis-0 flex-col items-center justify-start gap-5 px-2 pt-6 sm:w-auto sm:px-4"
+                              key={index}
+                            >
+                              <div className="self-stretch justify-start items-start gap-3 inline-flex">
+                                <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
+                                  <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
+                                    <svg
+                                      width="28"
+                                      height="28"
+                                      viewBox="0 0 28 28"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <g id="check-circle">
+                                        <path
+                                          id="Icon"
+                                          d="M8.75065 14.0002L12.2507 17.5002L19.2507 10.5002M25.6673 14.0002C25.6673 20.4435 20.444 25.6668 14.0007 25.6668C7.55733 25.6668 2.33398 20.4435 2.33398 14.0002C2.33398 7.55684 7.55733 2.3335 14.0007 2.3335C20.444 2.3335 25.6673 7.55684 25.6673 14.0002Z"
+                                          stroke="#7F56D9"
+                                          strokeWidth="2.33333"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                      </g>
+                                    </svg>
+                                  </div>
+                                </div>
+                                <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
+                                  <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
+                                    {list.value}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                       </div>
-                      <div className="flex flex-col items-start justify-start gap-4 px-1 sm:flex-row sm:flex-wrap sm:gap-8">
-                        <div className="flex w-full flex-wrap items-start justify-start sm:w-auto">
-                          {packageData?.package_sponser.list.length > 0 &&
-                            packageData?.package_sponser.list.map((list: any, index: number) => (
-                              <div
-                                className="inline-flex w-full grow shrink basis-0 flex-col items-center justify-start gap-5 px-2 pt-6 sm:w-auto sm:px-4"
-                                key={index}
-                              >
-                                <div className="self-stretch justify-start items-start gap-3 inline-flex">
-                                  <div className="w-7 h-7 rounded-full justify-center items-center flex overflow-hidden">
-                                    <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
+                    </div>
+                    <div className="flex flex-col items-start justify-start gap-5 self-stretch py-4">
+                      <div className="flex flex-col items-start justify-center gap-2 self-stretch">
+                        <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
+                          {packageData?.package_sponser.description}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="inline-flex flex-col items-start justify-start gap-8 self-stretch lg:col-span-2">
+                    <div className="flex items-start justify-center gap-8 self-stretch">
+                      <div className="grow shrink basis-0 bg-white rounded-2xl  border border-[#e4e7ec] flex-col justify-start items-start inline-flex">
+                        <div className="flex flex-col items-start justify-start gap-6 self-stretch px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8">
+                          <div className="self-stretch flex-col justify-start items-start gap-4 flex">
+                            {packageData?.package_sponser.features.length > 0 &&
+                              packageData?.package_sponser.features.map(
+                                (feature: any, index: number) => (
+                                  <div
+                                    className="self-stretch justify-start items-start gap-3 inline-flex"
+                                    key={index}
+                                  >
+                                    <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
                                       <svg
-                                        width="28"
-                                        height="28"
-                                        viewBox="0 0 28 28"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
                                         fill="none"
                                         xmlns="http://www.w3.org/2000/svg"
                                       >
-                                        <g id="check-circle">
+                                        <g id="Check icon">
+                                          <path
+                                            d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
+                                            fill="#DCFAE6"
+                                          />
                                           <path
                                             id="Icon"
-                                            d="M8.75065 14.0002L12.2507 17.5002L19.2507 10.5002M25.6673 14.0002C25.6673 20.4435 20.444 25.6668 14.0007 25.6668C7.55733 25.6668 2.33398 20.4435 2.33398 14.0002C2.33398 7.55684 7.55733 2.3335 14.0007 2.3335C20.444 2.3335 25.6673 7.55684 25.6673 14.0002Z"
-                                            stroke="#7F56D9"
-                                            strokeWidth="2.33333"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
+                                            d="M17.096 7.39016L9.93602 14.3002L8.03602 12.2702C7.68602 11.9402 7.13602 11.9202 6.73602 12.2002C6.34602 12.4902 6.23602 13.0002 6.47602 13.4102L8.72602 17.0702C8.94602 17.4102 9.32601 17.6202 9.75601 17.6202C10.166 17.6202 10.556 17.4102 10.776 17.0702C11.136 16.6002 18.006 8.41016 18.006 8.41016C18.906 7.49016 17.816 6.68016 17.096 7.38016V7.39016Z"
+                                            fill="#079455"
                                           />
                                         </g>
                                       </svg>
                                     </div>
-                                  </div>
-                                  <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
-                                    <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
-                                      {list.value}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-start justify-start gap-5 self-stretch py-4">
-                        <div className="flex flex-col items-start justify-center gap-2 self-stretch">
-                          <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
-                            {packageData?.package_sponser.description}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="inline-flex flex-col items-start justify-start gap-8 self-stretch lg:col-span-2">
-                      <div className="flex items-start justify-center gap-8 self-stretch">
-                        <div className="grow shrink basis-0 bg-white rounded-2xl  border border-[#e4e7ec] flex-col justify-start items-start inline-flex">
-                          <div className="flex flex-col items-start justify-start gap-6 self-stretch px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8">
-                            <div className="self-stretch flex-col justify-start items-start gap-4 flex">
-                              {packageData?.package_sponser.features.length > 0 &&
-                                packageData?.package_sponser.features.map(
-                                  (feature: any, index: number) => (
-                                    <div
-                                      className="self-stretch justify-start items-start gap-3 inline-flex"
-                                      key={index}
-                                    >
-                                      <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
-                                        <svg
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <g id="Check icon">
-                                            <path
-                                              d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
-                                              fill="#DCFAE6"
-                                            />
-                                            <path
-                                              id="Icon"
-                                              fillRule="evenodd"
-                                              clipRule="evenodd"
-                                              d="M17.096 7.39016L9.93602 14.3002L8.03602 12.2702C7.68602 11.9402 7.13602 11.9202 6.73602 12.2002C6.34602 12.4902 6.23602 13.0002 6.47602 13.4102L8.72602 17.0702C8.94602 17.4102 9.32601 17.6202 9.75601 17.6202C10.166 17.6202 10.556 17.4102 10.776 17.0702C11.136 16.6002 18.006 8.41016 18.006 8.41016C18.906 7.49016 17.816 6.68016 17.096 7.38016V7.39016Z"
-                                              fill="#079455"
-                                            />
-                                          </g>
-                                        </svg>
-                                      </div>
-                                      <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
-                                        <div className="self-stretch text-[#344054] text-lg font-semibold font-['Inter'] leading-7">
-                                          {feature.value}
-                                        </div>
+                                    <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
+                                      <div className="self-stretch text-[#344054] text-lg font-semibold font-['Inter'] leading-7">
+                                        {feature.value}
                                       </div>
                                     </div>
-                                  ),
-                                )}
-                            </div>
+                                  </div>
+                                ),
+                              )}
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
-              
+              </div>
+            )}
+
             <div className="w-full py-12 bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
               {/* <div className="flex w-full flex-col items-start justify-start gap-5 px-4 sm:px-8">
                 <div className="flex w-full flex-col items-start justify-start gap-5">
@@ -562,7 +563,7 @@ const PackageTabs = ({
                 </div>
               </div>
 
-              
+
             </div>
           </section>
         )}
