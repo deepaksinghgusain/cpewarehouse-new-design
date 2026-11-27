@@ -399,21 +399,22 @@ const PackageTabs = ({
         </div> */}
       </TabsContent>
       <TabsContent value="CPE Info">
-        <div className="inline-flex w-full flex-col items-center justify-start gap-10 overflow-hidden bg-Colors-Background-bg-primary py-10 text-[#475467] sm:gap-16 sm:py-16 lg:py-24">
-          <div className="inline-flex w-full flex-wrap content-start items-start justify-start gap-8 px-4 sm:gap-16 sm:px-8">
-            <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
-              <div
-                className="w-full flex flex-col justify-start items-start gap-5"
-                dangerouslySetInnerHTML={{ __html: packageData.cpe_info }}
+        { packageData.cpe_info && (
+          <div className="inline-flex w-full flex-col items-center justify-start gap-10 overflow-hidden bg-Colors-Background-bg-primary mt-4 text-[#475467] sm:gap-16 ">
+            <div className="inline-flex w-full flex-wrap content-start items-start justify-start gap-8 px-4 sm:gap-16 sm:px-8">
+              <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
+                <div
+                  className="w-full flex flex-col justify-start items-start gap-5"
+                  dangerouslySetInnerHTML={{ __html: packageData.cpe_info }}
               ></div>
             </div>
           </div>
-        </div>
+        </div>)}
 
         {packageData?.accredited_partners && (
           <section>
             {packageData?.package_sponser && (
-                <div className="mx-auto">
+                <div className="mx-auto mt-4">
                   <div className="grid grid-cols-1 gap-6 px-4 sm:px-8 lg:grid-cols-6 lg:gap-4">
                         <div className="min-w-0 py-5 lg:col-span-4 lg:gap-8">
                       <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">

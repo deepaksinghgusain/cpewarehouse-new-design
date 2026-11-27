@@ -181,7 +181,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 {
                                     creditAndInfo?.content && (<div className="">
                                         <div
-                                            className="w-full overflow-hidden bg-Colors-Background-bg-primary py-8 text-[#475467] sm:py-12">
+                                            className="w-full overflow-hidden bg-Colors-Background-bg-primary mt-4 text-[#475467] ">
                                             <div className="w-full px-0 sm:px-8">
                                                 <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
                                                     <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content ?? '' }} >
@@ -193,7 +193,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 }
 
                                 <section>
-                                    <div className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
+                                    <div className="mx-auto w-[calc(100%-2rem)] sm:w-[90%] mt-4">
                                         <div className="flex flex-col items-start gap-8 lg:flex-row">
                                             <div className="w-full py-5 lg:w-2/3">
                                                 <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
