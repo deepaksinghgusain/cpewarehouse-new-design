@@ -7,6 +7,7 @@ interface CartState {
 	discountCode: string;
 	discountPrice: number;
 	finalPrice: number;
+	isUpdating: boolean;
 }
 
 const initialState: CartState = {
@@ -15,7 +16,8 @@ const initialState: CartState = {
 	total: 0,
 	discountCode: "",
 	discountPrice: 0,
-	finalPrice: 0
+	finalPrice: 0,
+	isUpdating: false
 };
 
 const getCartItemPrice = (item: any) => {
@@ -34,6 +36,9 @@ const cartSlice = createSlice({
 	name: "cart",
 	initialState,
 	reducers: {
+		setCartUpdating(state, action: PayloadAction<boolean>) {
+			state.isUpdating = action.payload;
+		},
 		setCart(state, action: PayloadAction<any>) {
 
 
@@ -129,6 +134,6 @@ const cartSlice = createSlice({
 	},
 });
 
-export const { setCart, addItem, removeItem, clearCart } = cartSlice.actions;
+export const { setCart, setCartUpdating, addItem, removeItem, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;
 

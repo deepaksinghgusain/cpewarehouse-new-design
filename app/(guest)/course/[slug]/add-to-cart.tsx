@@ -20,63 +20,9 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
   const [addItems, setAddItems] = useState(1);
   const [showShareModal, setShowShareModal] = useState(false);
 
-  const getcardCount = async (cartId: number) => {
-    if (cartId > 0) {
-      let resp = await getCart(cartId);
-    }
-  };
-
   const selectedCourse: any = {
     id: courseData?.id,
     attributes: courseData,
-  };
-
-  const updateTotal = () => {
-    let total = 0;
-    let cartData: any;
-    cartData.data.CartItem.map((ci: any, index: any) => {
-      if (ci.course != undefined) {
-        if (ci.courseId > 0) {
-          total +=
-            (ci.course.discount || ci.course.discountPrice) > 0
-              ? ci.course.discount * ci.qty ||
-                ci.course.discountPrice * ci.qty ||
-                ci.course.discountPrice * ci.qty
-              : ci.course.price * ci.qty;
-        } else {
-          if (ci.course.discountPrice != null && ci.course.discountPrice > 0) {
-            total += ci.course.discountPrice * ci.qty;
-          } else if (ci.course.price != null && ci.course.price >= 0) {
-            total += ci.course.price * ci.qty;
-          } else {
-            total += ci.course.includedCoursePrice * ci.qty;
-          }
-        }
-      }
-    });
-
-    cartData.data.total = total;
-    cartData.data.finalPrice = total;
-  };
-
-  const updateCart = async (cartId: any, cartData: any) => {
-    const token = localStorage.getItem("token") || "";
-
-    let response = await fetch(
-      process.env.NEXT_PUBLIC_API_BASE_URL + `/api/carts/${cartId}`,
-      {
-        method: "POST",
-        body: JSON.stringify(cartData),
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-      },
-    );
-
-    let resp = await response.json();
-    getcardCount(cartId);
-    router.push("/learner/shopping-cart");
   };
 
   return (
@@ -120,7 +66,7 @@ const AddToCardComponent = ({ courseData, instructor, slug }: any) => {
                 ${courseData?.price * seats}
               </div>
               <div className="text-[#0e9384] text-[32px] font-semibold font-['Inter'] leading-[38px]">
-                ${(courseData?.price - (courseData?.discount ?? 0)) * seats}
+                ${((courseData?.discount ? courseData?.discount : courseData?.price) * seats)}
               </div>
             </div>
           </div>

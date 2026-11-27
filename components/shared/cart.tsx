@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ShoppingCart, Minus, Plus, Trash2 } from "lucide-react"
+import { ShoppingCart, Minus, Plus, Trash2, LoaderCircle } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,6 @@ const getCartItemPrice = (item: any) => {
     console.log("item", item)
     const attributes = item.course?.data?.attributes ?? item.course?.attributes ?? item.course ?? {}
 
-    console.log("attributes", attributes)
     const discount = attributes.discount ?? item.discount
     const discountedPrice = attributes.discounted_price ?? item.discounted_price
     const price = Number(attributes.price ?? item.course?.price ?? item.price ?? 0)
@@ -185,16 +184,22 @@ export function CartComponent() {
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() => decreaseQty(item)}
+                                                                    disabled={cart.isUpdating}
                                                                 >
                                                                     <Minus className="w-4 h-4" />
                                                                 </Button>
 
-                                                                <span className="px-4 text-sm">{qty}</span>
+                                                                <span className="flex min-w-8 justify-center px-2 text-sm" aria-live="polite">
+                                                                    {cart.isUpdating
+                                                                        ? <LoaderCircle className="h-4 w-4 animate-spin" aria-label="Updating quantity" />
+                                                                        : qty}
+                                                                </span>
 
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() => increaseQty(item)}
+                                                                    disabled={cart.isUpdating}
                                                                 >
                                                                     <Plus className="w-4 h-4" />
                                                                 </Button>
@@ -204,6 +209,7 @@ export function CartComponent() {
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 onClick={() => removeCartItem(item)}
+                                                                disabled={cart.isUpdating}
                                                             >
                                                                 <Trash2 className="w-5 h-5 text-red-500" />
                                                             </Button>

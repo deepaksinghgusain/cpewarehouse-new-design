@@ -1,7 +1,7 @@
 import { call, put, select, takeLatest } from "redux-saga/effects";
 import { CART_ADD_REQUEST, CART_UPDATE_REQUEST, CART_GET_REQUEST, CART_CLEAR_REQUEST } from "../actions/cart-actions";
 import { createCart, updateCartAPI, getCart } from "@/services/cart";
-import { setCart, clearCart } from "../reducers/cart-reducer";
+import { setCart, setCartUpdating, clearCart } from "../reducers/cart-reducer";
 
 const getCartItemPrice = (item: any) => {
   const attributes = item.course?.data?.attributes ?? item.course?.attributes ?? item.course ?? {};
@@ -189,6 +189,7 @@ function buildFullCartBody(cartState: any, payload: any) {
 }
 
 function* handleUpdateCart(action: any): Generator<any, any, any> {
+  yield put(setCartUpdating(true));
   try {
     const payload = action.payload;
     const cartState = yield select((state: any) => state.cart);
@@ -204,6 +205,8 @@ function* handleUpdateCart(action: any): Generator<any, any, any> {
     }
   } catch (err) {
     console.error("update cart error", err);
+  } finally {
+    yield put(setCartUpdating(false));
   }
 }
 

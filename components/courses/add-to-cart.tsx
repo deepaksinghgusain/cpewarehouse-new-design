@@ -108,7 +108,7 @@ const AddToCart = ({ course, quantity, type, absolute = true, className }: { cou
     const discount = Number(attributes.discount ?? 0);
     const discountedPrice = Number(attributes.discountedPrice ?? 0);
     const realPrice: number = discount !== 0
-      ? Math.max(Number(attributes.price ?? price ?? 0) - discount, 0)
+      ? Math.max(Number(discount), 0)
       : discountedPrice !== 0
         ? discountedPrice
         : Number(attributes.price ?? price ?? 0);
