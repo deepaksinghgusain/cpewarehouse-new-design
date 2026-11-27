@@ -3,6 +3,17 @@ import { CART_ADD_REQUEST, CART_UPDATE_REQUEST, CART_GET_REQUEST, CART_CLEAR_REQ
 import { createCart, updateCartAPI, getCart } from "@/services/cart";
 import { setCart, clearCart } from "../reducers/cart-reducer";
 
+const getCartItemPrice = (item: any) => {
+  const attributes = item.course?.data?.attributes ?? item.course?.attributes ?? item.course ?? {};
+  const price = Number(attributes.price ?? item.course?.price ?? item.price ?? 0);
+  const discount = Number(attributes.discount ?? item.discount ?? 0);
+  const discountedPrice = Number(attributes.discountedPrice ?? item.discountedPrice ?? 0);
+
+  if (discount !== 0) return Math.max(price - discount, 0);
+  if (discountedPrice !== 0) return discountedPrice;
+  return price;
+};
+
 function buildCartRequestBody(payload: any) {
   const courseId = payload.courseId || 0;
   const qty = payload.qty || 0;
@@ -160,7 +171,7 @@ function buildFullCartBody(cartState: any, payload: any) {
   }
 
   const total = items.reduce((acc: number, item: any) => {
-    const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+    const price = getCartItemPrice(item);
     const quantity = item.qty || item.quantity || 1;
     return acc + price * quantity;
   }, 0);

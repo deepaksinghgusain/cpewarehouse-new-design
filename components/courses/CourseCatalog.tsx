@@ -77,6 +77,8 @@ const CourseCatalog = () => {
 
         let resCourse: any = await getAllCoursesForLive();
 
+        console.log("resCourse", resCourse)
+
         let liveCourse: any = [];
         let freeCourse: any = [];
         let ebookCourse: any = [];

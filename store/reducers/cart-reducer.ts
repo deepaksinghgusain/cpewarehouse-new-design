@@ -18,12 +18,28 @@ const initialState: CartState = {
 	finalPrice: 0
 };
 
+const getCartItemPrice = (item: any) => {
+	console.log("item", item)
+	const attributes = item.course?.data?.attributes ?? item.course?.attributes ?? item.course ?? {};
+	const price = Number(attributes.price ?? item.course?.price ?? item.price ?? 0);
+	const discount = Number(attributes.discount ?? item.discount ?? 0);
+	const discountedPrice = Number(attributes.discounted_price ?? item.discounted_price ?? 0);
+
+	if (discount !== 0) return Math.max(price - discount, 0);
+	if (discountedPrice !== 0) return discountedPrice;
+	return price;
+};
+
 const cartSlice = createSlice({
 	name: "cart",
 	initialState,
 	reducers: {
 		setCart(state, action: PayloadAction<any>) {
+
+
 			const payload = action.payload;
+			console.log("setCart payload", payload);
+
 			// normalize payloads from different API shapes
 			let items: any[] = [];
 			if (payload?.data?.attributes?.CartItem) {
@@ -49,7 +65,7 @@ const cartSlice = createSlice({
 
 			if (state.finalPrice === 0) {
 				let finalPrice = items.reduce((acc: number, item: any) => {
-					const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+					const price = getCartItemPrice(item);
 					const qty = item.qty || item.quantity || 1;
 					return acc + price * qty;
 				}, 0);
@@ -65,7 +81,7 @@ const cartSlice = createSlice({
 				payload?.total;
 
 			const computedTotal = items.reduce((acc: number, item: any) => {
-				const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+				const price = getCartItemPrice(item);
 				const qty = item.qty || item.quantity || 1;
 				return acc + price * qty;
 			}, 0);
@@ -89,7 +105,7 @@ const cartSlice = createSlice({
 				state.items.push(item);
 			}
 			state.total = state.items.reduce((acc: number, item: any) => {
-				const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+				const price = getCartItemPrice(item);
 				const qty = item.qty || item.quantity || 1;
 				return acc + price * qty;
 			}, 0);
@@ -97,7 +113,7 @@ const cartSlice = createSlice({
 		removeItem(state, action: PayloadAction<number>) {
 			state.items = state.items.filter((i: any) => i.courseId !== action.payload && i.id !== action.payload && i.packageId !== action.payload);
 			state.total = state.items.reduce((acc: number, item: any) => {
-				const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+				const price = getCartItemPrice(item);
 				const qty = item.qty || item.quantity || 1;
 				return acc + price * qty;
 			}, 0);

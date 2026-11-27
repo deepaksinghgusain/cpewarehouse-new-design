@@ -889,7 +889,7 @@ function getCoursesLiveTitleGql(fortaxLaw: boolean, isActive: boolean) {
                 shortDesc
                 slug
                 creditsInfo
-
+                discount
                 image {
                 data {
                     attributes {

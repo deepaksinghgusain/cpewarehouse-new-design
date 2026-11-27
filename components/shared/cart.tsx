@@ -21,6 +21,20 @@ import { RootState, AppDispatch } from "@/store/store"
 import { updateCartRequest } from "@/store/actions/cart-actions"
 import { imageUrl as imageUrlConstant } from "@/lib/constants"
 
+const getCartItemPrice = (item: any) => {
+    console.log("item", item)
+    const attributes = item.course?.data?.attributes ?? item.course?.attributes ?? item.course ?? {}
+
+    console.log("attributes", attributes)
+    const discount = attributes.discount ?? item.discount
+    const discountedPrice = attributes.discounted_price ?? item.discounted_price
+    const price = Number(attributes.price ?? item.course?.price ?? item.price ?? 0)
+
+    if (discount != null && Number(discount) !== 0) return Math.max(price - Number(discount), 0)
+    if (discountedPrice != null && Number(discountedPrice) !== 0) return Number(discountedPrice)
+    return price
+}
+
 export function CartComponent() {
     const [mounted, setMounted] = useState(false)
     const dispatch = useDispatch<AppDispatch>()
@@ -40,10 +54,12 @@ export function CartComponent() {
         return '';
     }
 
-    const cartTotal = useSelector((state: RootState) => state.cart.total || 0)
     const [open, setOpen] = useState(false)
 
-    const subtotal = cartItems.reduce((acc: number, it: any) => acc + ((it.course?.price || 0) * (it.qty || 1)), 0);
+    const subtotal = cartItems.reduce(
+        (acc: number, item: any) => acc + getCartItemPrice(item) * (item.qty || item.quantity || 1),
+        0
+    )
 
     const increaseQty = (item: any) => {
         const qty = (item.qty || item.quantity || 1) + 1
@@ -59,12 +75,6 @@ export function CartComponent() {
     const removeCartItem = (item: any) => {
         dispatch(updateCartRequest({ item, remove: true }))
     }
-
-    const total = cartTotal || cartItems.reduce((acc: number, item: any) => {
-        const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0
-        const qty = item.qty || item.quantity || 1
-        return acc + price * qty
-    }, 0)
 
     useEffect(() => {
         setMounted(true)
@@ -128,12 +138,9 @@ export function CartComponent() {
                                                 item.course?.category ||
                                                 item.category ||
                                                 null
-                                            const price =
-                                                item.course?.data?.attributes?.price ||
-                                                item.course?.price ||
-                                                item.price ||
-                                                0
+                                            const price = getCartItemPrice(item)
                                             const qty = item.qty || item.quantity || 1
+                                            const itemTotal = price * qty
                                             const imageUrl =
                                                 imageUrlConstant + item.course?.url ||
                                                 "/assets/images/cart.gif"
@@ -168,7 +175,7 @@ export function CartComponent() {
                                                                 )}
                                                             </h3>
                                                             <p className="text-gray-500 text-sm">
-                                                                $ {Number(price ?? 0).toFixed(2)} x {qty} Enrollment(s) = $ {(Number(price ?? 0) * Number(qty ?? 0)).toFixed(2)}
+                                                                $ {Number(price ?? 0).toFixed(2)} x {qty} Enrollment(s) = $ {itemTotal.toFixed(2)}
                                                             </p>
                                                         </div>
 

@@ -146,9 +146,15 @@ const EnrollNowCart = ({
       }
     }
 
-    const price = isPackage
-      ? normalized.discountedPrice || normalized.price
-      : normalized.discount || normalized.price;
+    const price =
+      normalized.discount != null && normalized.discount !== 0
+        ? Math.max(normalized.price - normalized.discount, 0)
+        : normalized.discountedPrice != null && normalized.discountedPrice !== 0
+          ? normalized.discountedPrice
+          : normalized.price;
+
+
+    console.log("price", price, "discount", normalized.discount, "discountedPrice", normalized.discountedPrice);
 
     if (localStorage.getItem("token")) {
       const email = localStorage.getItem("email") || "";

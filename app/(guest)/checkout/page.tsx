@@ -19,6 +19,17 @@ type ParticipantField = 'name' | 'lastname' | 'email';
 
 const participantEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+const getCheckoutItemPrice = (item: any) => {
+    const attributes = item.course?.data?.attributes ?? item.course?.attributes ?? item.course ?? {};
+    const price = Number(attributes.price ?? item.course?.price ?? item.price ?? 0);
+    const discount = Number(attributes.discount ?? item.discount ?? 0);
+    const discountedPrice = Number(attributes.discounted_price ?? item.discounted_price ?? 0);
+
+    if (discount !== 0) return Math.max(price - discount, 0);
+    if (discountedPrice !== 0) return discountedPrice;
+    return price;
+};
+
 const getParticipantFieldError = (field: ParticipantField, value: string) => {
     const trimmedValue = value.trim();
 
@@ -57,7 +68,7 @@ const CheckoutPage = () => {
     const enrollments = items.reduce((acc: number, it: any) => acc + (it.qty || it.quantity || 1), 0);
     const subtotal = items.reduce(
         (acc: number, it: any) =>
-            acc + (Number(it.course?.price || 0) * Number(it.qty || it.quantity || 1)),
+            acc + (getCheckoutItemPrice(it) * Number(it.qty || it.quantity || 1)),
         0
     );
     const baseTotal = subtotal;
@@ -437,7 +448,7 @@ const CheckoutPage = () => {
                 }
 
                 // PRICE
-                const eachPrice = Number(data.course?.price || 0);
+                const eachPrice = getCheckoutItemPrice(data);
 
                 let couponDiscountedPrice: any = eachPrice;
 
@@ -506,7 +517,7 @@ const CheckoutPage = () => {
                 delete cartItems[index]['id'];
 
                 // PARTICULAR PRICE
-                const particularPrice = Number(cartItems[index].course?.price || 0);
+                const particularPrice = getCheckoutItemPrice(cartItems[index]);
 
                 cartItems[index]['price'] = particularPrice;
 
@@ -888,7 +899,7 @@ const CheckoutPage = () => {
                                                     : category === 'Live'
                                                         ? 'Live Webinar'
                                                         : category || 'Live Webinar';
-                                                const price = item.course?.data?.attributes?.price || item.course?.price || item.price || 0;
+                                                const price = getCheckoutItemPrice(item);
                                                 const lineTotal = price * qty;
 
                                                 const increaseQty = () => dispatch(updateCartRequest({ item, qty: qty + 1 }))

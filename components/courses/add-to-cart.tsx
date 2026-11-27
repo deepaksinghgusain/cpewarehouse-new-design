@@ -104,6 +104,14 @@ const AddToCart = ({ course, quantity, type, absolute = true, className }: { cou
     const courseid = selectedCourse?.id || selectedCourse?.attributes?.id || 0;
     const price = selectedCourse?.attributes?.price || selectedCourse?.price;
     const category = selectedCourse?.attributes?.category?.data?.attributes?.title || '';
+    const attributes = selectedCourse.attributes;
+    const discount = Number(attributes.discount ?? 0);
+    const discountedPrice = Number(attributes.discountedPrice ?? 0);
+    const realPrice: number = discount !== 0
+      ? Math.max(Number(attributes.price ?? price ?? 0) - discount, 0)
+      : discountedPrice !== 0
+        ? discountedPrice
+        : Number(attributes.price ?? price ?? 0);
 
     if (new Date(selectedCourse?.attributes?.endDate) < new Date() && category == 'Live') {
       toast.error("Course expired")
@@ -124,11 +132,9 @@ const AddToCart = ({ course, quantity, type, absolute = true, className }: { cou
         return;
       }
 
-      let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
-        ? selectedCourse.attributes.discount
-        : selectedCourse.attributes.price;
-
       const totalprice = realPrice * quantity;
+
+      console.log(realPrice, "realPrice", selectedCourse.attributes, "discount", selectedCourse.attributes.discountedPrice, "discountedPrice", selectedCourse.attributes.price, "price", totalprice, "totalprice");
 
       const payload = {
         courseId: type === "package" ? 0 : Number(courseid),
@@ -142,9 +148,7 @@ const AddToCart = ({ course, quantity, type, absolute = true, className }: { cou
 
       dispatch(addToCartRequest(payload))
     } else {
-      let realPrice: any = (selectedCourse.attributes.discount != null && selectedCourse.attributes.discount != 0)
-        ? selectedCourse.attributes.discount
-        : selectedCourse.attributes.price;
+      console.log("realPrice", realPrice, "discount", selectedCourse.attributes.discount, "discountedPrice", selectedCourse.attributes.discountedPrice);
 
       const payload = {
         courseId: type === "package" ? 0 : Number(courseid),
@@ -153,6 +157,8 @@ const AddToCart = ({ course, quantity, type, absolute = true, className }: { cou
         total: realPrice * quantity,
         packageId: Number(type === "package" ? selectedCourse.id : 0),
       }
+
+      console.log("payload", payload);
 
       toast.error(`Please Login first`)
 

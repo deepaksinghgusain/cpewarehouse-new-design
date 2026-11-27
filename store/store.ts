@@ -11,6 +11,7 @@ export const store = configureStore({
 		user: userReducer,
 		cart: cartReducer,
 	},
+	devTools: process.env.NODE_ENV !== "production",
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
 			thunk: false,
