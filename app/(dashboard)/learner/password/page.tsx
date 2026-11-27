@@ -35,6 +35,7 @@ const Password = () => {
 
     const form = useForm<Password>({
         resolver: zodResolver(passwordSchema),
+        shouldFocusError: false,
         defaultValues: {
             currentPassword: "",
             password: "",

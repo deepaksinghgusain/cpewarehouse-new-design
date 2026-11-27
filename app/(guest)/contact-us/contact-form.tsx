@@ -215,6 +215,7 @@ const ContactForm = () => {
                                     placeholder="First name"
                                     value={formData.firstName || ""}
                                     onChange={handleInputChange}
+                                    aria-invalid={Boolean(errors.firstName)}
                                     className={`w-full rounded-2xl border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${
                                         errors.firstName
                                             ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
@@ -236,6 +237,7 @@ const ContactForm = () => {
                                     placeholder="Last name"
                                     value={formData.lastName || ""}
                                     onChange={handleInputChange}
+                                    aria-invalid={Boolean(errors.lastName)}
                                     className={`w-full rounded-2xl border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${
                                         errors.lastName
                                             ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
@@ -258,6 +260,7 @@ const ContactForm = () => {
                                 placeholder="you@company.com"
                                 value={formData.email || ""}
                                 onChange={handleInputChange}
+                                aria-invalid={Boolean(errors.email)}
                                 className={`w-full rounded-2xl border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${
                                     errors.email
                                         ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
@@ -293,6 +296,7 @@ const ContactForm = () => {
                                         placeholder="+1 (555) 000-0000"
                                         value={formData.phoneNumber || ""}
                                         onChange={handleInputChange}
+                                        aria-invalid={Boolean(errors.phoneNumber)}
                                         className="flex-1 bg-transparent text-base text-slate-900 outline-none"
                                     />
                                 </div>
@@ -309,6 +313,7 @@ const ContactForm = () => {
                                     name="qType"
                                     value={formData.qType || ""}
                                     onChange={handleInputChange}
+                                    aria-invalid={Boolean(errors.qType)}
                                     className={`w-full rounded-2xl border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${
                                         errors.qType
                                             ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
@@ -346,6 +351,7 @@ const ContactForm = () => {
                                 rows={6}
                                 value={formData.message || ""}
                                 onChange={handleInputChange}
+                                aria-invalid={Boolean(errors.message)}
                                 className={`w-full resize-none rounded-2xl border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${
                                     errors.message
                                         ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
@@ -364,6 +370,7 @@ const ContactForm = () => {
                                     name="agreeToPrivacy"
                                     checked={formData.agreeToPrivacy || false}
                                     onChange={handleInputChange}
+                                    aria-invalid={Boolean(errors.agreeToPrivacy)}
                                     className={`h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 ${
                                         errors.agreeToPrivacy ? "border-red-500" : ""
                                     }`}

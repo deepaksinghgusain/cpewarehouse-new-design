@@ -90,6 +90,7 @@ const ProfileForm = () => {
 
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
+        shouldFocusError: false,
         defaultValues: {
             firstName: "",
             username: "",

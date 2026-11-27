@@ -31,6 +31,7 @@ const ForgotPassword = () => {
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
+    shouldFocusError: false,
     defaultValues: {
       email: '',
     },

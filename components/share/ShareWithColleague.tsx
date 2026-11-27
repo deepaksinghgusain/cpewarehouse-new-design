@@ -242,6 +242,7 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                                             placeholder="First Name"
                                             value={formData.colleague_first_name || ""}
                                             onChange={handleInputChange}
+                                            aria-invalid={Boolean(errors.colleague_first_name)}
                                             className={`w-full rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${errors.colleague_first_name
                                                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                                                     : "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -262,6 +263,7 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                                             placeholder="Last Name"
                                             value={formData.colleague_last_name || ""}
                                             onChange={handleInputChange}
+                                            aria-invalid={Boolean(errors.colleague_last_name)}
                                             className={`w-full rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${errors.colleague_last_name
                                                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                                                     : "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -283,6 +285,7 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                                         placeholder="colleague@example.com"
                                         value={formData.colleague_email_id || ""}
                                         onChange={handleInputChange}
+                                        aria-invalid={Boolean(errors.colleague_email_id)}
                                         className={`w-full rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${errors.colleague_email_id
                                                 ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                                                 : "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -303,6 +306,7 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                                         placeholder="Your Firm Name"
                                         value={formData.firm_name || ""}
                                         onChange={handleInputChange}
+                                        aria-invalid={Boolean(errors.firm_name)}
                                         className={`w-full rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${errors.firm_name
                                                 ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                                                 : "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -329,6 +333,7 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                                             placeholder="First Name"
                                             value={formData.sender_first_name || ""}
                                             onChange={handleInputChange}
+                                            aria-invalid={Boolean(errors.sender_first_name)}
                                             className={`w-full rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${errors.sender_first_name
                                                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                                                     : "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -349,6 +354,7 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                                             placeholder="Last Name"
                                             value={formData.sender_last_name || ""}
                                             onChange={handleInputChange}
+                                            aria-invalid={Boolean(errors.sender_last_name)}
                                             className={`w-full rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${errors.sender_last_name
                                                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                                                     : "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -372,6 +378,7 @@ const ShareWithColleague: React.FC<ShareWithColleagueProps> = ({ courseId, cours
                                     rows={5}
                                     value={formData.message || ""}
                                     onChange={handleInputChange}
+                                    aria-invalid={Boolean(errors.message)}
                                     className={`w-full resize-none rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition ${errors.message
                                             ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                                             : "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"

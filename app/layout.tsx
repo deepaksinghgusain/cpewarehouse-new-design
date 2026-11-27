@@ -8,6 +8,7 @@ import CookieConsent from '@/components/shared/CookieConsent';
 import { Inter } from 'next/font/google';
 import { getCommonData } from "@/services/common";
 import DisableDevTools from "@/components/shared/DisableDevTools";
+import FocusFirstInvalidField from "@/components/shared/FocusFirstInvalidField";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ApolloWrapper>
           <>
+            <FocusFirstInvalidField />
             {/* <main className="fixed top-0 z-200 mb-2 h-6 w-full bg-red-500 px-2 text-center">
               <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
                 <h1 className="text-xs font-semibold leading-6 text-white sm:text-base">

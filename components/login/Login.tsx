@@ -42,6 +42,7 @@ const LoginPageComponent = ({ heroImageSection }: { heroImageSection: any }) => 
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
+        shouldFocusError: false,
         defaultValues: {
             identifier: "",
             password: "",

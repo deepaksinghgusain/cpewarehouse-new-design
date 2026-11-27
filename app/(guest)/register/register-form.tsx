@@ -33,8 +33,8 @@ const registSchema = z.object({
     state: z.string().optional(),
     city: z.string().optional(),
     pinCode: z.string().optional(),
-    newsletter1: z.boolean().refine((val) => val !== undefined, {
-        message: "Please select term and condition",
+    newsletter1: z.boolean().refine((val) => val === true, {
+        message: "Please accept the Terms and Privacy Policy",
     }),
 })
 
@@ -46,6 +46,7 @@ const RegisterForm = () => {
 
     const form = useForm<z.infer<typeof registSchema>>({
         resolver: zodResolver(registSchema),
+        shouldFocusError: false,
         defaultValues: {
             customerType: "myself",
             firstName: "",
@@ -681,6 +682,7 @@ const RegisterForm = () => {
                                                     checked={field.value}
                                                     onCheckedChange={(val) => field.onChange(val === true)}
                                                     onBlur={field.onBlur}
+                                                    aria-invalid={fieldState.invalid}
                                                     className="
                                                         w-5 h-5
                                                         border-2 border-gray-400

@@ -3,20 +3,39 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '@/store/store'
 import { updateCartRequest } from '@/store/actions/cart-actions'
 import moment from 'moment'
 import Image from 'next/image'
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { LoaderCircle, Minus, Plus, Trash2 } from 'lucide-react'
 import { imageUrl as imageUrlConstant } from '@/lib/constants'
 import { addOrderApi, applyCouponApi, getCheckoutUrl, updateOrderStatus } from '@/services/cart';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
 
+type ParticipantField = 'name' | 'lastname' | 'email';
+
+const participantEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const getParticipantFieldError = (field: ParticipantField, value: string) => {
+    const trimmedValue = value.trim();
+
+    if (field === 'name' && !trimmedValue) return 'First name is required';
+    if (field === 'lastname' && !trimmedValue) return 'Last name is required';
+    if (field === 'email') {
+        if (!trimmedValue) return 'Email is required';
+        if (!participantEmailPattern.test(trimmedValue)) return 'Please enter a valid email address';
+    }
+
+    return undefined;
+};
+
 const CheckoutPage = () => {
     const [mounted, setMounted] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const isSubmittingRef = useRef(false)
     const dispatch = useDispatch<AppDispatch>()
     const cart = useSelector((s: RootState) => s.cart);
     const user = useSelector((s: RootState) => s.user);
@@ -95,13 +114,14 @@ const CheckoutPage = () => {
             const qty = it.qty || it.quantity || 1;
             const existingEnrolls = participantDetailsByItem?.[idx]?.enrolls || [];
             const enrolls = Array.from({ length: qty }, (_, i) => {
-                const existing = existingEnrolls[i] || { name: '', lastname: '', email: '', ptin: '', courseId: it.courseId };
+                const existing = existingEnrolls[i];
+                const isFirstEnrollment = i === 0;
                 return {
-                    name: existing.name || String(currentUser.firstName || ''),
-                    lastname: existing.lastname || String(currentUser.lastName || ''),
-                    email: existing.email || String(currentUser.email || ''),
-                    ptin: existing.ptin || String((currentUser as any).ptin || ''),
-                    courseId: existing.courseId || it.courseId,
+                    name: existing?.name ?? (isFirstEnrollment ? String(currentUser.firstName || '') : ''),
+                    lastname: existing?.lastname ?? (isFirstEnrollment ? String(currentUser.lastName || '') : ''),
+                    email: existing?.email ?? (isFirstEnrollment ? String(currentUser.email || '') : ''),
+                    ptin: existing?.ptin ?? (isFirstEnrollment ? String((currentUser as any).ptin || '') : ''),
+                    courseId: existing?.courseId || it.courseId,
                 };
             });
             return { enrolls };
@@ -139,8 +159,21 @@ const CheckoutPage = () => {
         );
     }
 
+    const validateParticipantField = (itemIndex: number, enrollIndex: number, field: ParticipantField, value: string) => {
+        const message = getParticipantFieldError(field, value);
+
+        setParticipantErrorsByItem((current) =>
+            current.map((item, idx) => idx !== itemIndex ? item : ({
+                enrolls: item.enrolls.map((error, ei) =>
+                    ei === enrollIndex ? { ...error, [field]: message } : error
+                ),
+            }))
+        );
+    }
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (isSubmittingRef.current) return;
         checkout(agreeTerms, addOrder);
     }
 
@@ -182,10 +215,6 @@ const CheckoutPage = () => {
 
     const checkout = (agreeTerms: boolean, addOrder: () => void) => {
         setFormSubmitError('');
-        if (!agreeTerms) {
-            setFormSubmitError('Please agree to the terms and conditions before placing your order.');
-            return;
-        }
 
         // remove focus from any active input (robust)
         try {
@@ -200,17 +229,18 @@ const CheckoutPage = () => {
         }
 
         // validate nested participant details
-        const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i;
         const errorsByItem = participantDetailsByItem.map((it) => ({ enrolls: it.enrolls.map(() => ({})) }));
         let foundFirstError: { itemIndex: number; enrollIndex: number; field: string } | null = null;
 
         participantDetailsByItem.forEach((it, itemIndex) => {
             it.enrolls.forEach((p, enrollIndex) => {
                 const e: any = {};
-                if (!p.name || !String(p.name).trim()) e.name = 'First name is required';
-                if (!p.lastname || !String(p.lastname).trim()) e.lastname = 'Last name is required';
-                if (!p.email || !String(p.email).trim()) e.email = 'Email is required';
-                else if (!emailPattern.test(String(p.email).trim())) e.email = 'Please enter a valid email address';
+                const nameError = getParticipantFieldError('name', p.name);
+                const lastnameError = getParticipantFieldError('lastname', p.lastname);
+                const emailError = getParticipantFieldError('email', p.email);
+                if (nameError) e.name = nameError;
+                if (lastnameError) e.lastname = lastnameError;
+                if (emailError) e.email = emailError;
                 errorsByItem[itemIndex].enrolls[enrollIndex] = e;
                 if (!foundFirstError && Object.keys(e).length > 0) {
                     const field = Object.keys(e)[0];
@@ -230,12 +260,22 @@ const CheckoutPage = () => {
                     const selector = `[data-item-index="${itemIndex}"][data-enroll-index="${enrollIndex}"][data-field="${field}"]`;
                     const el = document.querySelector(selector) as HTMLElement | null;
                     if (el && typeof el.focus === 'function') {
-                        el.focus();
+                        el.focus({ preventScroll: true });
                         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                 }
             } catch (err) {
                 console.warn('focus first error failed', err);
+            }
+            return;
+        }
+
+        if (!agreeTerms) {
+            setFormSubmitError('Please agree to the terms and conditions before placing your order.');
+            const termsCheckbox = document.getElementById('agree_terms');
+            if (termsCheckbox instanceof HTMLElement) {
+                termsCheckbox.focus({ preventScroll: true });
+                termsCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
             return;
         }
@@ -332,7 +372,11 @@ const CheckoutPage = () => {
     }
 
     const addOrder = async () => {
+        if (isSubmittingRef.current) return;
 
+        isSubmittingRef.current = true;
+        setIsSubmitting(true);
+        let redirectStarted = false;
         try {
 
             const originalCartItems: any[] = cart.items || [];
@@ -605,6 +649,7 @@ const CheckoutPage = () => {
                 let od: any = await addOrderApi(orderData);
 
                 if (errorText) {
+                    setFormSubmitError('Please review the participant details and try again.');
                     return;
                 }
 
@@ -615,7 +660,7 @@ const CheckoutPage = () => {
                         'Invalid order response',
                         od
                     );
-
+                    setFormSubmitError('Unable to create your order. Please try again.');
                     return;
                 }
 
@@ -632,7 +677,7 @@ const CheckoutPage = () => {
                         localStorage.getItem('email') || '';
                 });
 
-                checkoutUrl(checkoutData);
+                redirectStarted = await checkoutUrl(checkoutData);
 
             } else {
 
@@ -670,19 +715,35 @@ const CheckoutPage = () => {
 
                     if (res) {
                         router.push(`/success?orderId=${res.id}`);
+                        redirectStarted = true;
+                    } else {
+                        setFormSubmitError('Unable to complete your free order. Please try again.');
                     }
+                } else {
+                    setFormSubmitError('Unable to create your order. Please try again.');
                 }
             }
 
         } catch (error) {
-
             console.error('ADD ORDER ERROR', error);
+            setFormSubmitError('Unable to process your order. Please try again.');
+        } finally {
+            if (!redirectStarted) {
+                isSubmittingRef.current = false;
+                setIsSubmitting(false);
+            }
         }
     };
 
     const checkoutUrl = async (data: any) => {
         let ckData: any = await getCheckoutUrl(data);
-        window.open(ckData.url, '_self');
+        if (!ckData?.url) {
+            setFormSubmitError('Unable to start checkout. Please try again.');
+            return false;
+        }
+
+        window.location.assign(ckData.url);
+        return true;
     }
 
     if (mounted) {
@@ -792,7 +853,7 @@ const CheckoutPage = () => {
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="px-4 flex-col justify-start items-start inline-flex">
+                    <form noValidate onSubmit={handleSubmit} className="px-4 flex-col justify-start items-start inline-flex">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="w-full">
                                 <table className="w-full">
@@ -842,7 +903,7 @@ const CheckoutPage = () => {
                                                 return (
                                                     <tr key={item.id || item.courseId || idx} className="border-b border-[#e4e7ec]">
                                                         <td>
-                                                            <div className="self-stretch h-[194px] px-6 py-4 flex-col justify-start items-start gap-2 flex">
+                                                            <div className="self-stretch px-6 py-4 flex-col justify-start items-start gap-2 flex">
                                                                 <div className="self-stretch justify-start items-start gap-2 inline-flex">
                                                                     <div className="flex items-start gap-4">
                                                                         <div className="w-24 h-24 rounded-xl overflow-hidden bg-slate-100">
@@ -1012,10 +1073,15 @@ const CheckoutPage = () => {
                                         <div className="self-stretch px-6 pb-3 justify-start items-start gap-3 inline-flex">
                                             <button
                                                 type="submit"
-                                                className="grow shrink basis-0 px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden"
+                                                disabled={isSubmitting}
+                                                aria-busy={isSubmitting}
+                                                className="cursor-pointer grow shrink basis-0 px-[18px] py-3 bg-[#2970fe] rounded-[28px] shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border-2 border-white justify-center items-center gap-1.5 flex overflow-hidden disabled:cursor-wait disabled:opacity-70"
                                             >
-                                                <div className="px-0.5 justify-center items-center flex">
-                                                    <div className="text-white text-lg font-semibold font-['Inter'] leading-7 cursor-pointer">Pay Now</div>
+                                                <div className="flex items-center justify-center gap-2 px-0.5">
+                                                    {isSubmitting && <LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true" />}
+                                                    <span className="text-white text-lg font-semibold font-['Inter'] leading-7">
+                                                        {isSubmitting ? 'Redirecting...' : 'Pay Now'}
+                                                    </span>
                                                 </div>
                                             </button>
                                         </div>
@@ -1053,11 +1119,11 @@ const CheckoutPage = () => {
                                                 {(participantDetailsByItem?.[itemIndex]?.enrolls || Array.from({ length: item.qty || item.quantity || 1 })).map((participant: any, enrollIndex: number) => {
                                                     const err = participantErrorsByItem?.[itemIndex]?.enrolls?.[enrollIndex] || {};
                                                     return (
-                                                        <div key={enrollIndex} className="self-stretch h-52 p-6 flex flex-col justify-start items-start gap-6">
+                                                        <div key={enrollIndex} className="self-stretch p-6 flex flex-col justify-start items-start gap-6">
                                                             <div className="w-full flex flex-col gap-1">
                                                                 <div className="text-blue-700 text-sm font-medium">Learner {enrollIndex + 1}</div>
                                                             </div>
-                                                            <div className="grid grid-cols-2 h-11 w-full gap-6 mb-4">
+                                                            <div className="grid grid-cols-2 w-full gap-6 mb-4">
                                                                 <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
                                                                     <div className="self-stretch inline-flex justify-start items-center gap-0.5">
                                                                         <div className="justify-start text-[#344054] text-sm font-medium">First name</div>
@@ -1068,8 +1134,11 @@ const CheckoutPage = () => {
                                                                             data-item-index={itemIndex}
                                                                             data-enroll-index={enrollIndex}
                                                                             data-field="name"
+                                                                            required
+                                                                            aria-invalid={Boolean(err?.name)}
                                                                             value={participant?.name || ''}
                                                                             onChange={(e) => updateParticipantDetail(itemIndex, enrollIndex, 'name', e.target.value)}
+                                                                            onBlur={(e) => validateParticipantField(itemIndex, enrollIndex, 'name', e.target.value)}
                                                                             placeholder="Enter first name"
                                                                             className="border-none bg-transparent px-0 py-1 text-sm focus:outline-none focus:ring-0"
                                                                         />
@@ -1086,8 +1155,11 @@ const CheckoutPage = () => {
                                                                             data-item-index={itemIndex}
                                                                             data-enroll-index={enrollIndex}
                                                                             data-field="lastname"
+                                                                            required
+                                                                            aria-invalid={Boolean(err?.lastname)}
                                                                             value={participant?.lastname || ''}
                                                                             onChange={(e) => updateParticipantDetail(itemIndex, enrollIndex, 'lastname', e.target.value)}
+                                                                            onBlur={(e) => validateParticipantField(itemIndex, enrollIndex, 'lastname', e.target.value)}
                                                                             placeholder="Enter last name"
                                                                             className="border-none bg-transparent px-0 py-1 text-sm"
                                                                         />
@@ -1103,11 +1175,15 @@ const CheckoutPage = () => {
                                                                     </div>
                                                                     <div className={"self-stretch pb-1 " + (err?.email ? 'border-b border-red-500' : 'border-b border-[#D0D5DD]')}>
                                                                         <Input
+                                                                            type="email"
                                                                             data-item-index={itemIndex}
                                                                             data-enroll-index={enrollIndex}
                                                                             data-field="email"
+                                                                            required
+                                                                            aria-invalid={Boolean(err?.email)}
                                                                             value={participant?.email || ''}
                                                                             onChange={(e) => updateParticipantDetail(itemIndex, enrollIndex, 'email', e.target.value)}
+                                                                            onBlur={(e) => validateParticipantField(itemIndex, enrollIndex, 'email', e.target.value)}
                                                                             placeholder="Enter email address"
                                                                             className="border-none bg-transparent px-0 py-1 text-sm"
                                                                         />

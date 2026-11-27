@@ -40,6 +40,7 @@ const ResetPasswordForm = () => {
 
     const form = useForm<ResetPasswordFormValues>({
         resolver: zodResolver(resetPasswordSchema),
+        shouldFocusError: false,
         defaultValues: {
             password: '',
             confirmPassword: '',
