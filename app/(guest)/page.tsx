@@ -55,11 +55,11 @@ export default async function page() {
 
   return (
     <>
-      <section className="mx-auto w-[calc(100%-1rem)] h-auto mt-4 sm:mt-[-60px] sm:w-[90%]">
+      <section className="mx-auto mt-40 h-auto w-[calc(100%-1rem)] sm:mt-16 sm:w-[90%] md:mt-16">
         <div className="grid grid-cols-1 items-center md:grid-cols-2">
           <div className="grow shrink basis-0 flex-col justify-start items-start">
             <div className="flex-col justify-start items-start gap-6 flex mb-4">
-              <div className="self-stretch text-3xl font-semibold leading-tight text-[#101828] sm:text-5xl sm:leading-[50px]">{frontPageBanner?.title}</div>
+              <div className="self-stretch text-[clamp(1.5rem,3.8vw,3rem)] font-semibold leading-tight text-[#101828]">{frontPageBanner?.title}</div>
               <div className="flex flex-col items-start gap-3 pl-0 sm:pl-2">
 
                 {
@@ -71,7 +71,7 @@ export default async function page() {
                         </div>
                       </div>
                       <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
-                        <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
+                        <div className="self-stretch text-[clamp(1rem,1.4vw,1.125rem)] text-[#475467] font-normal font-['Inter'] leading-7">
                           {item.value}
                         </div>
                       </div>

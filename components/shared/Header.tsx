@@ -48,29 +48,29 @@ export const Header = () => {
 
         if (pathname !== "/login" && pathname !== "/register") {
             return (
-                <div className='border-b border-gray-300  z-10'>
+                <div className='z-10'>
                     <div className='w-[90%] mx-auto'>
-                        <header className="fixed top-0 left-0 w-full bg-white px-4 py-4 sm:px-6 sm:py-6">
-                            <nav className="mx-auto flex w-full flex-wrap items-center justify-between gap-4 lg:flex-nowrap lg:gap-8">
-                                <div className="flex shrink-0 items-center">
+                        <header className="fixed left-0 top-0 z-40 w-full bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4 lg:pt-3">
+                            <nav className="mx-auto grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 lg:flex lg:flex-nowrap lg:justify-between lg:gap-8">
+                                <div className="flex min-w-0 items-center">
                                     <Link href="/">
                                         {
-                                            logo && <Image src={logo} alt="LOGO" height={250} width={250} className="h-auto w-[150px] sm:w-[210px]" />
+                                            logo && <Image src={logo} alt="LOGO" height={250} width={250} className="h-auto w-[min(150px,40vw)] max-w-full sm:w-[210px]" />
                                         }
                                     </Link>
                                 </div>
-                                <div className="relative order-3 w-full py-1 lg:order-none lg:min-w-0 lg:flex-1">
+                                <div className="relative col-span-2 row-start-2 w-full min-w-0 lg:order-none lg:col-auto lg:row-auto lg:flex-1 lg:py-1">
                                     <Search />
                                 </div >
 
-                                <div className='flex items-center justify-end gap-3 sm:gap-6 lg:shrink-0'>
+                                <div className='col-start-2 row-start-1 flex items-center justify-end gap-2 sm:gap-6 lg:col-auto lg:row-auto lg:shrink-0'>
                                     <CartComponent />
 
                                     {isAuthenticated && user ? (
                                         <DropdownMenu modal={false}>
                                             <DropdownMenuTrigger asChild>
-                                                <button className="px-4 py-2.5 cursor-pointer bg-white rounded-lg border border-gray-300 shadow-sm flex items-center gap-2">
-                                                    <span className="max-w-[120px] truncate text-base font-semibold text-slate-700 sm:max-w-none">
+                                                <button className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 bg-white px-2 py-2 shadow-sm sm:px-4 sm:py-2.5">
+                                                    <span className="max-w-[72px] truncate text-base font-semibold text-slate-700 sm:max-w-[120px]">
                                                         {user?.firstName || user?.username || 'My Account'}
                                                     </span>
                                                     <ChevronDown className="w-4 h-4" />
@@ -153,43 +153,40 @@ export const Header = () => {
                                     </Sheet>
                                 </div>
                             </nav >
-                        </header >
 
-                        {
-                            !pathname.includes("learner") && <section className="">
-                                <div className="container mx-auto">
-                                    <div className="mt-20 flex min-h-[72px] items-center justify-center px-4 sm:px-8">
-                                        <div className="flex items-center justify-center gap-4">
-                                            <div className="hidden items-center justify-center gap-6 sm:flex">
-                                                <div
-                                                    className="px-3 py-2 bg-white rounded-md justify-center items-center gap-2 flex overflow-hidden">
-                                                    <div className="justify-start items-center gap-3 flex">
-                                                        <Link href="/course-catalog"
-                                                            className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Course
-                                                            Catalogue</Link>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className="px-3 py-2 bg-white rounded-md justify-start items-center gap-2 flex overflow-hidden">
-                                                    <div className="justify-start items-center gap-3 flex">
-                                                        <Link href="/bundle-and-subscription"
-                                                            className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Bundles
-                                                            & Subcriptions</Link>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className="h-11 px-3 py-2  rounded-md justify-start items-center gap-2 flex overflow-hidden">
-                                                    <div className="grow shrink basis-0 h-7 justify-center items-center gap-3 flex">
-                                                        <Link href="/about-us"
-                                                            className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">About</Link>
-                                                    </div>
+                            <section className="hidden lg:block">
+                            <div className="container mx-auto">
+                                <div className="flex min-h-[72px] items-center justify-center px-4 sm:px-8 lg:min-h-[50px]">
+                                    <div className="flex items-center justify-center gap-4">
+                                        <div className="hidden items-center justify-center gap-6 sm:flex">
+                                            <div className="px-3 py-2 bg-white rounded-md justify-center items-center gap-2 flex overflow-hidden">
+                                                <div className="justify-start items-center gap-3 flex">
+                                                    <Link href="/course-catalog"
+                                                        className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Course
+                                                        Catalogue</Link>
                                                 </div>
                                             </div>
-                                        </div >
-                                    </div >
-                                </div >
-                            </section >
-                        }
+                                            <div className="px-3 py-2 bg-white rounded-md justify-start items-center gap-2 flex overflow-hidden">
+                                                <div className="justify-start items-center gap-3 flex">
+                                                    <Link href="/bundle-and-subscription"
+                                                        className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">Bundles
+                                                        & Subcriptions</Link>
+                                                </div>
+                                            </div>
+                                            <div className="h-11 px-3 py-2 rounded-md justify-start items-center gap-2 flex overflow-hidden">
+                                                <div className="grow shrink basis-0 h-7 justify-center items-center gap-3 flex">
+                                                    <Link href="/about-us"
+                                                        className="justify-start text-Colors-Text-text-secondary_hover text-lg font-semibold font-['Inter'] leading-normal">About</Link>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        </header >
+
+
                     </div>
                 </div>
             )

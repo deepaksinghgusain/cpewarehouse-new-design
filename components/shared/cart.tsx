@@ -75,7 +75,7 @@ export function CartComponent() {
             <div className="flex items-center justify-center bg-white ">
                 <Sheet open={open} onOpenChange={setOpen}>
                     <SheetTrigger asChild>
-                        <Button variant="default" className="relative rounded-2xl px-6">
+                        <Button variant="default" className="relative rounded-2xl px-2 sm:px-6">
                             <Image src="/assets/images/cart.gif" height={30} width={30} className="h-[30px] w-[30px]" alt="" />
                             {isAuthenticated && cartItems.length > 0 && (
                                 <Badge className="bg-blue-600 text-white absolute -top-1 right-[6px]">

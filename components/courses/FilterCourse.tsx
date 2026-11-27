@@ -64,8 +64,8 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
     }, [])
 
     return (
-        <div className=" w-full self-start sticky top-[100px]  bg-white rounded-lgshadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)] border border-[#e4e7ec] flex-col justify-start items-start inline-flex overflow-hidden">
-            <div className=" px-3 justify-start items-center inline-flex border-b border-[#e4e7ec] pb-2 w-full">
+        <div className="flex w-full flex-col self-start rounded-lg border border-[#e4e7ec] bg-white shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]">
+            <div className="sticky top-[72px] z-20 flex w-full shrink-0 items-center justify-start border-b border-[#e4e7ec] bg-white px-3 pb-2">
                 <div className="grow shrink basis-0 h-12 pt-2 justify-start items-start gap-4 flex">
                     <div className="w-10 h-10 p-2.5 bg-white rounded-lg  shadow-[inset_0px_0px_0px_1px_rgba(16,24,40,0.18)] border border-[#e4e7ec] justify-center items-center flex overflow-hidden">
                         <div className="w-5 h-5 relative flex-col justify-start items-start flex overflow-hidden">
@@ -83,7 +83,7 @@ const FilterCourse = ({ getFilterValues, setFilterValues }: { getFilterValues: a
 
             {
                 filters.list && filters.list.length > 0 && filters.list.map((filter: any, index: number) => (
-                    <div className=" bg-white flex-col justify-start items-start flex border-b border-[#e4e7ec] py-2 w-full" key={index}>
+                    <div className="flex w-full flex-col items-start justify-start border-b border-[#e4e7ec] bg-white py-2" key={index}>
                         <div className="self-stretch px-3 justify-start items-center gap-4 inline-flex overflow-hidden cursor-pointer" onClick={() => toggleSection(index)}>
                             <div className="w-5 h-5 relative bg-white  overflow-hidden">
                                 {

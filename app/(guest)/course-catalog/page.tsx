@@ -20,7 +20,7 @@ const CourseCatalogPage = async () => {
 
     return (
         <>
-            <section className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
+            <section className="mx-auto mt-40 h-auto w-[calc(100%-1rem)] sm:mt-16 sm:w-[90%] md:mt-16">
                 <div className="grid grid-cols-1 items-center gap-8  md:grid-cols-2">
                     <div className="flex min-w-0 flex-col items-start gap-8 md:gap-12">
                         <div className="flex w-full flex-col items-start gap-6">
