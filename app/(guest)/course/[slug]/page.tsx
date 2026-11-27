@@ -178,24 +178,108 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                 </div >
                             </TabsContent>
                             <TabsContent value="CPE Info">
-                                <div className="">
-                                    <div
-                                        className="w-full overflow-hidden bg-Colors-Background-bg-primary py-8 text-[#475467] sm:py-12">
-                                        <div className="w-full px-0 sm:px-8">
-                                            <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
-                                                <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content ?? '' }} >
+                                {
+                                    creditAndInfo?.content && (<div className="">
+                                        <div
+                                            className="w-full overflow-hidden bg-Colors-Background-bg-primary py-8 text-[#475467] sm:py-12">
+                                            <div className="w-full px-0 sm:px-8">
+                                                <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
+                                                    <div className="w-full flex flex-col justify-start items-start gap-5" dangerouslySetInnerHTML={{ __html: creditAndInfo?.content ?? '' }} >
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div >
+                                    </div >)
+                                }
+
                                 <section>
+                                    <div className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
+                                        <div className="flex flex-col items-start gap-8 lg:flex-row">
+                                            <div className="w-full py-5 lg:w-2/3">
+                                                <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
+                                                    {sponsorship?.title}</div>
+                                                <div className="w-full px-1">
+                                                    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+
+                                                        {
+                                                            sponsorship?.list.length > 0 && sponsorship?.list.map((list: any, index: number) => (
+                                                                <div className="min-w-0 px-1 pt-4 sm:px-4 sm:pt-6" key={index}>
+                                                                    <div className="flex items-start gap-3">
+                                                                        <div className="h-7 w-7 shrink-0 rounded-full">
+                                                                            <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
+                                                                                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                    <g id="check-circle">
+                                                                                        <path id="Icon"
+                                                                                            d="M8.75065 14.0002L12.2507 17.5002L19.2507 10.5002M25.6673 14.0002C25.6673 20.4435 20.444 25.6668 14.0007 25.6668C7.55733 25.6668 2.33398 20.4435 2.33398 14.0002C2.33398 7.55684 7.55733 2.3335 14.0007 2.3335C20.444 2.3335 25.6673 7.55684 25.6673 14.0002Z"
+                                                                                            stroke="#7F56D9" strokeWidth="2.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                                                                    </g>
+                                                                                </svg>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
+                                                                            <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
+                                                                                {list?.value}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                        }
+
+                                                    </div>
+                                                </div>
+                                                <div className="w-full py-6">
+                                                    <div className="w-full">
+                                                        <div className="w-full text-base font-normal leading-7 text-[#475467] sm:text-lg">
+                                                            {sponsorship?.description}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {sponsorship?.features?.length > 0 &&
+                                                <div className="w-full px-0 lg:w-1/2 lg:px-8">
+                                                    <div className="self-stretch justify-center items-start gap-8 inline-flex">
+                                                        <div className="flex w-full flex-col items-start rounded-2xl border border-[#e4e7ec] bg-white shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]">
+                                                            <div className="w-full px-5 py-6 sm:px-8 sm:py-8">
+                                                                <div className="flex w-full flex-col items-start gap-4">
+
+                                                                    {
+                                                                        sponsorship?.features?.map((list: any, index: number) => (
+                                                                            <div className="flex w-full items-start gap-3" key={index}>
+                                                                                <div className="relative h-6 w-6 shrink-0 rounded-full bg-[#dbf9e6]">
+                                                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                        <g id="Check icon">
+                                                                                            <path
+                                                                                                d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
+                                                                                                fill="#DCFAE6" />
+                                                                                            <path id="Icon" fillRule="evenodd" clipRule="evenodd"
+                                                                                                d="M17.096 7.39016L9.93602 14.3002L8.03602 12.2702C7.68602 11.9402 7.13602 11.9202 6.73602 12.2002C6.34602 12.4902 6.23602 13.0002 6.47602 13.4102L8.72602 17.0702C8.94602 17.4102 9.32601 17.6202 9.75601 17.6202C10.166 17.6202 10.556 17.4102 10.776 17.0702C11.136 16.6002 18.006 8.41016 18.006 8.41016C18.906 7.49016 17.816 6.68016 17.096 7.38016V7.39016Z"
+                                                                                                fill="#079455" />
+                                                                                        </g>
+                                                                                    </svg>
+
+                                                                                </div>
+                                                                                <div className="min-w-0 flex-1">
+                                                                                    <div className="text-base font-semibold leading-7 text-[#344054] sm:text-lg">
+                                                                                        {list?.value}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))
+                                                                    }
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
                                     <div
                                         className="flex h-auto w-full flex-col items-center gap-8 overflow-hidden bg-white py-8 sm:gap-[38px] sm:py-12">
 
                                         {
                                             accreditedPartners && <div className="w-full py-12  bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
-                                                <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex mb-8">
+                                                {/* <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex mb-8">
                                                     <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
                                                         <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
                                                             <div className="container mx-auto">
@@ -206,7 +290,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> */}
                                                 <div className="w-full"
                                                     style={{
                                                         backgroundImage: `url('${imageUrl + accreditedPartners?.bg_image?.data?.attributes?.url}')`,
@@ -228,88 +312,6 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                                 </div>
                                             </div>
                                         }
-
-                                        <div className="mx-auto w-[calc(100%-2rem)] max-w-7xl sm:w-[90%]">
-                                            <div className="flex flex-col items-start gap-8 lg:flex-row">
-                                                <div className="w-full py-5 lg:w-2/3">
-                                                    <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
-                                                        {sponsorship?.title}</div>
-                                                    <div className="w-full px-1">
-                                                        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
-
-                                                            {
-                                                                sponsorship?.list.length > 0 && sponsorship?.list.map((list: any, index: number) => (
-                                                                    <div className="min-w-0 px-1 pt-4 sm:px-4 sm:pt-6" key={index}>
-                                                                        <div className="flex items-start gap-3">
-                                                                            <div className="h-7 w-7 shrink-0 rounded-full">
-                                                                                <div className="w-7 h-7 relative flex-col justify-start items-start flex overflow-hidden">
-                                                                                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                        <g id="check-circle">
-                                                                                            <path id="Icon"
-                                                                                                d="M8.75065 14.0002L12.2507 17.5002L19.2507 10.5002M25.6673 14.0002C25.6673 20.4435 20.444 25.6668 14.0007 25.6668C7.55733 25.6668 2.33398 20.4435 2.33398 14.0002C2.33398 7.55684 7.55733 2.3335 14.0007 2.3335C20.444 2.3335 25.6673 7.55684 25.6673 14.0002Z"
-                                                                                                stroke="#7F56D9" strokeWidth="2.33333" strokeLinecap="round" strokeLinejoin="round" />
-                                                                                        </g>
-                                                                                    </svg>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="grow shrink basis-0 flex-col justify-start items-start inline-flex">
-                                                                                <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
-                                                                                    {list?.value}</div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))
-                                                            }
-
-                                                        </div>
-                                                    </div>
-                                                    <div className="w-full py-6">
-                                                        <div className="w-full">
-                                                            <div className="w-full text-base font-normal leading-7 text-[#475467] sm:text-lg">
-                                                                {sponsorship?.description}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {sponsorship?.features?.length > 0 &&
-                                                    <div className="w-full px-0 lg:w-1/2 lg:px-8">
-                                                        <div className="self-stretch justify-center items-start gap-8 inline-flex">
-                                                            <div className="flex w-full flex-col items-start rounded-2xl border border-[#e4e7ec] bg-white shadow-[0px_12px_16px_-4px_rgba(16,24,40,0.08)]">
-                                                                <div className="w-full px-5 py-6 sm:px-8 sm:py-8">
-                                                                    <div className="flex w-full flex-col items-start gap-4">
-
-                                                                        {
-                                                                            sponsorship?.features?.map((list: any, index: number) => (
-                                                                                <div className="flex w-full items-start gap-3" key={index}>
-                                                                                    <div className="relative h-6 w-6 shrink-0 rounded-full bg-[#dbf9e6]">
-                                                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                            <g id="Check icon">
-                                                                                                <path
-                                                                                                    d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
-                                                                                                    fill="#DCFAE6" />
-                                                                                                <path id="Icon" fillRule="evenodd" clipRule="evenodd"
-                                                                                                    d="M17.096 7.39016L9.93602 14.3002L8.03602 12.2702C7.68602 11.9402 7.13602 11.9202 6.73602 12.2002C6.34602 12.4902 6.23602 13.0002 6.47602 13.4102L8.72602 17.0702C8.94602 17.4102 9.32601 17.6202 9.75601 17.6202C10.166 17.6202 10.556 17.4102 10.776 17.0702C11.136 16.6002 18.006 8.41016 18.006 8.41016C18.906 7.49016 17.816 6.68016 17.096 7.38016V7.39016Z"
-                                                                                                    fill="#079455" />
-                                                                                            </g>
-                                                                                        </svg>
-
-                                                                                    </div>
-                                                                                    <div className="min-w-0 flex-1">
-                                                                                        <div className="text-base font-semibold leading-7 text-[#344054] sm:text-lg">
-                                                                                            {list?.value}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            ))
-                                                                        }
-
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
                                     </div>
                                 </section>
                             </TabsContent>
@@ -444,7 +446,7 @@ const CourseLandingPage = async ({ params }: { params: Promise<{ slug: string }>
                                     <div className="relative flex w-full flex-col items-center gap-10 lg:flex-row lg:items-stretch lg:gap-14">
                                         <div className="w-full lg:w-[46%]">
                                             <div className="group relative mx-auto w-full max-w-[560px]">
-                                                
+
                                                 <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white p-3  ring-1 ring-[#101828]/5">
                                                     <div className="relative aspect-[4/2.6] overflow-hidden rounded-[1.5rem] bg-[#f2f4f7]">
                                                         {instructor?.image?.data?.attributes?.url ? (

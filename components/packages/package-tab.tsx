@@ -412,48 +412,7 @@ const PackageTabs = ({
 
         {packageData?.accredited_partners && (
           <section>
-            <div className="w-full py-12 bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
-              <div className="flex w-full flex-col items-start justify-start gap-5 px-4 sm:px-8">
-                <div className="flex w-full flex-col items-start justify-start gap-5">
-                  <div className="flex w-full flex-col items-start justify-start gap-5">
-                    <div className="container mx-auto">
-                      <div className="flex flex-col items-start justify-start gap-3 self-stretch">
-                        <div className="self-stretch text-2xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">
-                          {packageData?.accredited_partners.title}{" "}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                className="w-full"
-                style={{
-                  backgroundImage: `url( ${imageUrl + packageData?.accredited_partners.bg_image.data.attributes.url} )`,
-                  backgroundSize: "cover",
-                }}
-              >
-                <div className="flex w-full flex-col items-center justify-start gap-6 px-4 py-8 sm:px-8 sm:py-10">
-                  <div className="grid w-full grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 lg:flex lg:flex-wrap lg:justify-center lg:gap-8">
-                    {packageData?.accredited_partners.list.length > 0 &&
-                      packageData?.accredited_partners.list.map(
-                        (list: any, index: number) => (
-                          <div
-                            key={index}
-                            className="flex h-28 w-full max-w-[180px] flex-col items-center justify-start gap-5 rounded-2xl border border-white/30 bg-white/30 p-4 backdrop-blur-xl sm:h-[142px] sm:px-6 sm:py-8"
-                          >
-                            <img
-                              className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down"
-                              src={imageUrl + list.image.data.attributes.url}
-                            />
-                          </div>
-                        ),
-                      )}
-                  </div>
-                </div>
-              </div>
-
-              {packageData?.package_sponser && (
+            {packageData?.package_sponser && (
                 <div className="mx-auto">
                   <div className="grid grid-cols-1 gap-6 px-4 sm:px-8 lg:grid-cols-6 lg:gap-4">
                         <div className="min-w-0 py-5 lg:col-span-4 lg:gap-8">
@@ -560,6 +519,49 @@ const PackageTabs = ({
                   </div>
                 </div>
               )}
+              
+            <div className="w-full py-12 bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
+              {/* <div className="flex w-full flex-col items-start justify-start gap-5 px-4 sm:px-8">
+                <div className="flex w-full flex-col items-start justify-start gap-5">
+                  <div className="flex w-full flex-col items-start justify-start gap-5">
+                    <div className="container mx-auto">
+                      <div className="flex flex-col items-start justify-start gap-3 self-stretch">
+                        <div className="self-stretch text-2xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">
+                          {packageData?.accredited_partners.title}{" "}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div> */}
+              <div
+                className="w-full"
+                style={{
+                  backgroundImage: `url( ${imageUrl + packageData?.accredited_partners.bg_image.data.attributes.url} )`,
+                  backgroundSize: "cover",
+                }}
+              >
+                <div className="flex w-full flex-col items-center justify-start gap-6 px-4 py-8 sm:px-8 sm:py-10">
+                  <div className="grid w-full grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 lg:flex lg:flex-wrap lg:justify-center lg:gap-8">
+                    {packageData?.accredited_partners.list.length > 0 &&
+                      packageData?.accredited_partners.list.map(
+                        (list: any, index: number) => (
+                          <div
+                            key={index}
+                            className="flex h-28 w-full max-w-[180px] flex-col items-center justify-start gap-5 rounded-2xl border border-white/30 bg-white/30 p-4 backdrop-blur-xl sm:h-[142px] sm:px-6 sm:py-8"
+                          >
+                            <img
+                              className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down"
+                              src={imageUrl + list.image.data.attributes.url}
+                            />
+                          </div>
+                        ),
+                      )}
+                  </div>
+                </div>
+              </div>
+
+              
             </div>
           </section>
         )}
