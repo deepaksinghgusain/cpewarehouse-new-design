@@ -159,12 +159,12 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
 
     return (
         <>
-            <section className="mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
+            <section className="mx-auto mt-30 h-auto w-[calc(100%-1rem)] sm:mt-8 sm:w-[90%] md:mt-0">
                 <div className="grid grid-cols-1 items-start gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_minmax(300px,442px)] lg:gap-12">
                         <div className="flex min-w-0 flex-col items-start gap-8 lg:gap-12">
                             <div className="flex-col justify-start items-start gap-6 flex">
                                 <div className=" flex-col justify-start items-start gap-4 flex">
-                                    <div className="justify-start items-center gap-3 inline-flex">
+                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                                         <div className="justify-center items-center flex">
                                             <Link href="/course-catalog"
                                                 className="text-[#344054] text-sm font-medium font-['Inter'] leading-tight">Course Catalog</Link>
@@ -185,10 +185,10 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                     </div>
                                     <div className="self-stretch text-2xl font-semibold leading-8 text-[#101828] sm:text-3xl sm:leading-[38px]">
                                         {packageData?.title}</div>
-                                    <div className="pl-1 pr-2.5 py-1 rounded-full justify-start items-center gap-3 inline-flex">
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 py-1">
                                         <div className="text-[#667084] text-base font-semibold font-['Inter'] line-through leading-[38px]">
                                             ${packageData?.price}</div>
-                                        <div className="text-[#057647] text-[32px] font-semibold font-['Inter'] leading-[38px]">
+                                        <div className="text-[#057647] text-2xl font-semibold font-['Inter'] leading-tight sm:text-[32px] sm:leading-[38px]">
                                             ${packageData?.discountedPrice ?? packageData?.price}</div>
                                     </div>
                                 </div>
@@ -197,16 +197,16 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                 course={{ ...packageData, id: packageId }}
                                 quantity={1}
                                 type="package"
-                                className="bg-blue-500 hover:bg-blue-600 w-[200px] text-white flex justify-center items-center cursor-pointer mt-4 rounded-xl px-5 h-10 tracking-wide"
+                                className="mt-4 flex h-10 w-full max-w-[200px] cursor-pointer items-center justify-center rounded-xl bg-blue-500 px-5 tracking-wide text-white hover:bg-blue-600"
                             />
 
                             <div className="mt-8 flex w-full flex-col items-start gap-5 sm:mt-10">
                                 <div className="self-stretch  flex-col justify-start items-start gap-8 flex">
-                                    <div className="self-stretch justify-start items-center gap-5 inline-flex">
+                                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                                         <div className="justify-start items-center gap-2 flex">
-                                            <div><span className="text-[#475467] text-xl font-normal font-['Inter'] leading-[30px]">
+                                            <div><span className="text-lg font-normal leading-[30px] text-[#475467] sm:text-xl">
                                                 Questions?  </span><span
-                                                    className="text-[#db6803] text-xl font-bold font-['Inter'] leading-[30px]">
+                                                    className="text-lg font-bold leading-[30px] text-[#db6803] sm:text-xl">
                                                     <Link href="/contact-us">Contact Us</Link>
                                                 </span></div>
                                             <div className=" relative  overflow-hidden">
@@ -225,11 +225,11 @@ const PackageDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
                                 </div>
                             </div>
                         </div>
-                        <div className="flex w-full flex-col items-end overflow-hidden rounded-xl bg-white shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)]">
+                        <div className="flex w-full min-w-0 flex-col items-start overflow-hidden rounded-xl bg-white shadow-[0px_20px_24px_-4px_rgba(16,24,40,0.08)]">
                             <div className="w-full px-4 pt-4 sm:px-6 sm:pt-6">
-                                <div className="pr-[9px] pb-1 justify-start items-center inline-flex overflow-hidden">
-                                    <div className="h-auto w-full border border-[#175cd3]">
-                                        <img className="h-auto w-full object-contain" src={imageUrl + packageData?.image?.data?.attributes.url} alt="Package" />
+                                <div className="w-full overflow-hidden pb-1">
+                                    <div className="w-full border border-[#175cd3]">
+                                        <img className="block h-auto w-full object-contain" src={imageUrl + packageData?.image?.data?.attributes.url} alt="Package" />
                                     </div>
                                 </div>
                             </div>

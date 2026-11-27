@@ -55,7 +55,7 @@ export default async function page() {
 
   return (
     <>
-      <section className="mx-auto mt-40 h-auto w-[calc(100%-1rem)] sm:mt-16 sm:w-[90%] md:mt-16">
+      <section className="mx-auto mt-40 h-auto w-[calc(100%-1rem)] sm:mt-16 sm:w-[90%] md:mt-[-5%]">
         <div className="grid grid-cols-1 items-center md:grid-cols-2">
           <div className="grow shrink basis-0 flex-col justify-start items-start">
             <div className="flex-col justify-start items-start gap-6 flex mb-4">

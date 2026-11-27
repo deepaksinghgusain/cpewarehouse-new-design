@@ -16,38 +16,38 @@ const PackageTabs = ({
 }: any) => {
 
   return (
-    <Tabs defaultValue="outline" className="w-full bg-transparent ">
-      <TabsList variant="line" className="w-full bg-transparent ">
+    <Tabs defaultValue="outline" className="w-full min-w-0 bg-transparent">
+      <TabsList variant="line" className="w-full max-w-full justify-start overflow-x-auto bg-transparent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <TabsTrigger
           value="outline"
-          className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500"
+          className="shrink-0 whitespace-nowrap px-3 text-base font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500 sm:text-xl lg:text-2xl"
         >
           Outline
         </TabsTrigger>
         <TabsTrigger
           value="CPE Info"
-          className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500"
+          className="shrink-0 whitespace-nowrap px-3 text-base font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500 sm:text-xl lg:text-2xl"
         >
           CPE Info
         </TabsTrigger>
         <TabsTrigger
           value="FAQ"
-          className="text-2xl font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose  data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500"
+          className="shrink-0 whitespace-nowrap px-3 text-base font-bold cursor-pointer hover:text-blue-500 hover:after:bg-blue-500 hover:after:opacity-100 font-['Inter'] leading-loose data-[state=active]:text-blue-500 data-[state=active]:after:bg-blue-500 sm:text-xl lg:text-2xl"
         >
           FAQ
         </TabsTrigger>
       </TabsList>
       <TabsContent value="outline">
-        <div className="px-8 mt-8 rounded-xl justify-start gap-8 inline-flex border-b border-[#e4e7ec]">
+        <div className="mt-6 flex w-full flex-col gap-6 border-b border-[#e4e7ec] px-3 sm:px-6 lg:mt-8 lg:flex-row lg:flex-wrap lg:gap-8 lg:px-8">
           {packageData?.packege_outlines &&
             packageData?.packege_outlines.length > 0 &&
             packageData?.packege_outlines.map((outline: any, index: number) => (
               <div
-                className="w-[592px] rounded-2xl flex-col justify-start items-start inline-flex overflow-hidden"
+                className="flex w-full min-w-0 max-w-[592px] flex-col items-start overflow-hidden rounded-2xl"
                 key={index}
               >
-                <div className="self-stretch h-[88px] px-8 pt-8 pb-6 border-b border-[#e4e7ec] flex-col justify-start items-start gap-8 flex">
-                  <div className="self-stretch justify-start items-start gap-8 inline-flex">
+                <div className="flex min-h-[72px] flex-col items-start justify-start gap-4 self-stretch border-b border-[#e4e7ec] px-4 py-5 sm:gap-8 sm:px-8 sm:py-6">
+                  <div className="inline-flex items-start justify-start gap-4 self-stretch sm:gap-8">
                     <div className="grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
                       <div className="justify-start items-center gap-2 inline-flex">
                         <div className="text-[#101828] text-2xl font-semibold font-['Inter']  leading-loose">
@@ -57,12 +57,12 @@ const PackageTabs = ({
                     </div>
                   </div>
                 </div>
-                <div className="w-[592px] px-8 pt-8 pb-10  flex-col justify-start items-start gap-6 flex">
+                <div className="flex w-full flex-col items-start justify-start gap-6 px-4 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8">
                   <div className="self-stretch  justify-start items-start gap-8">
                     {outline.list.length > 0 &&
                       outline.list.map((item: any, index: number) => (
                         <div
-                          className="grow shrink basis-0 h-12 justify-start items-start gap-3 flex mb-4"
+                          className="mb-4 flex min-h-12 grow shrink basis-0 items-start justify-start gap-3"
                           key={index}
                         >
                           <div className="w-6 h-6 relative bg-[#dbf9e6] rounded-full  overflow-hidden">
@@ -104,14 +104,14 @@ const PackageTabs = ({
         <section className="border-b border-[#45a7c5] mt-8">
           <div className="w-[90%] mx-auto">
             <div className="">
-              <div className="grid grid-cols-6 gap-30">
-                <div className="col-span-3">
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-6 lg:gap-8">
+                <div className="min-w-0 lg:col-span-3">
                   {packageData?.package_includes && (
                     <div className=" mt-8">
                       <div className="text-[#101828] text-lg font-semibold font-['Inter'] leading-7 my-8">
                         {packageData?.package_includes.title}
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {packageData?.package_includes.list.length > 0 &&
                           packageData?.package_includes.list.map(
                             (list: any, index: number) => (
@@ -144,7 +144,7 @@ const PackageTabs = ({
                           {packageData?.package_attend.title}
                         </div>
                         {packageData?.package_attend.list.length > 0 && (
-                          <div className="grid grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                             {packageData?.package_attend.list.map(
                               (list: any, index: number) => (
                                 <div className="text-center" key={index}>
@@ -162,9 +162,9 @@ const PackageTabs = ({
                     )}
                   </div>
                 </div>
-                <div className="col-span-1"></div>
-                <div className="py-8 col-span-2">
-                  <div className="w-96 bg-white rounded-xl shadow-lg flex flex-col overflow-hidden">
+                <div className="hidden lg:block lg:col-span-1"></div>
+                <div className="w-full py-4 lg:col-span-2 lg:py-8">
+                  <div className="flex w-full max-w-96 flex-col overflow-hidden rounded-xl bg-white shadow-lg">
                     <div className="px-6 pt-6">
                       <div className="h-32 overflow-hidden rounded-md">
                         <video
@@ -205,11 +205,11 @@ const PackageTabs = ({
 
         {PackageCourses.length > 0 && (
           <section className="bg-[#f9fafb] py-10">
-            <div className="container w-[90%] mx-auto">
+            <div className="container mx-auto w-[calc(100%-2rem)] sm:w-[90%]">
               <div className="flex-col justify-start items-center gap-8 flex">
                 <div className="flex-col justify-start items-center gap-5 flex">
                   <div className="h-11 flex-col justify-start items-start gap-3 flex">
-                    <div className="text-left text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">
+                    <div className="text-left text-2xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">
                       Course Included
                     </div>
                   </div>
@@ -217,7 +217,7 @@ const PackageTabs = ({
               </div>
 
               <div className="w-full my-8">
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-6">
                   {PackageCourses.map((course: any, index: number) => (
                     <div
                       key={index}
@@ -254,7 +254,7 @@ const PackageTabs = ({
                                 ),
                               )}
                           </div>
-                          <div className="w-[280px] mt-2 justify-start">
+                          <div className="mt-2 w-full min-w-0 justify-start px-4 sm:px-5">
                             <div className="flex-col justify-start items-start">
                               <div className="text-white text-sm font-semibold font-['Inter'] leading-tight">
                                 {course.attributes?.instructors.data.length >
@@ -273,7 +273,7 @@ const PackageTabs = ({
                         </div>
                       </div>
 
-                      <div className="px-5 h-56 pb-6 mt-4 flex-col justify-start items-start gap-[18px] inline-flex">
+                      <div className="mt-4 flex min-h-56 w-full flex-col items-start justify-start gap-[18px] px-5 pb-6">
                         <div className="self-stretch justify-start items-start gap-2 inline-flex">
                           {course.attributes?.category?.data?.attributes
                             ?.title === "Live" && (
@@ -399,8 +399,8 @@ const PackageTabs = ({
         </div> */}
       </TabsContent>
       <TabsContent value="CPE Info">
-        <div className="w-full py-24 bg-Colors-Background-bg-primary inline-flex flex-col justify-start items-center gap-16 overflow-hidden text-[#475467]">
-          <div className="w-full  px-8 inline-flex justify-start items-start gap-16 flex-wrap content-start">
+        <div className="inline-flex w-full flex-col items-center justify-start gap-10 overflow-hidden bg-Colors-Background-bg-primary py-10 text-[#475467] sm:gap-16 sm:py-16 lg:py-24">
+          <div className="inline-flex w-full flex-wrap content-start items-start justify-start gap-8 px-4 sm:gap-16 sm:px-8">
             <div className="flex-1 inline-flex flex-col justify-start items-start gap-8">
               <div
                 className="w-full flex flex-col justify-start items-start gap-5"
@@ -413,12 +413,12 @@ const PackageTabs = ({
         {packageData?.accredited_partners && (
           <section>
             <div className="w-full py-12 bg-white flex-col justify-start items-center gap-[38px] inline-flex overflow-hidden">
-              <div className="self-stretch h-11 px-8 flex-col justify-start items-start gap-8 flex">
-                <div className="self-stretch h-11 flex-col justify-start items-start gap-8 flex">
-                  <div className="self-stretch h-11 flex-col justify-start items-start gap-5 flex">
+              <div className="flex w-full flex-col items-start justify-start gap-5 px-4 sm:px-8">
+                <div className="flex w-full flex-col items-start justify-start gap-5">
+                  <div className="flex w-full flex-col items-start justify-start gap-5">
                     <div className="container mx-auto">
-                      <div className="self-stretch h-11 flex-col justify-start items-start gap-3 flex">
-                        <div className="self-stretch text-[#101828] text-4xl font-semibold font-['Inter'] leading-[44px]">
+                      <div className="flex flex-col items-start justify-start gap-3 self-stretch">
+                        <div className="self-stretch text-2xl font-semibold leading-tight text-[#101828] sm:text-4xl sm:leading-[44px]">
                           {packageData?.accredited_partners.title}{" "}
                         </div>
                       </div>
@@ -433,14 +433,14 @@ const PackageTabs = ({
                   backgroundSize: "cover",
                 }}
               >
-                <div className="h-80 w-full px-1 flex-col justify-start items-center gap-16 flex">
-                  <div className="self-stretch h-80 p-16 justify-center items-start gap-8 inline-flex">
+                <div className="flex w-full flex-col items-center justify-start gap-6 px-4 py-8 sm:px-8 sm:py-10">
+                  <div className="grid w-full grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 lg:flex lg:flex-wrap lg:justify-center lg:gap-8">
                     {packageData?.accredited_partners.list.length > 0 &&
                       packageData?.accredited_partners.list.map(
                         (list: any, index: number) => (
                           <div
                             key={index}
-                            className="w-[180px] h-[142px] px-6 py-8 bg-white/30 rounded-2xl border border-white/30 backdrop-blur-xl flex-col justify-start items-center gap-5 inline-flex"
+                            className="flex h-28 w-full max-w-[180px] flex-col items-center justify-start gap-5 rounded-2xl border border-white/30 bg-white/30 p-4 backdrop-blur-xl sm:h-[142px] sm:px-6 sm:py-8"
                           >
                             <img
                               className="self-stretch grow shrink basis-0 w-[100%] h-[100%] object-scale-down"
@@ -455,17 +455,17 @@ const PackageTabs = ({
 
               {packageData?.package_sponser && (
                 <div className="mx-auto">
-                  <div className="grid grid-cols-6 gap-4">
-                    <div className="py-5  gap-8 col-span-4">
+                  <div className="grid grid-cols-1 gap-6 px-4 sm:px-8 lg:grid-cols-6 lg:gap-4">
+                        <div className="min-w-0 py-5 lg:col-span-4 lg:gap-8">
                       <div className="self-stretch text-[#101828] text-lg font-semibold font-['Inter'] leading-7">
                         {packageData?.package_sponser.title}
                       </div>
-                      <div className="self-stretch h-20 px-1 flex-col justify-start items-start gap-8 flex">
-                        <div className=" justify-start items-start inline-flex">
+                      <div className="flex flex-col items-start justify-start gap-4 px-1 sm:flex-row sm:flex-wrap sm:gap-8">
+                        <div className="flex w-full flex-wrap items-start justify-start sm:w-auto">
                           {packageData?.package_sponser.list.length > 0 &&
                             packageData?.package_sponser.list.map((list: any, index: number) => (
                               <div
-                                className="grow shrink basis-0 px-4 pt-6 flex-col justify-start items-center gap-5 inline-flex"
+                                className="inline-flex w-full grow shrink basis-0 flex-col items-center justify-start gap-5 px-2 pt-6 sm:w-auto sm:px-4"
                                 key={index}
                               >
                                 <div className="self-stretch justify-start items-start gap-3 inline-flex">
@@ -501,18 +501,18 @@ const PackageTabs = ({
                             ))}
                         </div>
                       </div>
-                      <div className="self-stretch h-[200px] py-4 flex-col justify-start items-start gap-5 flex">
-                        <div className="self-stretch h-[168px] flex-col justify-start items-center gap-2 flex">
+                      <div className="flex flex-col items-start justify-start gap-5 self-stretch py-4">
+                        <div className="flex flex-col items-start justify-center gap-2 self-stretch">
                           <div className="self-stretch text-[#475467] text-lg font-normal font-['Inter'] leading-7">
                             {packageData?.package_sponser.description}
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-span-2 self-stretch flex-col justify-start items-start gap-8 inline-flex">
-                      <div className="self-stretch justify-center items-start gap-8 inline-flex">
+                    <div className="inline-flex flex-col items-start justify-start gap-8 self-stretch lg:col-span-2">
+                      <div className="flex items-start justify-center gap-8 self-stretch">
                         <div className="grow shrink basis-0 bg-white rounded-2xl  border border-[#e4e7ec] flex-col justify-start items-start inline-flex">
-                          <div className="self-stretch  px-8 pt-8 pb-10 flex-col justify-start items-start gap-6 flex">
+                          <div className="flex flex-col items-start justify-start gap-6 self-stretch px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8">
                             <div className="self-stretch flex-col justify-start items-start gap-4 flex">
                               {packageData?.package_sponser.features.length > 0 &&
                                 packageData?.package_sponser.features.map(
@@ -580,8 +580,8 @@ const PackageTabs = ({
               </div>
             </div> */}
 
-            <div className="self-stretch w-full mx-auto px-8 flex-col justify-start items-center gap-16 flex">
-              <div className="self-stretch w-full flex-col justify-start items-start gap-8 flex">
+            <div className="mx-auto flex w-full flex-col items-center justify-start gap-8 px-4 sm:gap-16 sm:px-8">
+              <div className="flex w-full flex-col items-start justify-start gap-8 self-stretch">
                 <Accordion
                   type="single"
                   collapsible

@@ -704,7 +704,7 @@ const RegisterForm = () => {
                                 </FieldGroup>
                             </div>
                             <div className="flex flex-wrap items-baseline justify-center gap-1 text-center">
-                                <div className="text-lg font-normal leading-7 text-[#475467]">Allready have  CPE warehouse Account?</div>
+                                <div className="text-lg font-normal leading-7 text-[#475467]">Already have  CPE warehouse Account?</div>
                                 <div className="justify-center items-center gap-1.5 flex overflow-hidden">
                                     <Link href="/login" className="text-[#2970fe] text-lg font-semibold font-['Inter'] leading-7">Login</Link>
                                 </div>

@@ -3,7 +3,6 @@ import { imageUrl } from '@/lib/constants'
 import { getPageContent } from '@/services/common'
 import { getAllPackages } from '@/services/course'
 import Link from 'next/link'
-import React from 'react'
 
 const page = async () => {
 
@@ -17,9 +16,10 @@ const page = async () => {
         accreditedPartners = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.accredited-partners')[0];
         otherCourseBanner = res?.data[0]?.attributes?.blocks.filter((res: { __component: string; }) => res.__component === 'blocks.other-course-banner')[0];
     }
+
+    console.log("heroImageSection", heroImageSection);
     
     const result = await getAllPackages();
-    
     
     let packagedealData: any;
 
@@ -29,7 +29,7 @@ const page = async () => {
 
     return (
         <>
-            <section className="mx-auto w-[calc(100%-1rem)] sm:w-[90%]">
+            <section className="mx-auto mt-30 h-auto w-[calc(100%-1rem)] sm:mt-8 sm:w-[90%] md:mt-0">
                 <div className="grid grid-cols-1 items-center gap-8 py-8 md:grid-cols-2 md:py-2">
                     <div className="flex min-w-0 flex-col items-start gap-8 md:gap-12">
                         <div className="flex w-full flex-col items-start gap-6">
@@ -49,7 +49,7 @@ const page = async () => {
                     <div className="flex w-full justify-center overflow-hidden">
                         <div className="w-full bg-gradient-to-b pt-8 sm:pt-[61px]">
                             <div className="p-4 sm:p-8">
-                                <img src="/assets/images/sign-up-banner.jpg" className="h-auto w-full rounded-2xl object-contain" alt="" />
+                                <img src={imageUrl + heroImageSection?.image?.data?.attributes?.url} className="h-auto w-full rounded-2xl object-contain" alt="" />
                             </div>
                         </div>
                     </div>

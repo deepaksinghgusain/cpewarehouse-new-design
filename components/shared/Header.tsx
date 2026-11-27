@@ -50,7 +50,7 @@ export const Header = () => {
             return (
                 <div className='z-10'>
                     <div className='w-[90%] mx-auto'>
-                        <header className="fixed left-0 top-0 z-40 w-full bg-white px-4 py-3 shadow-sm sm:px-6 sm:py-4 lg:pt-3">
+                        <header className="fixed left-0 top-0 z-40 w-full bg-white px-4 py-3 sm:px-6 sm:py-4 lg:pt-3">
                             <nav className="mx-auto grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 lg:flex lg:flex-nowrap lg:justify-between lg:gap-8">
                                 <div className="flex min-w-0 items-center">
                                     <Link href="/">
@@ -153,10 +153,13 @@ export const Header = () => {
                                     </Sheet>
                                 </div>
                             </nav >
+                        </header >
 
-                            <section className="hidden lg:block">
+                        <div aria-hidden="true" className="hidden h-[84px] lg:block" />
+
+                        <section className="hidden border-b border-gray-200 bg-white lg:block">
                             <div className="container mx-auto">
-                                <div className="flex min-h-[72px] items-center justify-center px-4 sm:px-8 lg:min-h-[50px]">
+                                <div className="flex min-h-[50px] items-center justify-center px-4 sm:px-8">
                                     <div className="flex items-center justify-center gap-4">
                                         <div className="hidden items-center justify-center gap-6 sm:flex">
                                             <div className="px-3 py-2 bg-white rounded-md justify-center items-center gap-2 flex overflow-hidden">
@@ -184,8 +187,6 @@ export const Header = () => {
                                 </div>
                             </div>
                         </section>
-                        </header >
-
 
                     </div>
                 </div>
