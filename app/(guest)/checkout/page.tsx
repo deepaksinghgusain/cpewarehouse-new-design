@@ -25,7 +25,7 @@ const getCheckoutItemPrice = (item: any) => {
     const discount = Number(attributes.discount ?? item.discount ?? 0);
     const discountedPrice = Number(attributes.discounted_price ?? item.discounted_price ?? 0);
 
-    if (discount !== 0) return Math.max(price - discount, 0);
+    if (discount !== 0) return Math.max(discount, 0);
     if (discountedPrice !== 0) return discountedPrice;
     return price;
 };
@@ -945,15 +945,11 @@ const CheckoutPage = () => {
                                                                     <div className="grow shrink basis-0 flex-col justify-start items-start gap-3 flex">
                                                                         <div className="self-stretch grow shrink basis-0 justify-center items-center gap-4 inline-flex">
                                                                             <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-                                                                                <button onClick={decreaseQty} disabled={cart.isUpdating} aria-label="Decrease quantity" className="px-3 py-2 cursor-pointer disabled:cursor-wait disabled:opacity-50"><Minus className="w-4 h-4" /></button>
-                                                                                <span className="flex min-w-8 justify-center px-2 text-sm" aria-live="polite">
-                                                                                    {cart.isUpdating
-                                                                                        ? <LoaderCircle className="h-4 w-4 animate-spin" aria-label="Updating quantity" />
-                                                                                        : qty}
-                                                                                </span>
-                                                                                <button onClick={increaseQty} disabled={cart.isUpdating} aria-label="Increase quantity" className="px-3 py-2 cursor-pointer disabled:cursor-wait disabled:opacity-50"><Plus className="w-4 h-4" /></button>
+                                                                                <button onClick={decreaseQty} className="px-3 py-2 cursor-pointer"><Minus className="w-4 h-4" /></button>
+                                                                                <span className="px-4 text-sm">{qty}</span>
+                                                                                <button onClick={increaseQty} className="px-3 py-2 cursor-pointer"><Plus className="w-4 h-4" /></button>
                                                                             </div>
-                                                                            <button onClick={removeItem} disabled={cart.isUpdating} aria-label="Remove item" className="ml-4 cursor-pointer disabled:cursor-wait disabled:opacity-50"><Trash2 className="w-5 h-5 text-red-500" /></button>
+                                                                            <button onClick={removeItem} className="ml-4 cursor-pointer"><Trash2 className="w-5 h-5 text-red-500" /></button>
                                                                         </div>
                                                                     </div>
                                                                 </div>

@@ -148,13 +148,11 @@ const EnrollNowCart = ({
 
     const price =
       normalized.discount != null && normalized.discount !== 0
-        ? Math.max(normalized.price - normalized.discount, 0)
+        ? Math.max(normalized.discount, 0)
         : normalized.discountedPrice != null && normalized.discountedPrice !== 0
           ? normalized.discountedPrice
           : normalized.price;
 
-
-    console.log("price", price, "discount", normalized.discount, "discountedPrice", normalized.discountedPrice);
 
     if (localStorage.getItem("token")) {
       const email = localStorage.getItem("email") || "";
@@ -181,6 +179,8 @@ const EnrollNowCart = ({
         total: totalprice,
         packageId: Number(isPackage ? courseid : 0),
       };
+
+      console.log(payload, "payload");
 
       toast.success(`Item ${normalized.title} is add to cart successfully`);
       dispatch(addToCartRequest(payload));
